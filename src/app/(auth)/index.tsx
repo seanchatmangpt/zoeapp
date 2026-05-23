@@ -192,7 +192,9 @@ export default function Auth() {
 
           {/* Features Preview */}
           <View className="bg-blue-50 rounded-xl border border-blue-200 p-4">
-            <Text className="text-blue-800 font-medium mb-2 text-center">✨ What's Inside</Text>
+            <Text className="text-blue-800 font-medium mb-2 text-center">
+              ✨ What&apos;s Inside
+            </Text>
             <Text className="text-blue-700 text-sm text-center leading-5">
               AI Assistant • Secure Authentication • Profile Management
             </Text>

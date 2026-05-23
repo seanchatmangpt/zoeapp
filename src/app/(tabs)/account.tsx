@@ -44,45 +44,37 @@ export default function Account() {
 
   // Load user profile when session changes
   useEffect(() => {
+    async function getProfile() {
+      try {
+        setLoading(true);
+        if (!session?.user) throw new Error('No user on the session!');
+
+        const { data, error, status } = await supabase
+          .from('profiles')
+          .select(`username, website, avatar_url`)
+          .eq('id', session?.user.id)
+          .single();
+
+        if (error && status !== 406) {
+          throw error;
+        }
+
+        if (data) {
+          setUsername(data.username);
+          setWebsite(data.website);
+          setAvatarUrl(data.avatar_url);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          Alert.alert('Error loading profile', error.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
     if (session) getProfile();
   }, [session]);
-
-  /**
-   * Fetches the user's profile data from Supabase
-   * Updates local state with username, website, and avatar URL
-   *
-   * @async
-   * @function getProfile
-   * @throws {Error} When no user session exists or database query fails
-   */
-  async function getProfile() {
-    try {
-      setLoading(true);
-      if (!session?.user) throw new Error('No user on the session!');
-
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', session?.user.id)
-        .single();
-
-      if (error && status !== 406) {
-        throw error;
-      }
-
-      if (data) {
-        setUsername(data.username || '');
-        setWebsite(data.website || '');
-        setAvatarUrl(data.avatar_url || '');
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert('Error loading profile', error.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
 
   /**
    * Updates the user's profile information in Supabase

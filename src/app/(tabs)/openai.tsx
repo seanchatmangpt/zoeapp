@@ -82,7 +82,7 @@ export default function OpenAIScreen() {
           </Text>
 
           <Text className="text-gray-700 mb-4 leading-6">
-            I'm an AI assistant that can help you with various tasks:
+            I&apos;m an AI assistant that can help you with various tasks:
           </Text>
 
           <View className="space-y-2 mb-4">
@@ -98,7 +98,7 @@ export default function OpenAIScreen() {
           <View className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
             <Text className="text-blue-800 text-sm font-medium mb-1">💡 Try asking:</Text>
             <Text className="text-blue-700 text-sm">
-              "Explain React Native hooks" or "Write a professional email"
+              &quot;Explain React Native hooks&quot; or &quot;Write a professional email&quot;
             </Text>
           </View>
         </View>
@@ -166,7 +166,7 @@ export default function OpenAIScreen() {
       {/* Footer */}
       <View className="mt-8 mb-6 px-6">
         <Text className="text-center text-xs text-gray-500 leading-5">
-          This AI assistant is powered by OpenAI's language models{'\n'}
+          This AI assistant is powered by OpenAI&apos;s language models{'\n'}
           via secure Supabase Edge Functions
         </Text>
       </View>

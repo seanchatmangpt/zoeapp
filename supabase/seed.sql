@@ -9,8 +9,7 @@
 --    - profiles table with RLS policies
 --    - Automatic profile creation on user signup
 --    - Edge Functions support
- -- Sample data (optional - uncomment if you want test users)
-/*
+-- Sample data (optional - uncomment if you want test users)
 -- Create a test user profile (you would normally do this through the app)
 INSERT INTO auth.users (
   id,
@@ -35,4 +34,3 @@ INSERT INTO auth.users (
 );
 
 -- The profile will be automatically created by the trigger
-*/

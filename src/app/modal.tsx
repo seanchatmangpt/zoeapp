@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, TouchableOpacity, ScrollView } from 'react-native';
-import { View, Text } from 'react-native';
+import { Platform, TouchableOpacity, ScrollView, View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 
