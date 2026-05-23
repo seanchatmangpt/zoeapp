@@ -1,5 +1,5 @@
+/// <reference types="jest" />
 /* eslint-disable @typescript-eslint/no-require-imports */
-import '@testing-library/jest-native/extend-expect';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -22,7 +22,7 @@ jest.mock('expo-router', () => {
       React.useEffect(effect, [effect]);
     },
     Stack: {
-      Screen: jest.fn(({ options }) => {
+      Screen: jest.fn(({ options }: any) => {
         const Right = options?.headerRight;
         const Left = options?.headerLeft;
         return React.createElement(
