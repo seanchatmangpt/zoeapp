@@ -54,21 +54,29 @@ export default function Auth() {
    * @throws {Error} When authentication fails
    */
   async function signInWithEmail() {
+    console.log('[Auth Debug] signInWithEmail called with:', { email, password });
     if (!email || !password) {
+      console.log('[Auth Debug] Validation failed: missing email or password');
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      Alert.alert('Sign In Error', error.message);
+      console.log('[Auth Debug] signInWithPassword result:', { data, error });
+      if (error) {
+        Alert.alert('Sign In Error', error.message);
+      }
+    } catch (e) {
+      console.error('[Auth Debug] Unexpected error during sign in:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   /**
@@ -105,7 +113,10 @@ export default function Auth() {
     <KeyboardAvoidingView
       className="flex-1 bg-gray-50"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled">
         <Stack.Screen options={{ title: 'Welcome' }} />
 
         {/* Header Section */}
