@@ -9,9 +9,7 @@ declare global {
 
     const env: Env;
 
-    function serve(
-      handler: (request: Request) => Response | Promise<Response>
-    ): void;
+    function serve(handler: (request: Request) => Response | Promise<Response>): void;
   }
 }
 

@@ -7,9 +7,9 @@
  * @version 1.0.0
  */
 
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { useSession } from "@/context/SessionProvider";
-import { Link } from "expo-router";
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { useSession } from '@/context/SessionProvider';
+import { Link } from 'expo-router';
 
 /**
  * Home screen component - main dashboard of the application
@@ -36,7 +36,7 @@ export default function HomeScreen() {
 
   // Extract user information from session
   const userEmail = session?.user?.email;
-  const userName = userEmail?.split("@")[0] || "User";
+  const userName = userEmail?.split('@')[0] || 'User';
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
@@ -46,17 +46,13 @@ export default function HomeScreen() {
           <Text className="text-2xl font-bold text-gray-900 mb-2">
             Welcome back, {userName}! 👋
           </Text>
-          <Text className="text-gray-600">
-            What would you like to do today?
-          </Text>
+          <Text className="text-gray-600">What would you like to do today?</Text>
         </View>
       </View>
 
       {/* Quick Actions */}
       <View className="px-4 mt-6">
-        <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">
-          Quick Actions
-        </Text>
+        <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">Quick Actions</Text>
 
         <View className="space-y-3">
           {/* AI Assistant Card */}
@@ -67,9 +63,7 @@ export default function HomeScreen() {
                   <Text className="text-2xl">🤖</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 mb-1">
-                    AI Assistant
-                  </Text>
+                  <Text className="text-lg font-semibold text-gray-900 mb-1">AI Assistant</Text>
                   <Text className="text-gray-600 text-sm">
                     Ask questions, get help, and explore AI capabilities
                   </Text>
@@ -87,12 +81,8 @@ export default function HomeScreen() {
                   <Text className="text-2xl">👤</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 mb-1">
-                    Account Settings
-                  </Text>
-                  <Text className="text-gray-600 text-sm">
-                    Manage your profile and preferences
-                  </Text>
+                  <Text className="text-lg font-semibold text-gray-900 mb-1">Account Settings</Text>
+                  <Text className="text-gray-600 text-sm">Manage your profile and preferences</Text>
                 </View>
                 <Text className="text-gray-400 text-xl">›</Text>
               </View>
@@ -103,46 +93,32 @@ export default function HomeScreen() {
 
       {/* Features Overview */}
       <View className="px-4 mt-8">
-        <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">
-          App Features
-        </Text>
+        <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">App Features</Text>
 
         <View className="bg-white rounded-xl border border-gray-100 shadow-sm">
           <View className="p-6">
-            <Text className="text-base font-medium text-gray-900 mb-4">
-              This app includes:
-            </Text>
+            <Text className="text-base font-medium text-gray-900 mb-4">This app includes:</Text>
 
             <View className="space-y-3">
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>
-                <Text className="text-gray-700 flex-1">
-                  Secure authentication with Supabase
-                </Text>
+                <Text className="text-gray-700 flex-1">Secure authentication with Supabase</Text>
               </View>
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>
-                <Text className="text-gray-700 flex-1">
-                  AI assistant powered by OpenAI
-                </Text>
+                <Text className="text-gray-700 flex-1">AI assistant powered by OpenAI</Text>
               </View>
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>
-                <Text className="text-gray-700 flex-1">
-                  Profile management and settings
-                </Text>
+                <Text className="text-gray-700 flex-1">Profile management and settings</Text>
               </View>
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>
-                <Text className="text-gray-700 flex-1">
-                  Modern React Native with Expo Router
-                </Text>
+                <Text className="text-gray-700 flex-1">Modern React Native with Expo Router</Text>
               </View>
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>
-                <Text className="text-gray-700 flex-1">
-                  Professional UI with NativeWind
-                </Text>
+                <Text className="text-gray-700 flex-1">Professional UI with NativeWind</Text>
               </View>
             </View>
           </View>
@@ -152,12 +128,8 @@ export default function HomeScreen() {
       {/* User Info */}
       <View className="px-4 mt-6 mb-8">
         <View className="bg-blue-50 rounded-xl border border-blue-200 p-4">
-          <Text className="text-blue-800 font-medium mb-1">
-            Current Session
-          </Text>
-          <Text className="text-blue-600 text-sm">
-            Logged in as: {userEmail}
-          </Text>
+          <Text className="text-blue-800 font-medium mb-1">Current Session</Text>
+          <Text className="text-blue-600 text-sm">Logged in as: {userEmail}</Text>
         </View>
       </View>
     </ScrollView>

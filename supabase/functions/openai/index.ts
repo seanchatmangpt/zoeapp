@@ -9,7 +9,7 @@
  * @version 1.0.0
  */
 
-import { OpenAI } from "npm:openai@^4.0.0";
+import { OpenAI } from 'npm:openai@^4.0.0';
 
 /**
  * Request interface for OpenAI API calls
@@ -46,10 +46,9 @@ interface ErrorResponse {
  * @constant {Object} corsHeaders
  */
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 /**
@@ -58,7 +57,7 @@ const corsHeaders = {
  * @constant {OpenAI} openai
  */
 const openai = new OpenAI({
-  apiKey: Deno.env.get("OPENAI_API_KEY") || "",
+  apiKey: Deno.env.get('OPENAI_API_KEY') || '',
 });
 
 /**
@@ -79,21 +78,18 @@ const openai = new OpenAI({
 Deno.serve(async (req: Request): Promise<Response> => {
   try {
     // Handle CORS preflight requests
-    if (req.method === "OPTIONS") {
-      return new Response("ok", {
+    if (req.method === 'OPTIONS') {
+      return new Response('ok', {
         headers: corsHeaders,
       });
     }
 
     // Only allow POST requests
-    if (req.method !== "POST") {
-      return new Response(
-        JSON.stringify({ error: "Method not allowed" } as ErrorResponse),
-        {
-          status: 405,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' } as ErrorResponse), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Parse and validate request body
@@ -103,57 +99,52 @@ Deno.serve(async (req: Request): Promise<Response> => {
     } catch {
       return new Response(
         JSON.stringify({
-          error: "Invalid JSON in request body",
+          error: 'Invalid JSON in request body',
         } as ErrorResponse),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
     }
 
     const { message } = requestBody;
 
-    if (
-      !message ||
-      typeof message !== "string" ||
-      message.trim().length === 0
-    ) {
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return new Response(
         JSON.stringify({
-          error: "Message is required and must be a non-empty string",
+          error: 'Message is required and must be a non-empty string',
         } as ErrorResponse),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
     }
 
     // Check if OpenAI API key is configured
-    if (!Deno.env.get("OPENAI_API_KEY")) {
+    if (!Deno.env.get('OPENAI_API_KEY')) {
       return new Response(
         JSON.stringify({
-          error: "OpenAI API key not configured",
+          error: 'OpenAI API key not configured',
         } as ErrorResponse),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         }
       );
     }
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: 'gpt-3.5-turbo',
       messages: [
         {
-          role: "system",
-          content:
-            "You are a helpful AI assistant. Provide concise and helpful responses.",
+          role: 'system',
+          content: 'You are a helpful AI assistant. Provide concise and helpful responses.',
         },
         {
-          role: "user",
+          role: 'user',
           content: message.trim(),
         },
       ],
@@ -169,25 +160,25 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify(responseData), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error("OpenAI API Error:", error);
+    console.error('OpenAI API Error:', error);
 
     // Handle different types of errors
-    let errorMessage = "Failed to process your request";
+    let errorMessage = 'Failed to process your request';
     let details: string | undefined;
 
     if (error instanceof Error) {
       details = error.message;
 
       // Handle specific OpenAI errors
-      if (error.message.includes("API key")) {
-        errorMessage = "Invalid OpenAI API key";
-      } else if (error.message.includes("quota")) {
-        errorMessage = "OpenAI API quota exceeded";
-      } else if (error.message.includes("rate limit")) {
-        errorMessage = "OpenAI API rate limit exceeded";
+      if (error.message.includes('API key')) {
+        errorMessage = 'Invalid OpenAI API key';
+      } else if (error.message.includes('quota')) {
+        errorMessage = 'OpenAI API quota exceeded';
+      } else if (error.message.includes('rate limit')) {
+        errorMessage = 'OpenAI API rate limit exceeded';
       }
     }
 
@@ -198,7 +189,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify(errorResponse), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

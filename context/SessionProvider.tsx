@@ -7,9 +7,9 @@
  * @version 1.0.0
  */
 
-import React, { createContext, useState, useEffect, useContext } from "react";
-import { supabase } from "../lib/supabase";
-import { Session } from "@supabase/supabase-js";
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 /**
  * Session context interface
@@ -46,11 +46,7 @@ const SessionContext = createContext<SessionContextType>({
  *   <App />
  * </SessionProvider>
  */
-export const SessionProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
   /** Current authentication session */
   const [session, setSession] = useState<Session | null>(null);
 
@@ -58,39 +54,28 @@ export const SessionProvider = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("SessionProvider useEffect triggered");
+    console.log('SessionProvider useEffect triggered');
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("SessionProvider getSession result:", session);
+      console.log('SessionProvider getSession result:', session);
       setSession(session);
       setLoading(false);
     });
 
     // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        console.log(
-          "SessionProvider onAuthStateChange event:",
-          _event,
-          "session:",
-          session
-        );
-        setSession(session);
-        setLoading(false);
-      }
-    );
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('SessionProvider onAuthStateChange event:', _event, 'session:', session);
+      setSession(session);
+      setLoading(false);
+    });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
 
-  return (
-    <SessionContext.Provider value={{ session, loading }}>
-      {children}
-    </SessionContext.Provider>
-  );
+  return <SessionContext.Provider value={{ session, loading }}>{children}</SessionContext.Provider>;
 };
 
 /**

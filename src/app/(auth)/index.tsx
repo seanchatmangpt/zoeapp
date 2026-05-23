@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Alert,
   View,
@@ -17,9 +17,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-} from "react-native";
-import { supabase } from "../../../lib/supabase";
-import { Stack } from "expo-router";
+} from 'react-native';
+import { supabase } from '../../../lib/supabase';
+import { Stack } from 'expo-router';
 
 /**
  * Authentication component with sign in and sign up functionality
@@ -34,10 +34,10 @@ import { Stack } from "expo-router";
  */
 export default function Auth() {
   /** User's email address */
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
 
   /** User's password */
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
 
   /** Loading state during authentication */
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function Auth() {
    */
   async function signInWithEmail() {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
@@ -66,7 +66,7 @@ export default function Auth() {
     });
 
     if (error) {
-      Alert.alert("Sign In Error", error.message);
+      Alert.alert('Sign In Error', error.message);
     }
     setLoading(false);
   }
@@ -81,12 +81,12 @@ export default function Auth() {
    */
   async function signUpWithEmail() {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
+      Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
@@ -94,9 +94,9 @@ export default function Auth() {
     const { error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
-      Alert.alert("Sign Up Error", error.message);
+      Alert.alert('Sign Up Error', error.message);
     } else {
-      Alert.alert("Success", "Check your email for verification link!");
+      Alert.alert('Success', 'Check your email for verification link!');
     }
     setLoading(false);
   }
@@ -104,10 +104,9 @@ export default function Auth() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-gray-50"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1 }}>
-        <Stack.Screen options={{ title: "Welcome" }} />
+        <Stack.Screen options={{ title: 'Welcome' }} />
 
         {/* Header Section */}
         <View className="flex-1 justify-center px-6 py-12">
@@ -120,22 +119,20 @@ export default function Auth() {
             </Text>
             <Text className="text-gray-600 text-center leading-6">
               {isSignUp
-                ? "Create your account to get started with AI-powered features"
-                : "Sign in to access your AI assistant and more"}
+                ? 'Create your account to get started with AI-powered features'
+                : 'Sign in to access your AI assistant and more'}
             </Text>
           </View>
 
           {/* Form Card */}
           <View className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <Text className="text-xl font-semibold text-gray-900 mb-6 text-center">
-              {isSignUp ? "Create Account" : "Sign In"}
+              {isSignUp ? 'Create Account' : 'Sign In'}
             </Text>
 
             {/* Email Input */}
             <View className="mb-4">
-              <Text className="text-base font-medium text-gray-700 mb-2">
-                Email Address
-              </Text>
+              <Text className="text-base font-medium text-gray-700 mb-2">Email Address</Text>
               <TextInput
                 className="border border-gray-300 rounded-lg p-4 text-base text-gray-900 bg-white"
                 onChangeText={setEmail}
@@ -150,17 +147,13 @@ export default function Auth() {
 
             {/* Password Input */}
             <View className="mb-6">
-              <Text className="text-base font-medium text-gray-700 mb-2">
-                Password
-              </Text>
+              <Text className="text-base font-medium text-gray-700 mb-2">Password</Text>
               <TextInput
                 className="border border-gray-300 rounded-lg p-4 text-base text-gray-900 bg-white"
                 onChangeText={setPassword}
                 value={password}
                 secureTextEntry={true}
-                placeholder={
-                  isSignUp ? "Minimum 6 characters" : "Enter your password"
-                }
+                placeholder={isSignUp ? 'Minimum 6 characters' : 'Enter your password'}
                 placeholderTextColor="#9CA3AF"
                 autoCapitalize="none"
               />
@@ -174,25 +167,15 @@ export default function Auth() {
             {/* Submit Button */}
             <TouchableOpacity
               className={`rounded-lg py-4 px-6 mb-4 ${
-                loading || !email || !password
-                  ? "bg-gray-300"
-                  : "bg-blue-600 active:bg-blue-700"
+                loading || !email || !password ? 'bg-gray-300' : 'bg-blue-600 active:bg-blue-700'
               }`}
               onPress={isSignUp ? signUpWithEmail : signInWithEmail}
-              disabled={loading || !email || !password}
-            >
+              disabled={loading || !email || !password}>
               <Text
                 className={`text-center font-semibold ${
-                  loading || !email || !password
-                    ? "text-gray-500"
-                    : "text-white"
-                }`}
-              >
-                {loading
-                  ? "⏳ Please wait..."
-                  : isSignUp
-                  ? "🎉 Create Account"
-                  : "🔑 Sign In"}
+                  loading || !email || !password ? 'text-gray-500' : 'text-white'
+                }`}>
+                {loading ? '⏳ Please wait...' : isSignUp ? '🎉 Create Account' : '🔑 Sign In'}
               </Text>
             </TouchableOpacity>
 
@@ -200,21 +183,16 @@ export default function Auth() {
             <TouchableOpacity
               className="py-3"
               onPress={() => setIsSignUp(!isSignUp)}
-              disabled={loading}
-            >
+              disabled={loading}>
               <Text className="text-center text-blue-600 font-medium">
-                {isSignUp
-                  ? "Already have an account? Sign In"
-                  : "Don't have an account? Sign Up"}
+                {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
               </Text>
             </TouchableOpacity>
           </View>
 
           {/* Features Preview */}
           <View className="bg-blue-50 rounded-xl border border-blue-200 p-4">
-            <Text className="text-blue-800 font-medium mb-2 text-center">
-              ✨ What's Inside
-            </Text>
+            <Text className="text-blue-800 font-medium mb-2 text-center">✨ What's Inside</Text>
             <Text className="text-blue-700 text-sm text-center leading-5">
               AI Assistant • Secure Authentication • Profile Management
             </Text>

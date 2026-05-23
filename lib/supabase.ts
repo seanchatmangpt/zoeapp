@@ -7,15 +7,15 @@
  * @version 1.0.0
  */
 
-import "react-native-url-polyfill/auto";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient } from "@supabase/supabase-js";
+import 'react-native-url-polyfill/auto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createClient } from '@supabase/supabase-js';
 
 /** Supabase project URL from environment variables */
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || "";
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 
 /** Supabase anonymous key from environment variables */
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
 /**
  * Configured Supabase client instance

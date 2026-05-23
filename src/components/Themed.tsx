@@ -20,9 +20,9 @@ export function useThemedColor(styleType: 'text' | 'background') {
   const theme = useColorScheme();
 
   if (styleType === 'background') {
-    return (theme === 'light') ? 'bg-light-background' : 'bg-dark-background';
+    return theme === 'light' ? 'bg-light-background' : 'bg-dark-background';
   } else if (styleType === 'text') {
-    return (theme === 'light') ? 'text-light-text' : 'text-dark-text';
+    return theme === 'light' ? 'text-light-text' : 'text-dark-text';
   }
 }
 
@@ -30,18 +30,12 @@ export function Text(props: TextProps) {
   const { className, ...otherProps } = props;
   const textColor = useThemedColor('text');
 
-  return <DefaultText className={cn(
-    textColor,
-    className
-  )} {...otherProps} />;
+  return <DefaultText className={cn(textColor, className)} {...otherProps} />;
 }
 
 export function View(props: ViewProps) {
   const { className, ...otherProps } = props;
   const backgroundColor = useThemedColor('background');
 
-  return <DefaultView className={cn(
-    backgroundColor,
-    className
-  )} {...otherProps} />;
+  return <DefaultView className={cn(backgroundColor, className)} {...otherProps} />;
 }

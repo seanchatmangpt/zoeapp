@@ -7,17 +7,10 @@
  * @version 1.0.0
  */
 
-import { useState } from "react";
-import {
-  View,
-  TextInput,
-  Text,
-  Alert,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import { supabase } from "../../../lib/supabase";
-import { Stack } from "expo-router";
+import { useState } from 'react';
+import { View, TextInput, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { supabase } from '../../../lib/supabase';
+import { Stack } from 'expo-router';
 
 /**
  * OpenAI Assistant screen component
@@ -32,10 +25,10 @@ import { Stack } from "expo-router";
  */
 export default function OpenAIScreen() {
   /** User's input prompt/question */
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState('');
 
   /** AI response from OpenAI */
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState('');
 
   /** Loading state during API calls */
   const [loading, setLoading] = useState(false);
@@ -50,17 +43,17 @@ export default function OpenAIScreen() {
    */
   const callOpenAIFunction = async () => {
     if (!prompt) {
-      Alert.alert("Please enter a prompt");
+      Alert.alert('Please enter a prompt');
       return;
     }
 
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke("openai", {
+    const { data, error } = await supabase.functions.invoke('openai', {
       body: { message: prompt },
     });
 
     if (error) {
-      Alert.alert("Error", error.message || "Failed to get AI response");
+      Alert.alert('Error', error.message || 'Failed to get AI response');
     } else {
       setResponse(data.message);
     }
@@ -69,14 +62,12 @@ export default function OpenAIScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <Stack.Screen options={{ title: "AI Assistant" }} />
+      <Stack.Screen options={{ title: 'AI Assistant' }} />
 
       {/* Header Section */}
       <View className="bg-white border-b border-gray-200">
         <View className="px-6 py-8 items-center">
-          <Text className="text-3xl font-bold text-gray-900 mb-2">
-            🤖 AI Assistant
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900 mb-2">🤖 AI Assistant</Text>
           <Text className="text-sm text-gray-600 text-center">
             Powered by OpenAI & Supabase Edge Functions
           </Text>
@@ -99,19 +90,13 @@ export default function OpenAIScreen() {
               • Answer questions and explain concepts
             </Text>
             <Text className="text-gray-600">• Write and edit content</Text>
-            <Text className="text-gray-600">
-              • Solve problems and brainstorm ideas
-            </Text>
-            <Text className="text-gray-600">
-              • Code assistance and debugging
-            </Text>
+            <Text className="text-gray-600">• Solve problems and brainstorm ideas</Text>
+            <Text className="text-gray-600">• Code assistance and debugging</Text>
             <Text className="text-gray-600">• Research and analysis</Text>
           </View>
 
           <View className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-            <Text className="text-blue-800 text-sm font-medium mb-1">
-              💡 Try asking:
-            </Text>
+            <Text className="text-blue-800 text-sm font-medium mb-1">💡 Try asking:</Text>
             <Text className="text-blue-700 text-sm">
               "Explain React Native hooks" or "Write a professional email"
             </Text>
@@ -134,24 +119,20 @@ export default function OpenAIScreen() {
             onChangeText={setPrompt}
             multiline
             textAlignVertical="top"
-            style={{ fontFamily: "System" }}
+            style={{ fontFamily: 'System' }}
           />
 
           <TouchableOpacity
             className={`mt-4 rounded-lg py-4 px-6 ${
-              loading || !prompt.trim()
-                ? "bg-gray-300"
-                : "bg-blue-600 active:bg-blue-700"
+              loading || !prompt.trim() ? 'bg-gray-300' : 'bg-blue-600 active:bg-blue-700'
             }`}
             onPress={callOpenAIFunction}
-            disabled={loading || !prompt.trim()}
-          >
+            disabled={loading || !prompt.trim()}>
             <Text
               className={`text-center font-semibold ${
-                loading || !prompt.trim() ? "text-gray-500" : "text-white"
-              }`}
-            >
-              {loading ? "🧠 AI is thinking..." : "✨ Ask AI"}
+                loading || !prompt.trim() ? 'text-gray-500' : 'text-white'
+              }`}>
+              {loading ? '🧠 AI is thinking...' : '✨ Ask AI'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -161,12 +142,8 @@ export default function OpenAIScreen() {
       {loading && (
         <View className="mx-4 mt-4 bg-blue-50 rounded-xl border border-blue-200">
           <View className="p-6 items-center">
-            <Text className="text-blue-800 font-medium">
-              Processing your request...
-            </Text>
-            <Text className="text-blue-600 text-sm mt-1">
-              This may take a few seconds
-            </Text>
+            <Text className="text-blue-800 font-medium">Processing your request...</Text>
+            <Text className="text-blue-600 text-sm mt-1">This may take a few seconds</Text>
           </View>
         </View>
       )}
@@ -176,15 +153,11 @@ export default function OpenAIScreen() {
         <View className="mx-4 mt-4 bg-white rounded-xl shadow-sm border border-gray-100">
           <View className="p-6">
             <View className="flex-row items-center mb-4">
-              <Text className="text-lg font-semibold text-green-700">
-                🤖 AI Response
-              </Text>
+              <Text className="text-lg font-semibold text-green-700">🤖 AI Response</Text>
             </View>
 
             <View className="bg-gray-50 border-l-4 border-green-500 rounded-r-lg p-4">
-              <Text className="text-gray-900 leading-6 text-base">
-                {response}
-              </Text>
+              <Text className="text-gray-900 leading-6 text-base">{response}</Text>
             </View>
           </View>
         </View>
@@ -193,7 +166,7 @@ export default function OpenAIScreen() {
       {/* Footer */}
       <View className="mt-8 mb-6 px-6">
         <Text className="text-center text-xs text-gray-500 leading-5">
-          This AI assistant is powered by OpenAI's language models{"\n"}
+          This AI assistant is powered by OpenAI's language models{'\n'}
           via secure Supabase Edge Functions
         </Text>
       </View>

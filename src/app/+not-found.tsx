@@ -1,10 +1,10 @@
-import { Link, Stack } from "expo-router";
-import { Text, View, TouchableOpacity } from "react-native";
+import { Link, Stack } from 'expo-router';
+import { Text, View, TouchableOpacity } from 'react-native';
 
 export default function NotFoundScreen() {
   return (
     <>
-      <Stack.Screen options={{ title: "Page Not Found" }} />
+      <Stack.Screen options={{ title: 'Page Not Found' }} />
       <View className="flex-1 bg-gray-50 items-center justify-center px-6">
         {/* Error Illustration */}
         <View className="items-center mb-8">
@@ -25,24 +25,16 @@ export default function NotFoundScreen() {
             What happened?
           </Text>
           <View className="space-y-2">
-            <Text className="text-gray-600 text-sm">
-              • The URL might be incorrect
-            </Text>
-            <Text className="text-gray-600 text-sm">
-              • The page might have been removed
-            </Text>
-            <Text className="text-gray-600 text-sm">
-              • You might not have permission
-            </Text>
+            <Text className="text-gray-600 text-sm">• The URL might be incorrect</Text>
+            <Text className="text-gray-600 text-sm">• The page might have been removed</Text>
+            <Text className="text-gray-600 text-sm">• You might not have permission</Text>
           </View>
         </View>
 
         {/* Action Button */}
         <Link href="/" asChild>
           <TouchableOpacity className="bg-blue-600 rounded-lg py-4 px-8 w-full max-w-sm active:bg-blue-700">
-            <Text className="text-white font-semibold text-center">
-              🏠 Return to Home
-            </Text>
+            <Text className="text-white font-semibold text-center">🏠 Return to Home</Text>
           </TouchableOpacity>
         </Link>
 

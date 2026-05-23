@@ -8,9 +8,7 @@ export default function EditScreenInfo({ path }: { path: string }) {
   return (
     <View>
       <View className="items-center mx-12">
-        <Text className="text-lg text-center">
-          Open up the code for this screen:
-        </Text>
+        <Text className="text-lg text-center">Open up the code for this screen:</Text>
 
         <View className="rounded px-1 my-2">
           <MonoText>{path}</MonoText>
