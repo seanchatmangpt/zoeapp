@@ -1,4 +1,4 @@
-package com.truex.zoeapp
+package com.truex.membraneclient
 
 import android.app.Application
 import android.content.res.Configuration

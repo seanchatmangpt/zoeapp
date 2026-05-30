@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { View, TextInput, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { supabase } from '../../../lib/supabase';
-import { Stack } from 'expo-router';
+import { Stack } from '@/src/components/AvatarRelativeProjection';
 
 /**
  * OpenAI Assistant Avatar-Relative Projection component

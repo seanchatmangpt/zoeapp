@@ -1,4 +1,4 @@
-appId: com.truex.zoeapp
+appId: com.truex.membraneclient
 ---
 - launchApp:
     clearState: true

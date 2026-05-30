@@ -1,4 +1,5 @@
-import { Link, Stack } from 'expo-router';
+import { Link } from 'expo-router';
+import { Stack } from '@/src/components/AvatarRelativeProjection';
 import { Text, View, TouchableOpacity } from 'react-native';
 
 export default function NotFoundAvatarRelativeProjection() {

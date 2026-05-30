@@ -1,13 +1,8 @@
 import React from 'react';
 import { Stack as ExpoStack, Tabs as ExpoTabs } from 'expo-router';
 
-type CustomStackType = typeof ExpoStack & {
-  AvatarRelativeProjection: typeof ExpoStack.Screen;
-};
-
-type CustomTabsType = typeof ExpoTabs & {
-  AvatarRelativeProjection: typeof ExpoTabs.Screen;
-};
+type CustomStackType = any;
+type CustomTabsType = any;
 
 const StackComponent = React.forwardRef<any, any>(({ avatarRelativeProjectionOptions, screenOptions, ...props }, ref) => {
   return (

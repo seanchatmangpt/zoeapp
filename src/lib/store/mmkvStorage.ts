@@ -3,7 +3,7 @@ import { createMMKV } from 'react-native-mmkv';
 
 // Initialize a dedicated MMKV instance for Zustand stores
 export const mmkvInstance = createMMKV({
-  id: '@truex/membrane-client-zustand-storage',
+  id: 'zoeapp-zustand-storage',
 });
 
 /**

@@ -15,14 +15,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.truex.zoeapp"
+      "bundleIdentifier": "com.truex.membraneclient"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.truex.zoeapp"
+      "package": "com.truex.membraneclient"
     },
     "web": {
       "bundler": "metro",

@@ -1,4 +1,4 @@
-appId: com.anonymous.expo-supabase-ai-template
+appId: com.truex.membraneclient
 ---
 - launchApp:
     clearState: true

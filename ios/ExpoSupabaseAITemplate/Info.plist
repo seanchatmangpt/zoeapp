@@ -28,7 +28,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>myapp</string>
-				<string>com.truex.zoeapp</string>
+				<string>com.truex.membraneclient</string>
 			</array>
 		</dict>
 	</array>
