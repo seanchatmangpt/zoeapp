@@ -18,6 +18,13 @@ jest.mock('expo-router', () => {
   };
 });
 
+jest.mock('../../lib/actor/actorOps', () => {
+  const mockStore = (selector: any) => selector({ latestReceipt: null });
+  return {
+    useActorOpsStore: mockStore,
+  };
+});
+
 describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();

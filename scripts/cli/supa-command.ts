@@ -80,7 +80,7 @@ export const supaCommand = defineCommand({
             consola.info('Verifying database schema tables and views...');
             // In a real check, query schema, here we check migration files
             const projectRoot = process.cwd();
-            const actorMigration = path.resolve(projectRoot, 'supabase/migrations/20260523000000_actor_tables.sql');
+            const actorMigration = path.resolve(projectRoot, 'supabase/migrations/20260523000002_actor_tables.sql');
             if (fs.existsSync(actorMigration)) {
               consola.success('  actor_tables migration file verified');
             }

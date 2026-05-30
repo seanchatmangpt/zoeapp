@@ -56,7 +56,7 @@ export class MembraneContext {
         commandId,
         capabilityId,
         timestamp,
-        verdict: 'allow',
+        verdict,
         success: true,
         deltaHash: receiptHash,
         previousHash: prevHash

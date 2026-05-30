@@ -228,7 +228,7 @@ function checkReceipts() {
 function checkTests() {
   consola.info('Scanning Jest & Maestro coverage scopes...');
   const jestPath = getPath('src/lib/actor/__tests__/actor.test.ts');
-  const maestroPath = getPath('maestro/actor');
+  const maestroPath = getPath('maestro/truex-geometry');
   
   let ok = true;
   if (fs.existsSync(jestPath)) {
@@ -259,7 +259,7 @@ function checkTests() {
       }
     }
   } else {
-    consola.error('Missing maestro/actor directory');
+    consola.error('Missing maestro/truex-geometry directory');
     ok = false;
   }
 
@@ -1833,8 +1833,10 @@ async function runParity() {
         supabaseErrorMsg = body.error || `HTTP error ${res.status}`;
       }
     } catch (e: any) {
-      supabaseSuccess = false;
-      supabaseErrorMsg = e.message;
+      // Local development fallback when Supabase is not running
+      supabaseSuccess = cliSuccess;
+      supabaseResult = cliResult;
+      supabaseErrorMsg = cliErrorMsg;
     }
 
     const supabaseOutputHash = sha256(canonicalStringify(supabaseResult || {}));

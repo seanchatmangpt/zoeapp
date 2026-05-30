@@ -91,7 +91,7 @@ export default function ConsequenceSupervisionAvatarRelativeProjection() {
 
         <View className="space-y-3">
           {/* Truex Admin Console Card */}
-          <Link href={"/admin/dashboard" as any} asChild>
+          <Link href={"/admin/consequence-supervision" as any} asChild>
             <TouchableOpacity className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm active:bg-gray-50">
               <View className="flex-row items-center">
                 <View className="bg-blue-100 rounded-full p-3 mr-4">

@@ -12,7 +12,7 @@ import { count, eq, desc, or } from 'drizzle-orm';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { generateReceiptHash } from '../../lib/crypto/receipts';
 
-export default function AdminDashboard() {
+export default function AdminConsequenceSupervision() {
   const router = useRouter();
   const { outboxCount, quarantineCount, latestReceipt, networkOnline, setCounts } = useActorOpsStore();
   
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
   }, []);
 
   const adminModules = [
-    { name: 'Dashboard', route: '/admin/dashboard', icon: 'dashboard', color: '#3B82F6' },
+    { name: 'Consequence Supervision', route: '/admin/consequence-supervision', icon: 'dashboard', color: '#3B82F6' },
     { name: 'Church Profile', route: '/admin/church', icon: 'institution', color: '#10B981' },
     { name: 'Content', route: '/admin/content', icon: 'file-text-o', color: '#8B5CF6' },
     { name: 'Sermons', route: '/admin/sermons', icon: 'microphone', color: '#F59E0B' },
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <AdminShell title="ActorOps Console" subtitle="Authoritative Command Engine Admin Dashboard" scrollable={true}>
+    <AdminShell title="ActorOps Console" subtitle="Authoritative Command Engine Admin Consequence Supervision" scrollable={true}>
       
       {/* Diagnostics Grid Section */}
       <Text style={styles.sectionHeader}>Mission Control Diagnostics</Text>

@@ -110,11 +110,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   participant,
 }) => {
   const { session, loading } = useSession();
+  const latestReceipt = require('../lib/actor/actorOps').useActorOpsStore((state: any) => state.latestReceipt);
   const [receiptVerified, setReceiptVerified] = React.useState(false);
   const [checkingReceipt, setCheckingReceipt] = React.useState(!!route.requiredReceiptCommandId);
 
   React.useEffect(() => {
     let active = true;
+    let mmkvListener: { remove: () => void } | null = null;
+
     async function verifyReceipt() {
       if (!route.requiredReceiptCommandId) {
         if (active) {
@@ -200,10 +203,28 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     verifyReceipt();
 
+    // Subscribe to MMKV changes dynamically
+    try {
+      const { mmkvInstance } = require('../lib/store/mmkvStorage');
+      mmkvListener = mmkvInstance.addOnValueChangedListener((key: string) => {
+        if (
+          key === `receipt_${route.requiredReceiptCommandId}` ||
+          key === `receipt_hash_${route.requiredReceiptCommandId}`
+        ) {
+          verifyReceipt();
+        }
+      });
+    } catch (err) {
+      console.warn('Failed to subscribe to MMKV changes in ProtectedRoute:', err);
+    }
+
     return () => {
       active = false;
+      if (mmkvListener) {
+        mmkvListener.remove();
+      }
     };
-  }, [route.requiredReceiptCommandId, route.requiredReceiptDeltaHash]);
+  }, [route.requiredReceiptCommandId, route.requiredReceiptDeltaHash, latestReceipt]);
 
   // If loading and no explicit participant is provided, render loading UI
   if (loading && !participant) {

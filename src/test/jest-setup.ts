@@ -74,3 +74,31 @@ jest.mock('@expo/vector-icons', () => {
     Ionicons: (props: any) => React.createElement('View', props),
   };
 });
+
+// Mock react-native-mmkv globally
+jest.mock('react-native-mmkv', () => {
+  const instances: Record<string, any> = {};
+  return {
+    createMMKV: jest.fn((options?: { id?: string }) => {
+      const id = options?.id || 'default';
+      if (!instances[id]) {
+        const store: Record<string, string> = {};
+        instances[id] = {
+          id,
+          set: jest.fn((key: string, val: string) => {
+            store[key] = val;
+          }),
+          getString: jest.fn((key: string) => {
+            return store[key] !== undefined ? store[key] : undefined;
+          }),
+          remove: jest.fn((key: string) => {
+            delete store[key];
+          }),
+          addOnValueChangedListener: jest.fn(() => ({ remove: jest.fn() })),
+          _store: store,
+        };
+      }
+      return instances[id];
+    }),
+  };
+});

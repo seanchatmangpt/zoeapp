@@ -17,7 +17,7 @@ export function AdminShell({ title, subtitle, children, scrollable = true }: Adm
     if (router.canGoBack()) {
       router.back();
     } else {
-      router.replace('/admin/dashboard' as any);
+      router.replace('/admin/consequence-supervision' as any);
     }
   };
 
