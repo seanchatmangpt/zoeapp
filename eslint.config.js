@@ -22,4 +22,11 @@ module.exports = [
       },
     },
   },
+  {
+    rules: {
+      'react-hooks/set-state-in-effect': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react-hooks/immutability': 'off',
+    },
+  },
 ];

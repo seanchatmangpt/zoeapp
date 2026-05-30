@@ -164,3 +164,192 @@ export function generateReceiptHash(previousHash: string | null | undefined, dat
   const dataStr = canonicalStringify(data);
   return sha256(prev + dataStr);
 }
+
+const IV = [
+  0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+  0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+];
+
+const MSG_PERMUTATION = [2, 6, 3, 10, 7, 0, 4, 13, 1, 11, 12, 5, 9, 14, 15, 8];
+
+const CHUNK_START = 1 << 0;
+const CHUNK_END = 1 << 1;
+const PARENT = 1 << 2;
+const ROOT = 1 << 3;
+
+function blake3G(v: number[], a: number, b: number, c: number, d: number, x: number, y: number) {
+  v[a] = (v[a] + v[b] + x) | 0;
+  v[d] = rightRotate(v[d] ^ v[a], 16);
+  v[c] = (v[c] + v[d]) | 0;
+  v[b] = rightRotate(v[b] ^ v[c], 12);
+  v[a] = (v[a] + v[b] + y) | 0;
+  v[d] = rightRotate(v[d] ^ v[a], 8);
+  v[c] = (v[c] + v[d]) | 0;
+  v[b] = rightRotate(v[b] ^ v[c], 7);
+}
+
+function rightRotate(x: number, n: number): number {
+  return (x >>> n) | (x << (32 - n));
+}
+
+function compressBlake3(
+  chainingValue: number[],
+  blockWords: number[],
+  counterLow: number,
+  counterHigh: number,
+  blockLen: number,
+  flags: number
+): number[] {
+  const v = [
+    chainingValue[0], chainingValue[1], chainingValue[2], chainingValue[3],
+    chainingValue[4], chainingValue[5], chainingValue[6], chainingValue[7],
+    IV[0], IV[1], IV[2], IV[3],
+    counterLow, counterHigh,
+    blockLen, flags
+  ];
+
+  let m = [...blockWords];
+
+  for (let round = 0; round < 7; round++) {
+    if (round > 0) {
+      const nextM = new Array(16);
+      for (let i = 0; i < 16; i++) {
+        nextM[i] = m[MSG_PERMUTATION[i]];
+      }
+      m = nextM;
+    }
+    // Column step
+    blake3G(v, 0, 4, 8, 12, m[0], m[1]);
+    blake3G(v, 1, 5, 9, 13, m[2], m[3]);
+    blake3G(v, 2, 6, 10, 14, m[4], m[5]);
+    blake3G(v, 3, 7, 11, 15, m[6], m[7]);
+    // Diagonal step
+    blake3G(v, 0, 5, 10, 15, m[8], m[9]);
+    blake3G(v, 1, 6, 11, 12, m[10], m[11]);
+    blake3G(v, 2, 7, 8, 13, m[12], m[13]);
+    blake3G(v, 3, 4, 9, 14, m[14], m[15]);
+  }
+
+  return [
+    v[0] ^ v[8],
+    v[1] ^ v[9],
+    v[2] ^ v[10],
+    v[3] ^ v[11],
+    v[4] ^ v[12],
+    v[5] ^ v[13],
+    v[6] ^ v[14],
+    v[7] ^ v[15]
+  ];
+}
+
+function bytesToWords(bytes: number[], start: number, end: number): number[] {
+  const words = new Array(16).fill(0);
+  for (let i = 0; i < 16; i++) {
+    const offset = start + i * 4;
+    let w = 0;
+    if (offset < end) w |= bytes[offset];
+    if (offset + 1 < end) w |= bytes[offset + 1] << 8;
+    if (offset + 2 < end) w |= bytes[offset + 2] << 16;
+    if (offset + 3 < end) w |= bytes[offset + 3] << 24;
+    words[i] = w;
+  }
+  return words;
+}
+
+/**
+ * Pure JavaScript implementation of the BLAKE3 cryptographic hash function.
+ */
+export function blake3(message: string): string {
+  const bytes = stringToUtf8ByteArray(message);
+  const chunkSize = 1024;
+  const chunkOutputs: number[][] = [];
+  
+  let chunkIndex = 0;
+  let start = 0;
+  
+  if (bytes.length === 0) {
+    const words = new Array(16).fill(0);
+    const hashWords = compressBlake3(IV, words, 0, 0, 0, CHUNK_START | CHUNK_END | ROOT);
+    return hashWords.map(w => {
+      const unsigned = w < 0 ? w + 0x100000000 : w;
+      const b0 = unsigned & 0xff;
+      const b1 = (unsigned >> 8) & 0xff;
+      const b2 = (unsigned >> 16) & 0xff;
+      const b3 = (unsigned >> 24) & 0xff;
+      return [b0, b1, b2, b3].map(b => b.toString(16).padStart(2, '0')).join('');
+    }).join('');
+  }
+  
+  while (start < bytes.length) {
+    const end = Math.min(start + chunkSize, bytes.length);
+    const chunkBytes = bytes.slice(start, end);
+    
+    let cv = [...IV];
+    const numBlocks = Math.ceil(chunkBytes.length / 64);
+    
+    for (let blockIdx = 0; blockIdx < numBlocks; blockIdx++) {
+      const blockStart = blockIdx * 64;
+      const blockEnd = Math.min(blockStart + 64, chunkBytes.length);
+      const blockLen = blockEnd - blockStart;
+      const words = bytesToWords(chunkBytes, blockStart, blockEnd);
+      
+      let flags = 0;
+      if (blockIdx === 0) flags |= CHUNK_START;
+      if (blockIdx === numBlocks - 1) flags |= CHUNK_END;
+      
+      if (end === bytes.length && blockIdx === numBlocks - 1) {
+        flags |= ROOT;
+      }
+      
+      const counterLow = chunkIndex & 0xffffffff;
+      const counterHigh = Math.floor(chunkIndex / 0x100000000);
+      
+      cv = compressBlake3(cv, words, counterLow, counterHigh, blockLen, flags);
+    }
+    
+    chunkOutputs.push(cv);
+    chunkIndex++;
+    start = end;
+  }
+  
+  let currentLevel = chunkOutputs;
+  while (currentLevel.length > 1) {
+    const nextLevel: number[][] = [];
+    for (let i = 0; i < currentLevel.length; i += 2) {
+      if (i + 1 < currentLevel.length) {
+        const left = currentLevel[i];
+        const right = currentLevel[i + 1];
+        const parentWords = [...left, ...right];
+        
+        let flags = PARENT;
+        if (i + 2 >= currentLevel.length && nextLevel.length === 0) {
+          if (currentLevel.length === 2) {
+            flags |= ROOT;
+          }
+        }
+        
+        const cv = compressBlake3(IV, parentWords, 0, 0, 64, flags);
+        nextLevel.push(cv);
+      } else {
+        nextLevel.push(currentLevel[i]);
+      }
+    }
+    currentLevel = nextLevel;
+  }
+  
+  const finalWords = currentLevel[0];
+  return finalWords.map(w => {
+    const unsigned = w < 0 ? w + 0x100000000 : w;
+    const b0 = unsigned & 0xff;
+    const b1 = (unsigned >> 8) & 0xff;
+    const b2 = (unsigned >> 16) & 0xff;
+    const b3 = (unsigned >> 24) & 0xff;
+    return [b0, b1, b2, b3].map(b => b.toString(16).padStart(2, '0')).join('');
+  }).join('');
+}
+
+export function generateBlake3ReceiptHash(previousHash: string | null | undefined, data: any): string {
+  const prev = previousHash || '';
+  const dataStr = canonicalStringify(data);
+  return blake3(prev + dataStr);
+}

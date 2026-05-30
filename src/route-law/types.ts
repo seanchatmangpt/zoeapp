@@ -68,4 +68,15 @@ export interface RouteDefinition {
    * Returns a RefusalReason if denied, or null if admitted.
    */
   customGuard?: (participant: ParticipantBasis) => RefusalReason | null;
+
+  /**
+   * Optional command/action ID of a BLAKE3 receipt that must exist in local storage
+   * (SQLite/MMKV) for this route/projection to unlock.
+   */
+  requiredReceiptCommandId?: string;
+
+  /**
+   * Optional expected BLAKE3 hash of the receipt to match.
+   */
+  requiredReceiptDeltaHash?: string;
 }

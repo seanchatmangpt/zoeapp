@@ -110,6 +110,100 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   participant,
 }) => {
   const { session, loading } = useSession();
+  const [receiptVerified, setReceiptVerified] = React.useState(false);
+  const [checkingReceipt, setCheckingReceipt] = React.useState(!!route.requiredReceiptCommandId);
+
+  React.useEffect(() => {
+    let active = true;
+    async function verifyReceipt() {
+      if (!route.requiredReceiptCommandId) {
+        if (active) {
+          setReceiptVerified(true);
+          setCheckingReceipt(false);
+        }
+        return;
+      }
+
+      if (active) {
+        setCheckingReceipt(true);
+      }
+
+      try {
+        // 1. Check MMKV first (fast synchronous lookup)
+        const { mmkvInstance } = require('../lib/store/mmkvStorage');
+        const mmkvReceiptJson = mmkvInstance.getString(`receipt_${route.requiredReceiptCommandId}`);
+        const mmkvHash = mmkvInstance.getString(`receipt_hash_${route.requiredReceiptCommandId}`);
+        
+        let foundInMMKV = false;
+        if (mmkvReceiptJson) {
+          const receipt = JSON.parse(mmkvReceiptJson);
+          if (!route.requiredReceiptDeltaHash || receipt.deltaHash === route.requiredReceiptDeltaHash) {
+            foundInMMKV = true;
+          }
+        } else if (mmkvHash) {
+          if (!route.requiredReceiptDeltaHash || mmkvHash === route.requiredReceiptDeltaHash) {
+            foundInMMKV = true;
+          }
+        }
+
+        if (foundInMMKV) {
+          if (active) {
+            setReceiptVerified(true);
+            setCheckingReceipt(false);
+          }
+          return;
+        }
+
+        // 2. Check SQLite if not found in MMKV
+        const { db } = require('../lib/db/db');
+        const { actorReceipts } = require('../lib/db/schema');
+        const { eq } = require('drizzle-orm');
+
+        const records = await db
+          .select()
+          .from(actorReceipts)
+          .where(eq(actorReceipts.commandId, route.requiredReceiptCommandId));
+
+        if (records.length > 0) {
+          const record = records[0];
+          
+          if (route.requiredReceiptDeltaHash) {
+            if (record.deltaHash === route.requiredReceiptDeltaHash) {
+              if (active) {
+                setReceiptVerified(true);
+              }
+            } else {
+              if (active) {
+                setReceiptVerified(false);
+              }
+            }
+          } else {
+            if (active) {
+              setReceiptVerified(true);
+            }
+          }
+        } else {
+          if (active) {
+            setReceiptVerified(false);
+          }
+        }
+      } catch (err) {
+        if (active) {
+          setReceiptVerified(false);
+        }
+      } finally {
+        if (active) {
+          setCheckingReceipt(false);
+        }
+      }
+    }
+
+    verifyReceipt();
+
+    return () => {
+      active = false;
+    };
+  }, [route.requiredReceiptCommandId, route.requiredReceiptDeltaHash]);
 
   // If loading and no explicit participant is provided, render loading UI
   if (loading && !participant) {
@@ -129,29 +223,59 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Evaluate admission constraints
   const { admitted, refusal } = admitRoute(activeParticipant, route, hierarchy);
 
-  if (admitted) {
-    return <>{children}</>;
-  }
+  if (!admitted) {
+    // Access denied: format refusal logic
+    const activeRefusal: RefusalReason = refusal ?? {
+      code: 'REFUSED',
+      message: 'Access is restricted.',
+    };
 
-  // Access denied: format refusal logic
-  const activeRefusal: RefusalReason = refusal ?? {
-    code: 'REFUSED',
-    message: 'Access is restricted.',
-  };
-
-  // Render custom fallback if defined
-  if (fallback) {
-    if (typeof fallback === 'function') {
-      return <>{fallback(activeRefusal)}</>;
+    // Render custom fallback if defined
+    if (fallback) {
+      if (typeof fallback === 'function') {
+        return <>{fallback(activeRefusal)}</>;
+      }
+      return <>{fallback}</>;
     }
-    return <>{fallback}</>;
+
+    // Otherwise, fallback to routing redirect
+    const resolvedRedirectPath =
+      redirectPath ?? (activeRefusal.code === 'UNAUTHENTICATED' ? '/(auth)' : '/');
+
+    return <Redirect href={resolvedRedirectPath as any} />;
   }
 
-  // Otherwise, fallback to routing redirect
-  const resolvedRedirectPath =
-    redirectPath ?? (activeRefusal.code === 'UNAUTHENTICATED' ? '/(auth)' : '/');
+  // If admitted but receipt check is in progress, show loading spinner
+  if (checkingReceipt) {
+    if (loadingComponent) {
+      return <>{loadingComponent}</>;
+    }
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
-  return <Redirect href={resolvedRedirectPath as any} />;
+  // If receipt verification failed, refuse access
+  if (!receiptVerified) {
+    const receiptRefusal: RefusalReason = {
+      code: 'RECEIPT_NOT_FOUND',
+      message: `Required BLAKE3 receipt for command '${route.requiredReceiptCommandId}' was not found in local storage.`,
+    };
+
+    if (fallback) {
+      if (typeof fallback === 'function') {
+        return <>{fallback(receiptRefusal)}</>;
+      }
+      return <>{fallback}</>;
+    }
+
+    const resolvedRedirectPath = redirectPath ?? '/(tabs)';
+    return <Redirect href={resolvedRedirectPath as any} />;
+  }
+
+  return <>{children}</>;
 };
 
 const styles = StyleSheet.create({
