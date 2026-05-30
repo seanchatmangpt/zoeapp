@@ -35,8 +35,7 @@ export default function TabLayout() {
       <Tabs.AvatarRelativeProjection
         name="openai"
         options={{
-          title: 'OpenAI',
-          tabBarIcon: ({ color }) => <TabBarIcon name="lightbulb-o" color={color} />,
+          href: null, // Quarantined from main tab navigation
         }}
       />
       <Tabs.AvatarRelativeProjection
@@ -44,6 +43,14 @@ export default function TabLayout() {
         options={{
           title: 'Account',
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="admin"
+        options={{
+          title: 'Admin',
+          tabBarIcon: ({ color }) => <TabBarIcon name="gears" color={color} />,
+          tabBarButtonTestID: 'dev-actor-lab-tab',
         }}
       />
     </Tabs>

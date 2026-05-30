@@ -1,6 +1,7 @@
 appId: com.anonymous.expo-supabase-ai-template
 ---
-- launchApp
+- launchApp:
+    clearState: true
 - tapOn: "your@email.com"
 - inputText: "test@example.com"
 - tapOn: "Enter your password"

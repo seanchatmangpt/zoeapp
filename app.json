@@ -15,14 +15,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.expo-supabase-ai-template"
+      "bundleIdentifier": "com.truex.zoeapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.exposupabaseaitemplate"
+      "package": "com.truex.zoeapp"
     },
     "web": {
       "bundler": "metro",
