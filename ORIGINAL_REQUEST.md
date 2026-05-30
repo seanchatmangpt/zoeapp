@@ -17,7 +17,7 @@ Integrity mode: development
 2. Perform terminology shift across all documentation, UI text, and comments:
    - "User Interface" / "Screen" → "Avatar-Relative Projection"
    - "API Call" → "Propagation Trigger"
-   - "Offline Queue" → "Admissibility Backlog"
+    - "Offline Queue" → "Pre-Admission Tension Queue"
    - "Dashboard" → "Consequence Supervision"
 3. Update package dependency declarations in `package.json` for migrated/aliased packages to use the new `@truex` scope:
    - `@seanchatmangpt/unjucks` → `@truex/unjucks`

@@ -67,7 +67,7 @@ This repository fundamentally implements **Actor Geometry** and **Propagation Ge
 **Terminology Shifts:**
 * User Interface / Screen → Avatar-Relative Projection
 * API Call → Propagation Trigger
-* Offline Queue → Admissibility Backlog
+* Offline Queue → Pre-Admission Tension Queue
 * Dashboard → Consequence Supervision
 
 ---
