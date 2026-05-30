@@ -1,0 +1,12 @@
+appId: com.anonymous.expo-supabase-ai-template
+---
+- launchApp:
+    clearState: false
+- tapOn: "Process Intel"
+- assertVisible: "Process Intelligence"
+- assertVisible: "Truex OCEL 2.0 Receipt Verifier"
+- tapOn:
+    id: "run-intel-truex-receipt-verifier"
+- assertVisible: "Audit Run Receipt"
+- assertVisible: "VERIFIED"
+- assertVisible: "[Truex] Audit verdict: VERIFIED"

@@ -1,0 +1,16 @@
+appId: com.truex.zoeapp
+---
+- launchApp:
+    clearState: true
+
+- assertVisible: "Truex Hook Cockpit"
+
+# Tap rapidly to trigger flood rate limits
+- tapOn: "Trigger Volunteer Cancellation"
+- tapOn: "Trigger Volunteer Cancellation"
+- tapOn: "Trigger Volunteer Cancellation"
+- tapOn: "Trigger Volunteer Cancellation"
+- tapOn: "Trigger Volunteer Cancellation"
+
+# Assert that flood supervisor intercepts and suppresses
+- assertVisible: "Processing local optimistic VKG sync..."

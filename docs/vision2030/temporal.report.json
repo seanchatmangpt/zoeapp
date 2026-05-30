@@ -1,0 +1,40 @@
+{
+  "totalReplaysTested": 3,
+  "passedCount": 3,
+  "failedCount": 0,
+  "cases": [
+    {
+      "capabilityId": "truex-receipt-verifier",
+      "timestamps": {
+        "today": "2026-05-23T18:58:36.899Z",
+        "tomorrow": "2026-05-24T18:58:36.899Z"
+      },
+      "same_outcome_status": true,
+      "same_output_hash": true,
+      "same_public_ontology_projection": true,
+      "status": "passed"
+    },
+    {
+      "capabilityId": "jtbd-conformance-auditor",
+      "timestamps": {
+        "today": "2026-05-23T18:58:36.899Z",
+        "tomorrow": "2026-05-24T18:58:36.899Z"
+      },
+      "same_outcome_status": true,
+      "same_output_hash": true,
+      "same_public_ontology_projection": true,
+      "status": "passed"
+    },
+    {
+      "capabilityId": "concept-drift-detector",
+      "timestamps": {
+        "today": "2026-05-23T18:58:36.899Z",
+        "tomorrow": "2026-05-24T18:58:36.899Z"
+      },
+      "same_outcome_status": true,
+      "same_output_hash": true,
+      "same_public_ontology_projection": true,
+      "status": "passed"
+    }
+  ]
+}

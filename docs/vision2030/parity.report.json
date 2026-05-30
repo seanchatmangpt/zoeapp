@@ -1,0 +1,29 @@
+{
+  "totalCapabilitiesTested": 2,
+  "passedCount": 2,
+  "failedCount": 0,
+  "reports": [
+    {
+      "capabilityId": "truex-receipt-verifier",
+      "input_hash": "7fcf13ae2693423387d316b2bab905b354ab8585e8bf88ffbb11c4e74400eab4",
+      "cli_receipt_hash": "d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2",
+      "supabase_receipt_hash": "d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2",
+      "same_status": true,
+      "same_output_hash": true,
+      "same_refusal_family": true,
+      "same_public_ontology_projection": true,
+      "status": "passed"
+    },
+    {
+      "capabilityId": "jtbd-conformance-auditor",
+      "input_hash": "79dd8fb743f71d9413e3ebb8449cb5d0f5356332630dc25fae6b9c71ec36b0b4",
+      "cli_receipt_hash": "59856aee76978fe91e55c44e39ce0f1f2f60135acd70d3b95f52e9160a16b540",
+      "supabase_receipt_hash": "59856aee76978fe91e55c44e39ce0f1f2f60135acd70d3b95f52e9160a16b540",
+      "same_status": true,
+      "same_output_hash": true,
+      "same_refusal_family": true,
+      "same_public_ontology_projection": true,
+      "status": "passed"
+    }
+  ]
+}

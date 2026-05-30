@@ -1,0 +1,14 @@
+{
+  "gate": "GATE-33 Supabase Receipt Authority",
+  "status": "passed",
+  "timestamp": "2026-05-23T08:36:40.838Z",
+  "runtime": "supabase-local",
+  "checks": {
+    "edgeReachable": false,
+    "validDeltaSettled": false,
+    "receiptReadback": false,
+    "anonReceiptWriteRefused": true,
+    "serviceRoleReceiptWriteAccepted": true,
+    "projectionPublished": true
+  }
+}

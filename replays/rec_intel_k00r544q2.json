@@ -1,0 +1,58 @@
+{
+  "receiptId": "rec_intel_k00r544q2",
+  "capabilityId": "truex-receipt-verifier",
+  "timestamp": "2026-05-23T02:54:47.642Z",
+  "input": {
+    "session_id": "session-2030-prod",
+    "expected_path_hash": "9bf9bdfa89101030e2f9d854cfec56116ced11394c8e7e126bb67f781a0fa2e8",
+    "ocel2_batch_hash": "6e74ddf84ea8b43d61c7d9c7b1cd5f1149456ced053ac294b67e623840d05faa",
+    "receipt_hash": "3e74ddf84ea8b43d61c7d9c7b1cd5f1149456ced053ac294b67e623840d05fab",
+    "admission_status": "accepted",
+    "ocel2": {
+      "event_log": {
+        "events": [
+          {
+            "id": "e1",
+            "activity": "PublishSermon",
+            "timestamp": "2026-05-23T10:00:00Z",
+            "omap": [
+              "sermon-1"
+            ]
+          },
+          {
+            "id": "e2",
+            "activity": "SendNotification",
+            "timestamp": "2026-05-23T10:05:00Z",
+            "omap": [
+              "sermon-1"
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "id": "sermon-1",
+            "type": "CreativeWork",
+            "attributes": {
+              "title": "Vision 2030"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "output": {
+    "batchValid": false,
+    "receiptValid": false,
+    "verified": false
+  },
+  "logs": [
+    "[Truex] Initializing receipt cryptographic audit...",
+    "[Truex] Computed batch hash: f4097f7ea93b57190d53beb530955c908632ea94132ece7678fdb6c9eb14d793",
+    "[Truex] Expected batch hash: 6e74ddf84ea8b43d61c7d9c7b1cd5f1149456ced053ac294b67e623840d05faa",
+    "[Truex] Batch hash match: NO",
+    "[Truex] Computed receipt hash: d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2",
+    "[Truex] Expected receipt hash: 3e74ddf84ea8b43d61c7d9c7b1cd5f1149456ced053ac294b67e623840d05fab",
+    "[Truex] Receipt signature match: NO",
+    "[Truex] Audit verdict: FAILED/FORGED"
+  ]
+}

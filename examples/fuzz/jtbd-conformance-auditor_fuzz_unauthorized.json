@@ -1,0 +1,11 @@
+{
+  "declaredWorkflow": [
+    "PublishSermon",
+    "SendNotification"
+  ],
+  "actualEvents": [
+    "PublishSermon",
+    "SendNotification"
+  ],
+  "authorityContext": "anonymous"
+}

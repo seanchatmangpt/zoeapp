@@ -1,0 +1,49 @@
+name: proxyable-interceptor
+description: Create an isolated context-based proxy interceptor for the Universal Operational Membrane
+version: 1.0.0
+category: membrane
+
+variables:
+  name:
+    type: string
+    required: true
+    description: Interceptor name (e.g. volunteer-coverage)
+    pattern: ^[a-z][a-z0-9-]*$
+
+  exportName:
+    type: string
+    required: true
+    description: TypeScript export name, e.g. defineVolunteerInterceptor
+
+  out:
+    type: string
+    required: true
+    description: Output file path (e.g. src/lib/membrane/interceptors/volunteer.ts)
+
+  description:
+    type: string
+    required: true
+    default: Proxyable interceptor
+    description: Description of the interceptor's boundary condition
+
+  withGetTrap:
+    type: boolean
+    required: false
+    default: true
+    description: Scaffold defineGetInterceptor
+
+  withSetTrap:
+    type: boolean
+    required: false
+    default: true
+    description: Scaffold defineSetInterceptor
+
+examples:
+  - title: Volunteer Shortage Proxyable Interceptor
+    variables:
+      name: volunteer-coverage
+      exportName: defineVolunteerInterceptor
+      out: src/lib/membrane/interceptors/volunteer.ts
+      description: Intercepts and limits assignment modifications
+      withGetTrap: true
+      withSetTrap: true

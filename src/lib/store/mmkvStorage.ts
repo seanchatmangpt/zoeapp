@@ -1,8 +1,8 @@
 import { StateStorage } from 'zustand/middleware';
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 
 // Initialize a dedicated MMKV instance for Zustand stores
-export const mmkvInstance = new MMKV({
+export const mmkvInstance = createMMKV({
   id: 'zoeapp-zustand-storage',
 });
 
@@ -30,6 +30,6 @@ export const mmkvStorage: StateStorage = {
    * Remove a value from storage.
    */
   removeItem: (name: string): void => {
-    mmkvInstance.delete(name);
+    mmkvInstance.remove(name);
   },
 };

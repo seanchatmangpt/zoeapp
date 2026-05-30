@@ -1,0 +1,59 @@
+name: citty-arg
+description: Insert an argument definition into a Citty command
+version: 1.0.0
+category: cli
+
+variables:
+  commandFile:
+    type: string
+    required: true
+
+  name:
+    type: string
+    required: true
+
+  type:
+    type: enum
+    required: true
+    options:
+      - positional
+      - string
+      - boolean
+      - enum
+
+  description:
+    type: string
+    required: true
+
+  required:
+    type: boolean
+    default: false
+
+  defaultValue:
+    type: string
+    required: false
+    default: ""
+
+  alias:
+    type: string
+    required: false
+    default: ""
+
+  valueHint:
+    type: string
+    required: false
+    default: ""
+
+  enumOptions:
+    type: string
+    required: false
+    default: ""
+
+examples:
+  - title: Add receiptId positional arg
+    variables:
+      commandFile: scripts/cli/commands/explain.ts
+      name: receiptId
+      type: positional
+      description: Receipt ID
+      required: true

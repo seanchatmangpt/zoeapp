@@ -1,0 +1,25 @@
+appId: com.truex.zoeapp
+---
+- launchApp:
+    clearState: true
+
+- assertVisible: "Truex Hook Cockpit"
+
+# Switch to guest avatar and confirm hidden state
+- tapOn: "guest"
+- assertVisible: "[HIDDEN] No projection visible for guest avatar."
+
+# Switch to member avatar and confirm help invitation surface
+- tapOn: "member"
+- assertVisible: "HELP INVITATION"
+- assertVisible: "Join us in welcoming others!"
+
+# Switch to volunteer avatar and confirm shift prompt surface
+- tapOn: "volunteer"
+- assertVisible: "SHIFT PROMPT"
+- assertVisible: "We need you!"
+
+# Switch to pastor avatar and confirm risk summary surface
+- tapOn: "pastor"
+- assertVisible: "RISK SUMMARY"
+- assertVisible: "High"

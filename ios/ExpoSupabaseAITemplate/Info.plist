@@ -28,7 +28,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>myapp</string>
-				<string>com.anonymous.expo-supabase-ai-template</string>
+				<string>com.truex.zoeapp</string>
 			</array>
 		</dict>
 	</array>

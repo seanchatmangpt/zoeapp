@@ -1,0 +1,42 @@
+appId: com.anonymous.expo-supabase-ai-template
+name: Remote Rejection Reconciliation
+
+---
+- runFlow: 00_boot.yaml
+
+- tapOn:
+    id: "dev-actor-lab-tab"
+
+- tapOn:
+    id: "mock-remote-reject-on"
+
+- tapOn: "Sermons"
+
+- tapOn:
+    id: "sermon-title-input"
+
+- inputText: "Remote Rejected Sermon"
+
+- tapOn:
+    id: "publish-sermon-submit"
+
+- assertVisible: "accepted_pending"
+
+- tapOn:
+    id: "arrow-left"
+
+- assertVisible:
+    id: "sermon-title-rendered"
+- assertVisible: "Remote Rejected Sermon"
+
+- tapOn:
+    id: "sync-outbox-now"
+
+- assertVisible: "rejected_remote"
+
+- assertNotVisible: "Remote Rejected Sermon"
+
+- assertVisible:
+    id: "latest-error-code"
+
+- assertVisible: "REMOTE_AUTHORITY_REJECTED"

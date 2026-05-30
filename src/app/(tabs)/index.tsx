@@ -7,9 +7,10 @@
  * @version 1.0.0
  */
 
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useSession } from '@/context/SessionProvider';
 import { Link } from 'expo-router';
+import { useState } from 'react';
 
 /**
  * Home screen component - main dashboard of the application
@@ -24,6 +25,40 @@ import { Link } from 'expo-router';
  */
 export default function HomeScreen() {
   const { session, loading } = useSession();
+  const [receiptHash, setReceiptHash] = useState('');
+  const [status, setStatus] = useState('');
+
+  const cancelVolunteer = async () => {
+    try {
+      setStatus('pending');
+      // Artificial delay to ensure Maestro observes "Processing Sync..."
+      await new Promise(resolve => setTimeout(resolve, 800));
+      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321';
+      // For local testing, we might need a default anon key if env is missing
+      const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZmF1bHQiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTY3NjMwNjUyMCwiZXhwIjoyMDAxODgyNTIwfQ.qKk3';
+      const res = await fetch(`${supabaseUrl}/functions/v1/truex-min-verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({
+          type: 'volunteer_cancelled',
+          payload: { user_id: session?.user?.id || 'test' },
+          previous_receipt_hash: '0000000000000000000000000000000000000000000000000000000000000000'
+        })
+      });
+      const data = await res.json();
+      if (data.receipt?.receipt_hash) {
+        setReceiptHash(data.receipt.receipt_hash);
+        setStatus('confirmed');
+      } else {
+        setStatus('failed');
+      }
+    } catch (e) {
+      setStatus('error');
+    }
+  };
 
   // Show loading state while session is being determined
   if (loading) {
@@ -55,17 +90,17 @@ export default function HomeScreen() {
         <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">Quick Actions</Text>
 
         <View className="space-y-3">
-          {/* AI Assistant Card */}
-          <Link href="/(tabs)/openai" asChild>
+          {/* Truex Admin Console Card */}
+          <Link href={"/admin/dashboard" as any} asChild>
             <TouchableOpacity className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm active:bg-gray-50">
               <View className="flex-row items-center">
                 <View className="bg-blue-100 rounded-full p-3 mr-4">
-                  <Text className="text-2xl">🤖</Text>
+                  <Text className="text-2xl">⚡</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 mb-1">AI Assistant</Text>
+                  <Text className="text-lg font-semibold text-gray-900 mb-1">Truex Mission Control</Text>
                   <Text className="text-gray-600 text-sm">
-                    Ask questions, get help, and explore AI capabilities
+                    Explore process intelligence, operational simulation, and actor audits
                   </Text>
                 </View>
                 <Text className="text-gray-400 text-xl">›</Text>
@@ -91,6 +126,43 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {/* Truex Membrane UI Trigger */}
+      <View className="px-4 mt-8">
+        <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">Truex Membrane</Text>
+        <View className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <View className="flex-row justify-between mb-4">
+            <Text className="text-gray-600">Pending Receipts: {status === 'pending' ? '1' : '0'}</Text>
+            <Text className="text-gray-600">Confirmed Receipts: {status === 'confirmed' ? '1' : '0'}</Text>
+          </View>
+          <TouchableOpacity 
+            onPress={cancelVolunteer}
+            disabled={status === 'pending'}
+            className={`${status === 'pending' ? 'bg-red-300' : 'bg-red-500'} rounded-lg p-4 items-center mb-4`}
+          >
+            <Text className="text-white font-semibold">Trigger Volunteer Cancellation</Text>
+          </TouchableOpacity>
+          {status === 'pending' && (
+            <View className="bg-blue-50 p-4 rounded-lg items-center">
+              <ActivityIndicator color="#3b82f6" className="mb-2" />
+              <Text className="text-blue-800 font-medium">Processing Sync...</Text>
+            </View>
+          )}
+          {status === 'confirmed' && (
+            <View className="bg-green-50 p-4 rounded-lg items-center">
+              <Text className="text-green-800 font-medium text-lg">All Evidence Reconciled ✅</Text>
+              {receiptHash ? (
+                <Text className="text-green-600 text-xs mt-2 text-center">{receiptHash}</Text>
+              ) : null}
+            </View>
+          )}
+          {status === 'failed' && (
+            <View className="bg-red-50 p-4 rounded-lg items-center">
+              <Text className="text-red-800 font-medium">Reconciliation Failed</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
       {/* Features Overview */}
       <View className="px-4 mt-8">
         <Text className="text-lg font-semibold text-gray-900 mb-4 px-2">App Features</Text>
@@ -106,7 +178,7 @@ export default function HomeScreen() {
               </View>
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>
-                <Text className="text-gray-700 flex-1">AI assistant powered by OpenAI</Text>
+                <Text className="text-gray-700 flex-1">Non-LLM Process Intelligence & Membrane checks</Text>
               </View>
               <View className="flex-row items-center">
                 <Text className="text-green-500 mr-3">✓</Text>

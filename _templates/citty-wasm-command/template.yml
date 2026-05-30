@@ -1,0 +1,42 @@
+name: citty-wasm-command
+description: Create a reusable Citty command module backed by Truex WASM/OTEL
+version: 1.0.0
+category: cli
+
+variables:
+  name:
+    type: string
+    required: true
+    description: Command name in kebab-case
+    pattern: ^[a-z][a-z0-9-]*$
+
+  exportName:
+    type: string
+    required: true
+    description: TypeScript export name, e.g. truexVerifyCmd
+
+  out:
+    type: string
+    required: true
+    description: Output file path
+
+  description:
+    type: string
+    required: true
+    default: Truex WASM Command
+    description: Command description
+
+  wasmEngineMethod:
+    type: string
+    required: true
+    default: truex_verify_receipt
+    description: The exported WASM method to execute
+
+examples:
+  - title: Truex Verify command shell
+    variables:
+      name: verify
+      exportName: truexVerifyCmd
+      out: scripts/cli/commands/verify.ts
+      description: Verify a Truex OCEL 2.0 Canonical Receipt Envelope
+      wasmEngineMethod: truex_verify_receipt

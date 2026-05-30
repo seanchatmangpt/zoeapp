@@ -1,0 +1,22 @@
+appId: com.truex.zoeapp
+---
+- launchApp:
+    clearState: true
+
+- assertVisible: "Truex Hook Cockpit"
+- assertVisible: "Pending Receipts: 0"
+- assertVisible: "Confirmed Receipts: 0"
+
+- tapOn: "Trigger Volunteer Cancellation"
+
+# Assert local optimistic pending receipt appears instantly
+- assertVisible: "Processing local optimistic VKG sync..."
+- assertVisible: "Pending Receipts: 1"
+
+# Assert server authoritative confirmed receipt reconciles
+- extendedWaitUntil:
+    visible: "Evidence Reconciled & Authority Signed ✅"
+    timeout: 5000
+
+- assertVisible: "Confirmed Receipts: 1"
+- assertVisible: "Pending Receipts: 0"

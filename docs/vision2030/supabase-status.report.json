@@ -1,0 +1,16 @@
+{
+  "commit": "f1961be6686794ecd695c55e40eeb728c6825cdc",
+  "timestamp": "2026-05-23T04:08:56.074Z",
+  "runtime": "supabase-local",
+  "config_exists": true,
+  "migrations_exists": true,
+  "functions_exists": true,
+  "api_reachable": true,
+  "anon_key_present": true,
+  "service_role_present": true,
+  "functions": {
+    "truex-verify": true,
+    "v2030-runtime-health": true
+  },
+  "status": "passed"
+}

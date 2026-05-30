@@ -1,0 +1,44 @@
+name: citty-subcommand
+description: Add a subcommand to an existing Citty command module
+version: 1.0.0
+category: cli
+
+variables:
+  parentFile:
+    type: string
+    required: true
+    description: Parent command file containing // <citty-subcommands>
+
+  childName:
+    type: string
+    required: true
+    pattern: ^[a-z][a-z0-9-]*$
+
+  childExport:
+    type: string
+    required: true
+    description: Export name for child command
+
+  childOut:
+    type: string
+    required: true
+    description: Output path for child command module
+
+  description:
+    type: string
+    required: true
+    default: Citty subcommand
+
+  lazy:
+    type: boolean
+    default: true
+
+examples:
+  - title: Add smoke under supa
+    variables:
+      parentFile: scripts/cli/commands/supa.ts
+      childName: smoke
+      childExport: supaSmokeCommand
+      childOut: scripts/cli/supabase/smoke.ts
+      description: Run Supabase smoke check
+      lazy: true

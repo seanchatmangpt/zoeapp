@@ -1,0 +1,897 @@
+{
+  "coveragePolicy": {
+    "mode": "critical-equivalence-classes",
+    "totalCartesianMeasured": true,
+    "fullCartesianRequired": false,
+    "minimumCriticalCoveragePercent": 100,
+    "minimumCapabilityCoveragePercent": 100,
+    "minimumRuntimeBoundaryCoveragePercent": 100
+  },
+  "axes": {
+    "runtimes": [
+      "cli",
+      "supabase-edge",
+      "expo-view"
+    ],
+    "capabilities": [
+      "truex-receipt-verifier",
+      "jtbd-conformance-auditor",
+      "concept-drift-detector",
+      "rl-orchestrator-monitor",
+      "compliance-safety-guard",
+      "habit-prompt-generator",
+      "volunteer-fit-suggester",
+      "spiritual-rhythm-tracker",
+      "on-campus-navigator",
+      "care-risk-escalator",
+      "engagement-fatigue-controller",
+      "hook-evaluator",
+      "realtime-projector",
+      "spc-supervisor",
+      "doe-runner",
+      "digital-twin-simulator"
+    ],
+    "inputClasses": [
+      "valid",
+      "malformed",
+      "forged",
+      "stale",
+      "duplicate",
+      "missing_field",
+      "unauthorized",
+      "boundary_large"
+    ],
+    "authorities": [
+      "admin",
+      "pastor",
+      "volunteer",
+      "member",
+      "guest",
+      "anonymous"
+    ],
+    "expectedOutcomes": [
+      "admitted",
+      "refused",
+      "quarantined",
+      "pending",
+      "replayed",
+      "reconciled"
+    ],
+    "requiredArtifacts": [
+      "receipt",
+      "OCEL",
+      "replay",
+      "trace",
+      "public-ontology record",
+      "rollback diff"
+    ]
+  },
+  "cases": [
+    {
+      "id": "CASE-CLI-TRUEX-01",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "OCEL"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "successfully verifies canonical OCEL 2.0 signatures"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-TRUEX-02",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "forged",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "fails verification if ocel2 batch hash does not match"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-JTBD-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "trace"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "returns perfect fitness for conforming traces"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-JTBD-02",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "malformed",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "returns lower fitness and VARIANCE verdict for deviant traces"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-DRIFT-01",
+      "runtime": "cli",
+      "capability": "concept-drift-detector",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "trace"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "detects no drift for stable activity streams"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-DRIFT-02",
+      "runtime": "cli",
+      "capability": "concept-drift-detector",
+      "inputClass": "boundary_large",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "trace"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "raises drift alerts when activity sets drift over windows"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-RLMON-01",
+      "runtime": "cli",
+      "capability": "rl-orchestrator-monitor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "simulates cycle execution rewards and calculates policy convergence"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-COMPL-01",
+      "runtime": "cli",
+      "capability": "compliance-safety-guard",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "trace"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "admits compliant temporal traces"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-COMPL-02",
+      "runtime": "cli",
+      "capability": "compliance-safety-guard",
+      "inputClass": "unauthorized",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "refuses traces violating the OCPQ temporal order guard rule"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-HABIT-01",
+      "runtime": "cli",
+      "capability": "habit-prompt-generator",
+      "inputClass": "valid",
+      "authority": "member",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "generates a PROMPT intervention when streaks are missed"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-VOLFIT-01",
+      "runtime": "cli",
+      "capability": "volunteer-fit-suggester",
+      "inputClass": "valid",
+      "authority": "member",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "suggests a RECOMMEND intervention when user has Hospitality gift"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-RHYTHM-01",
+      "runtime": "cli",
+      "capability": "spiritual-rhythm-tracker",
+      "inputClass": "valid",
+      "authority": "member",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "emits a REMIND intervention when no next action is scheduled"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-CAMPNAV-01",
+      "runtime": "cli",
+      "capability": "on-campus-navigator",
+      "inputClass": "valid",
+      "authority": "member",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "emits a REORDER intervention when user is checked in"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-CARE-01",
+      "runtime": "cli",
+      "capability": "care-risk-escalator",
+      "inputClass": "valid",
+      "authority": "member",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "emits an ESCALATE intervention when missed groups count is exceeded"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CLI-FATIGUE-01",
+      "runtime": "cli",
+      "capability": "engagement-fatigue-controller",
+      "inputClass": "valid",
+      "authority": "member",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt",
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/intelligence.test.ts",
+          "contains": "emits a SUPPRESS intervention when not opened streak is high"
+        }
+      ]
+    },
+    {
+      "id": "CASE-EDGE-HEALTH-01",
+      "runtime": "supabase-edge",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor supabase-wasm",
+          "expected": "Supabase wasm4pm Edge runtime: OK"
+        }
+      ]
+    },
+    {
+      "id": "CASE-EXPO-VIEW-01",
+      "runtime": "expo-view",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "valid",
+      "authority": "guest",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor expo-boundary",
+          "expected": "Expo runtime boundary: VERIFIED"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-TRUEX-RECEIPT-VERIFIER-MISSING_FIELD",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "missing_field",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-TRUEX-RECEIPT-VERIFIER-BOUNDARY_LARGE",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "boundary_large",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-TRUEX-RECEIPT-VERIFIER-FORGED",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "forged",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-TRUEX-RECEIPT-VERIFIER-MALFORMED",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "malformed",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-TRUEX-RECEIPT-VERIFIER-UNAUTHORIZED",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "unauthorized",
+      "authority": "anonymous",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-JTBD-CONFORMANCE-AUDITOR-MISSING_FIELD",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "missing_field",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-JTBD-CONFORMANCE-AUDITOR-BOUNDARY_LARGE",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "boundary_large",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-JTBD-CONFORMANCE-AUDITOR-FORGED",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "forged",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-JTBD-CONFORMANCE-AUDITOR-MALFORMED",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "malformed",
+      "authority": "admin",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "FUZZ-JTBD-CONFORMANCE-AUDITOR-UNAUTHORIZED",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "unauthorized",
+      "authority": "anonymous",
+      "expectedOutcome": "refused",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "doctor",
+          "command": "truex doctor perturb",
+          "expected": "refused"
+        }
+      ]
+    },
+    {
+      "id": "CASE-TEMPORAL-STABILITY-01",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "replay"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies that replaying truex verifier yields identical results under different phases"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CONCURRENCY-EQUIVALENCE-01",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "replay"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies convergence of interleaved independent command sequences S1 and S2"
+        }
+      ]
+    },
+    {
+      "id": "CASE-OCEL-ROUNDTRIP-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "replay",
+        "OCEL"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies that command receipts can be exported to OCEL 2.0 and replayed identically after import"
+        }
+      ]
+    },
+    {
+      "id": "CASE-REPLICAS-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "replay"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies multi-node convergence after delayed synchronization"
+        }
+      ]
+    },
+    {
+      "id": "CASE-CHAIN-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies receipt chain lineage continuity and error detection"
+        }
+      ]
+    },
+    {
+      "id": "CASE-ONTOLOGY-DRIFT-01",
+      "runtime": "cli",
+      "capability": "habit-prompt-generator",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "public-ontology record"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies ontology projection stability and schema evolution"
+        }
+      ]
+    },
+    {
+      "id": "CASE-ISOLATION-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "receipt"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies capability isolation and crash containment"
+        }
+      ]
+    },
+    {
+      "id": "CASE-DETERMINISM-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "replay"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies deterministic canonical replay hashing"
+        }
+      ]
+    },
+    {
+      "id": "CASE-COMPRESSION-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "replayed",
+      "requiredArtifacts": [
+        "replay"
+      ],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [
+        {
+          "type": "jest",
+          "file": "src/lib/v2030/__tests__/temporal-concurrency.test.ts",
+          "contains": "verifies operational event compression convergence"
+        }
+      ]
+    },
+    {
+      "id": "CASE-HOOK-EVAL-01",
+      "runtime": "cli",
+      "capability": "hook-evaluator",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["receipt"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor hook-eval", "expected": "Gate 21 (Hook evaluation): OK"}]
+    },
+    {
+      "id": "CASE-HOOK-RECEIPT-01",
+      "runtime": "cli",
+      "capability": "hook-evaluator",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["receipt"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor hook-receipts", "expected": "Gate 22 (Hook receipts): OK"}]
+    },
+    {
+      "id": "CASE-SUPABASE-HOOK-01",
+      "runtime": "supabase-edge",
+      "capability": "hook-evaluator",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["receipt"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor supabase-hooks", "expected": "Gate 23 (Supabase hook authority): OK"}]
+    },
+    {
+      "id": "CASE-REALTIME-01",
+      "runtime": "cli",
+      "capability": "realtime-projector",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "reconciled",
+      "requiredArtifacts": ["trace"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor realtime", "expected": "Gate 24 (Realtime projection): OK"}]
+    },
+    {
+      "id": "CASE-DOE-01",
+      "runtime": "cli",
+      "capability": "doe-runner",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["trace"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor doe", "expected": "Gate 25 (DOE): OK"}]
+    },
+    {
+      "id": "CASE-SPC-01",
+      "runtime": "cli",
+      "capability": "spc-supervisor",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["trace"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor spc", "expected": "Gate 26 (SPC): OK"}]
+    },
+    {
+      "id": "CASE-TWIN-01",
+      "runtime": "cli",
+      "capability": "digital-twin-simulator",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["replay"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor twin", "expected": "Gate 27 (Digital twin): OK"}]
+    },
+    {
+      "id": "CASE-RESP-SURF-01",
+      "runtime": "cli",
+      "capability": "doe-runner",
+      "inputClass": "valid",
+      "authority": "admin",
+      "expectedOutcome": "admitted",
+      "requiredArtifacts": ["trace"],
+      "severity": "critical",
+      "required": true,
+      "testRefs": [{"type": "doctor", "command": "truex doctor response-surface", "expected": "Gate 28 (Response surface): OK"}]
+    }
+  ]
+}
