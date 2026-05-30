@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, act, fireEvent, waitFor } from '@testing-library/react-native';
 import { VkgProvider } from '@/src/components/VkgProvider';
-import HooksScreen from '../hooks';
+import HooksProjection from '../hooks';
 
-describe('Truex Hooks Screen View', () => {
+describe('Truex Hooks Projection View', () => {
   beforeEach(() => {
     global.fetch = jest.fn().mockImplementation(() =>
       Promise.resolve({
@@ -20,7 +20,7 @@ describe('Truex Hooks Screen View', () => {
   test('should render cockpit, allow avatar switching, and show projection details', async () => {
     const { getByText, queryByText } = render(
       <VkgProvider>
-        <HooksScreen />
+        <HooksProjection />
       </VkgProvider>
     );
 

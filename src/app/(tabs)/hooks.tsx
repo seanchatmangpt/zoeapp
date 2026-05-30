@@ -5,7 +5,7 @@ import { AvatarRole } from '@/src/lib/truex/avatar/types';
 
 const rolesList: AvatarRole[] = ['guest', 'member', 'volunteer', 'teamLead', 'pastor', 'admin', 'operator'];
 
-export default function HooksScreen() {
+export default function HooksProjection() {
   const {
     pendingReceipts,
     processedReceipts,

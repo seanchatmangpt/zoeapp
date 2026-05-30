@@ -10,7 +10,7 @@ export default function AdminLayout() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="dashboard" />
+      <Stack.Screen name="consequence-supervision" />
       <Stack.Screen name="actor-lab" />
       <Stack.Screen name="receipts" />
       <Stack.Screen name="outbox" />
