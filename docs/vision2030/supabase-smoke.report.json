@@ -1,0 +1,22 @@
+{
+  "commit": "f1961be6686794ecd695c55e40eeb728c6825cdc",
+  "timestamp": "2026-05-23T04:09:12.206Z",
+  "status": "passed",
+  "runtime": "supabase-local",
+  "edge": {
+    "v2030-runtime-health": "passed",
+    "truex-verify": "passed"
+  },
+  "db": {
+    "receipt_insert": "passed",
+    "receipt_readback": "passed"
+  },
+  "authority": {
+    "service_role_write": "passed",
+    "anon_public_invoke": "passed"
+  },
+  "boundary": {
+    "expo_service_role_leak": false,
+    "expo_wasm_leak": false
+  }
+}

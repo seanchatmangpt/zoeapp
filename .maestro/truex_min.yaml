@@ -1,0 +1,26 @@
+appId: com.truex.zoeapp
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    text: "Open"
+    optional: true
+- tapOn:
+    text: "your@email.com"
+    optional: true
+- inputText: "test@example.com"
+- tapOn:
+    text: "Enter your password"
+    optional: true
+- inputText: "password123"
+- tapOn:
+    text: "Sign in to access your AI assistant and more"
+    optional: true
+- tapOn:
+    text: "Create Account"
+    optional: true
+- tapOn:
+    text: "🔑 Sign In"
+    optional: true
+- tapOn: "Trigger Volunteer Cancellation"
+- assertVisible: "All Evidence Reconciled ✅"

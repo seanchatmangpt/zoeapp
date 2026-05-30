@@ -1,0 +1,79 @@
+name: citty-command
+description: Create a reusable Citty command module
+version: 1.0.0
+category: cli
+
+variables:
+  name:
+    type: string
+    required: true
+    description: Command name in kebab-case
+    pattern: ^[a-z][a-z0-9-]*$
+
+  exportName:
+    type: string
+    required: true
+    description: TypeScript export name, e.g. doctorCommand
+
+  out:
+    type: string
+    required: true
+    description: Output file path
+
+  description:
+    type: string
+    required: true
+    default: Citty command
+    description: Command description
+
+  alias:
+    type: string
+    required: false
+    default: ""
+    description: Optional comma-separated aliases
+
+  hidden:
+    type: boolean
+    required: false
+    default: false
+    description: Hide command from help output
+
+  withArgs:
+    type: boolean
+    required: false
+    default: false
+
+  withHooks:
+    type: boolean
+    required: false
+    default: false
+
+  withPlugins:
+    type: boolean
+    required: false
+    default: false
+
+  withSubcommands:
+    type: boolean
+    required: false
+    default: false
+
+  lazySubcommands:
+    type: boolean
+    required: false
+    default: true
+
+  withTest:
+    type: boolean
+    required: false
+    default: false
+
+examples:
+  - title: Doctor command shell
+    variables:
+      name: doctor
+      exportName: doctorCommand
+      out: scripts/cli/commands/doctor.ts
+      description: Diagnose runtime health
+      withSubcommands: true
+      lazySubcommands: true

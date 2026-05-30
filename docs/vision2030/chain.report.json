@@ -1,0 +1,7 @@
+{
+  "valid_chain_passed": true,
+  "broken_lineage_detected": true,
+  "reorder_detected": true,
+  "deletion_detected": true,
+  "status": "passed"
+}

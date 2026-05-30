@@ -1,0 +1,14 @@
+appId: com.truex.zoeapp
+---
+- launchApp:
+    clearState: true
+
+- assertVisible: "Truex Hook Cockpit"
+
+# Switch to admin to view run audits
+- tapOn: "admin"
+- assertVisible: "RECEIPT/AUDIT"
+
+# Switch back to member
+- tapOn: "member"
+- assertVisible: "HELP INVITATION"

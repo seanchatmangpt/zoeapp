@@ -1,0 +1,45 @@
+name: citty-root
+description: Create a root Citty CLI entrypoint
+version: 1.0.0
+category: cli
+
+variables:
+  name:
+    type: string
+    required: true
+    description: CLI command name
+    pattern: ^[a-z][a-z0-9-]*$
+
+  out:
+    type: string
+    required: true
+    default: scripts/truex.next.ts
+    description: Output file path
+
+  description:
+    type: string
+    required: true
+    default: Operator CLI
+    description: CLI description
+
+  version:
+    type: string
+    required: false
+    default: 0.0.0
+    description: CLI version
+
+  lazy:
+    type: boolean
+    required: false
+    default: true
+    description: Use lazy subcommand imports
+
+examples:
+  - title: Truex root CLI
+    action: citty-root
+    variables:
+      name: truex
+      out: scripts/truex.next.ts
+      description: Truex operator CLI
+      version: 0.1.0
+      lazy: true

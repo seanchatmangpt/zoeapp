@@ -1,0 +1,87 @@
+{
+  "totalTrajectoriesTested": 6,
+  "passedCount": 6,
+  "failedCount": 0,
+  "cases": [
+    {
+      "id": "TRAJ-SERMON-CONFORMING",
+      "familyId": "SermonFlow",
+      "trajectory": [
+        "idle",
+        "drafted",
+        "reviewed",
+        "published"
+      ],
+      "expectedOutcome": "admitted",
+      "actualOutcome": "admitted",
+      "status": "passed"
+    },
+    {
+      "id": "TRAJ-SERMON-PERTURBED",
+      "familyId": "SermonFlow",
+      "trajectory": [
+        "idle",
+        "drafted",
+        "published"
+      ],
+      "expectedOutcome": "refused",
+      "actualOutcome": "refused",
+      "status": "passed",
+      "errorMsg": "TransitionFamilyRefused: Illegal transition from 'drafted' to 'published' in SermonFlow. Missing required intermediate states: reviewed"
+    },
+    {
+      "id": "TRAJ-ORDER-CONFORMING",
+      "familyId": "OrderFlow",
+      "trajectory": [
+        "idle",
+        "cart_updated",
+        "address_added",
+        "processing",
+        "paid"
+      ],
+      "expectedOutcome": "admitted",
+      "actualOutcome": "admitted",
+      "status": "passed"
+    },
+    {
+      "id": "TRAJ-ORDER-PERTURBED",
+      "familyId": "OrderFlow",
+      "trajectory": [
+        "idle",
+        "processing",
+        "paid"
+      ],
+      "expectedOutcome": "refused",
+      "actualOutcome": "refused",
+      "status": "passed",
+      "errorMsg": "TransitionFamilyRefused: Illegal transition from 'idle' to 'processing' in OrderFlow. Missing required intermediate states: cart_updated, address_added"
+    },
+    {
+      "id": "TRAJ-VOLUNTEER-CONFORMING",
+      "familyId": "VolunteerFlow",
+      "trajectory": [
+        "idle",
+        "applied",
+        "interview_scheduled",
+        "approved",
+        "assigned"
+      ],
+      "expectedOutcome": "admitted",
+      "actualOutcome": "admitted",
+      "status": "passed"
+    },
+    {
+      "id": "TRAJ-VOLUNTEER-PERTURBED",
+      "familyId": "VolunteerFlow",
+      "trajectory": [
+        "idle",
+        "applied",
+        "idle"
+      ],
+      "expectedOutcome": "refused",
+      "actualOutcome": "refused",
+      "status": "passed",
+      "errorMsg": "TransitionFamilyRefused: Illegal transition from 'applied' to 'idle' in VolunteerFlow"
+    }
+  ]
+}

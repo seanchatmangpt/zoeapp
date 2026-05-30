@@ -1,0 +1,16 @@
+{
+  "gate": "TRUEX-HOOK-OTP-SMOKE",
+  "status": "passed",
+  "duration_ms": 75,
+  "checks": {
+    "clientAdvisory": true,
+    "pendingReceipt": true,
+    "clientAuthorityRefused": true,
+    "outboxQueued": true,
+    "edgeSettled": true,
+    "receiptReadback": true,
+    "avatarProjectionMatrix": true,
+    "supervisorIntervention": true,
+    "replayDeterminism": true
+  }
+}

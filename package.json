@@ -13,7 +13,12 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gen:semantic": "hypergen action semantic",
+    "hygen": "hypergen",
+    "truex": "npx tsx scripts/dispatch.ts",
+    "e2e": "maestro test .maestro/",
+    "dispatch": "npx tsx scripts/dispatch.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -59,19 +64,23 @@
     "@babel/core": "^7.29.0",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
+    "@types/node": "^25.9.1",
     "@types/react": "~19.2.15",
     "babel-preset-expo": "~56.0.0",
+    "citty": "^0.2.2",
+    "consola": "^3.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.4",
     "eslint-config-expo": "^56.0.4",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
+    "hypergen": "^8.0.0-beta.1",
     "jest": "^29.7.0",
     "jest-expo": "~56.0.4",
     "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
-    "react-test-renderer": "19.2.0",
+    "react-test-renderer": "^19.2.3",
     "supabase": "^2.101.0",
     "typescript": "^6.0.3"
   },

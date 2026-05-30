@@ -1,0 +1,42 @@
+appId: com.anonymous.expo-supabase-ai-template
+name: Offline Outbox Replay
+
+---
+- runFlow: 00_boot.yaml
+
+- tapOn:
+    id: "dev-actor-lab-tab"
+
+- tapOn:
+    id: "mock-network-off"
+
+- tapOn: "Sermons"
+
+- tapOn:
+    id: "sermon-title-input"
+
+- inputText: "Offline Sermon"
+
+- tapOn:
+    id: "publish-sermon-submit"
+
+- assertVisible: "accepted_pending"
+
+- tapOn:
+    id: "arrow-left"
+
+- assertVisible:
+    id: "outbox-count"
+- assertVisible: "1"
+
+- tapOn:
+    id: "mock-network-on"
+
+- tapOn:
+    id: "sync-outbox-now"
+
+- assertVisible: "applied_remote"
+
+- assertVisible:
+    id: "outbox-count"
+- assertVisible: "0"

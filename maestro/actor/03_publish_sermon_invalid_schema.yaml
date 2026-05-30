@@ -1,0 +1,31 @@
+appId: com.anonymous.expo-supabase-ai-template
+name: Publish Sermon - Invalid Schema
+
+---
+- runFlow: 00_boot.yaml
+
+- tapOn:
+    id: "dev-actor-lab-tab"
+
+- tapOn: "Sermons"
+
+- tapOn:
+    id: "publish-sermon-submit"
+
+- assertVisible:
+    id: "receipt-status"
+
+- assertVisible: "rejected_local"
+
+- assertVisible:
+    id: "latest-error-code"
+
+- assertVisible: "INPUT_INVALID"
+
+- tapOn:
+    id: "arrow-left"
+
+- assertVisible:
+    id: "outbox-count"
+
+- assertVisible: "0"

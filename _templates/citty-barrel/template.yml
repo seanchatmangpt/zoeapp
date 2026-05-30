@@ -1,0 +1,14 @@
+name: citty-barrel
+description: Create a simple index barrel for command modules
+version: 1.0.0
+category: cli
+
+variables:
+  out:
+    type: string
+    required: true
+
+examples:
+  - title: Commands barrel
+    variables:
+      out: scripts/cli/commands/index.ts

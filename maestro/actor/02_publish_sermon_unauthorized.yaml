@@ -1,0 +1,38 @@
+appId: com.anonymous.expo-supabase-ai-template
+name: Publish Sermon - Unauthorized Rejection
+
+---
+- runFlow: 00_boot.yaml
+
+- tapOn:
+    id: "dev-actor-lab-tab"
+
+- tapOn: "guest"
+
+- tapOn: "Sermons"
+
+- tapOn:
+    id: "sermon-title-input"
+
+- inputText: "Unauthorized Sermon"
+
+- tapOn:
+    id: "publish-sermon-submit"
+
+- assertVisible:
+    id: "receipt-status"
+
+- assertVisible: "rejected_local"
+
+- assertVisible:
+    id: "latest-error-code"
+
+- assertVisible: "AUTHZ_DENIED"
+
+- tapOn:
+    id: "arrow-left"
+
+- assertVisible:
+    id: "outbox-count"
+
+- assertVisible: "0"

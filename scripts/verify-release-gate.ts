@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -156,7 +157,7 @@ export function verifyReleaseGate(manifestPath?: string): void {
 }
 
 // Execute the check if run directly
-if (require.main === module) {
+if (typeof require !== 'undefined' && (require as any).main === module) {
   try {
     verifyReleaseGate();
     process.exit(0);
