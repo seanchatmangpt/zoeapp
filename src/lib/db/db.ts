@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { openDatabaseSync } from 'expo-sqlite';
 import * as schema from './schema';
 
-export const DATABASE_NAME = 'zoeapp.db';
+export const DATABASE_NAME = '@truex/membrane-client.db';
 
 // Open the SQLite database connection
 export const expoDb = openDatabaseSync(DATABASE_NAME);
