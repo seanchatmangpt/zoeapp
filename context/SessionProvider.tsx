@@ -90,7 +90,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
  * const { session, loading } = useSession();
  *
  * if (loading) return <LoadingSpinner />;
- * if (!session) return <LoginScreen />;
+ * if (!session) return <LoginAvatarRelativeProjection />;
  * return <AuthenticatedApp />;
  */
 export const useSession = () => {

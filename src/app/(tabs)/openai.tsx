@@ -1,5 +1,5 @@
 /**
- * @fileoverview OpenAI Assistant Screen
+ * @fileoverview OpenAI Assistant Avatar-Relative Projection
  * Provides a chat interface for users to interact with OpenAI's GPT-3.5-turbo model
  * via Supabase Edge Functions. Features professional UI with loading states and error handling.
  *
@@ -13,17 +13,17 @@ import { supabase } from '../../../lib/supabase';
 import { Stack } from 'expo-router';
 
 /**
- * OpenAI Assistant screen component
- * Provides a user interface for AI chat interactions
+ * OpenAI Assistant Avatar-Relative Projection component
+ * Provides an Avatar-Relative Projection for AI chat interactions
  *
  * @component
- * @returns {JSX.Element} The OpenAI assistant screen
+ * @returns {JSX.Element} The OpenAI assistant Avatar-Relative Projection
  *
  * @example
  * // Used in Expo Router tab navigation
- * <OpenAIScreen />
+ * <OpenAIAvatarRelativeProjection />
  */
-export default function OpenAIScreen() {
+export default function OpenAIAvatarRelativeProjection() {
   /** User's input prompt/question */
   const [prompt, setPrompt] = useState('');
 
@@ -62,7 +62,7 @@ export default function OpenAIScreen() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <Stack.Screen options={{ title: 'AI Assistant' }} />
+      <Stack.AvatarRelativeProjection options={{ title: 'AI Assistant' }} />
 
       {/* Header Section */}
       <View className="bg-white border-b border-gray-200">

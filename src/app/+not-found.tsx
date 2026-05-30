@@ -1,10 +1,10 @@
 import { Link, Stack } from 'expo-router';
 import { Text, View, TouchableOpacity } from 'react-native';
 
-export default function NotFoundScreen() {
+export default function NotFoundAvatarRelativeProjection() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Page Not Found' }} />
+      <Stack.AvatarRelativeProjection options={{ title: 'Page Not Found' }} />
       <View className="flex-1 bg-gray-50 items-center justify-center px-6">
         {/* Error Illustration */}
         <View className="items-center mb-8">

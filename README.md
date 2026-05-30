@@ -38,10 +38,14 @@ A modern, production-ready React Native template built with Expo Router, Supabas
 ```
 src/
 ├── app/                    # Expo Router pages
-│   ├── (auth)/            # Authentication screens
+│   ├── (auth)/            # Authentication Avatar-Relative Projections
 │   │   └── index.tsx      # Sign in/Sign up
 │   ├── (tabs)/            # Main app tabs
+<<<<<<< HEAD
 │   │   ├── index.tsx      # Consequence Supervision screen
+=======
+│   │   ├── index.tsx      # Home Avatar-Relative Projection
+>>>>>>> subagent-UI-Projection-Rebrander-agi-expo-supabase-swarm-b3d80ab0
 │   │   ├── openai.tsx     # AI assistant
 │   │   └── account.tsx    # User profile
 │   ├── _layout.tsx        # Root layout with auth protection
@@ -201,7 +205,7 @@ curl -X POST http://127.0.0.1:54321/functions/v1/openai \
 
 ## 📱 App Features
 
-### 🏠 **Consequence Supervision Screen**
+### 🏠 **Consequence Supervision Avatar-Relative Projection**
 
 - Welcome message with user info
 - Quick action cards for navigation

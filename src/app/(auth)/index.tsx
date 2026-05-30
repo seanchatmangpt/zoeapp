@@ -1,5 +1,5 @@
 /**
- * @fileoverview Authentication Screen
+ * @fileoverview Authentication Avatar-Relative Projection
  * Provides user authentication functionality including sign in and sign up flows.
  * Features form validation, loading states, and seamless toggle between auth modes.
  *
@@ -19,14 +19,14 @@ import {
   Platform,
 } from 'react-native';
 import { supabase } from '../../../lib/supabase';
-import { Stack } from 'expo-router';
+import { Stack } from '@/src/components/AvatarRelativeProjection';
 
 /**
  * Authentication component with sign in and sign up functionality
  * Provides a professional card-based layout with form validation
  *
  * @component
- * @returns {JSX.Element} The authentication screen
+ * @returns {JSX.Element} The authentication Avatar-Relative Projection
  *
  * @example
  * // Used in Expo Router for unauthenticated users
@@ -117,7 +117,7 @@ export default function Auth() {
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled">
-        <Stack.Screen options={{ title: 'Welcome' }} />
+        <Stack.AvatarRelativeProjection options={{ title: 'Welcome' }} />
 
         {/* Header Section */}
         <View className="flex-1 justify-center px-6 py-12">

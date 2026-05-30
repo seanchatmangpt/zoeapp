@@ -1,6 +1,6 @@
 /**
- * @fileoverview Consequence Supervision Screen Component
- * The main Consequence Supervision screen that welcomes users and provides navigation to key app features.
+ * @fileoverview Consequence Supervision Avatar-Relative Projection Component
+ * The main Consequence Supervision Avatar-Relative Projection that welcomes users and provides navigation to key app features.
  * Displays user information, quick action cards, and feature overview.
  *
  * @author Your Name
@@ -12,17 +12,17 @@ import { useSession } from '@/context/SessionProvider';
 import { Link } from 'expo-router';
 
 /**
- * Consequence Supervision screen component - main Consequence Supervision of the application
+ * Consequence Supervision Avatar-Relative Projection component - main Consequence Supervision of the application
  * Shows welcome message, user info, and navigation cards to key features
  *
  * @component
- * @returns {JSX.Element} The Consequence Supervision screen with welcome message and feature cards
+ * @returns {JSX.Element} The Consequence Supervision Avatar-Relative Projection with welcome message and feature cards
  *
  * @example
  * // Used as the main tab in Expo Router
- * <ConsequenceSupervisionScreen />
+ * <ConsequenceSupervisionAvatarRelativeProjection />
  */
-export default function ConsequenceSupervisionScreen() {
+export default function ConsequenceSupervisionAvatarRelativeProjection() {
   const { session, loading } = useSession();
 
   // Show loading state while session is being determined
