@@ -2,6 +2,8 @@ import { VirtualKnowledgeGraphClient } from '../client';
 import { DataFactory } from '../rdf';
 import { Sermon } from '../../../types/semantic/Sermon';
 
+import { db } from '../../db/db';
+
 // Mock Drizzle and Supabase
 jest.mock('../../db/db', () => {
   const mockWhereSelectFn = jest.fn().mockImplementation(() => Promise.resolve([]));
@@ -28,8 +30,6 @@ jest.mock('@/lib/supabase', () => ({
     }),
   },
 }));
-
-import { db } from '../../db/db';
 
 describe('Schema.org Sermon Mapping', () => {
   let client: VirtualKnowledgeGraphClient;

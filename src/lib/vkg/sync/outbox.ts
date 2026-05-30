@@ -3,7 +3,7 @@ import { GraphDelta } from '../hooks/engine.js';
 import { VkgHook, HookReceipt } from '../hooks/types.js';
 
 export class OutboxManager {
-  private queue: Array<{ delta: GraphDelta, hook: VkgHook, isBatched: boolean }> = [];
+  private queue: { delta: GraphDelta, hook: VkgHook, isBatched: boolean }[] = [];
   private receipts: HookReceipt[] = [];
   private lastReceiptHash: string = 'genesis_hash';
   

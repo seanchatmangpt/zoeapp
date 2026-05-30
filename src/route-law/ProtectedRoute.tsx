@@ -7,6 +7,8 @@ import React from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useSession } from '@/context/SessionProvider';
+import { useActorOpsStore } from '../lib/actor/actorOps';
+import { mmkvInstance } from '../lib/store/mmkvStorage';
 import { admitRoute, DEFAULT_IDENTITY_HIERARCHY } from './guards';
 import { RouteDefinition, ParticipantBasis, RefusalReason, IdentityBoundary } from './types';
 
@@ -110,7 +112,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   participant,
 }) => {
   const { session, loading } = useSession();
-  const latestReceipt = require('../lib/actor/actorOps').useActorOpsStore((state: any) => state.latestReceipt);
+  const latestReceipt = useActorOpsStore((state: any) => state.latestReceipt);
   const [receiptVerified, setReceiptVerified] = React.useState(false);
   const [checkingReceipt, setCheckingReceipt] = React.useState(!!route.requiredReceiptCommandId);
 
@@ -132,8 +134,18 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       }
 
       try {
-        // 1. Check MMKV first (fast synchronous lookup)
-        const { mmkvInstance } = require('../lib/store/mmkvStorage');
+        // 1. Check Zustand store's latestReceipt first (fast local check)
+        if (latestReceipt && latestReceipt.commandId === route.requiredReceiptCommandId) {
+          if (!route.requiredReceiptDeltaHash || latestReceipt.deltaHash === route.requiredReceiptDeltaHash) {
+            if (active) {
+              setReceiptVerified(true);
+              setCheckingReceipt(false);
+            }
+            return;
+          }
+        }
+
+        // 2. Check MMKV (fast synchronous lookup)
         const mmkvReceiptJson = mmkvInstance.getString(`receipt_${route.requiredReceiptCommandId}`);
         const mmkvHash = mmkvInstance.getString(`receipt_hash_${route.requiredReceiptCommandId}`);
         
@@ -157,7 +169,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           return;
         }
 
-        // 2. Check SQLite if not found in MMKV
+        // 3. Check SQLite if not found in MMKV/Zustand
         const { db } = require('../lib/db/db');
         const { actorReceipts } = require('../lib/db/schema');
         const { eq } = require('drizzle-orm');
@@ -204,18 +216,19 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     verifyReceipt();
 
     // Subscribe to MMKV changes dynamically
-    try {
-      const { mmkvInstance } = require('../lib/store/mmkvStorage');
-      mmkvListener = mmkvInstance.addOnValueChangedListener((key: string) => {
-        if (
-          key === `receipt_${route.requiredReceiptCommandId}` ||
-          key === `receipt_hash_${route.requiredReceiptCommandId}`
-        ) {
-          verifyReceipt();
-        }
-      });
-    } catch (err) {
-      console.warn('Failed to subscribe to MMKV changes in ProtectedRoute:', err);
+    if (route.requiredReceiptCommandId) {
+      try {
+        mmkvListener = mmkvInstance.addOnValueChangedListener((key: string) => {
+          if (
+            key === `receipt_${route.requiredReceiptCommandId}` ||
+            key === `receipt_hash_${route.requiredReceiptCommandId}`
+          ) {
+            verifyReceipt();
+          }
+        });
+      } catch (err) {
+        console.warn('Failed to subscribe to MMKV changes in ProtectedRoute:', err);
+      }
     }
 
     return () => {

@@ -1,6 +1,9 @@
 import { SyncEngine } from './syncEngine';
 import { SyncJob } from '../db/schema';
 
+// Import after mocking so hoisted mocks take effect
+import { db } from '../db/db';
+
 // Mock the database client structure, exposing the mock hooks directly
 jest.mock('../db/db', () => {
   const mockReturningFn = jest.fn();
@@ -42,9 +45,6 @@ jest.mock('../db/db', () => {
     },
   };
 });
-
-// Import after mocking so hoisted mocks take effect
-import { db } from '../db/db';
 
 const mockedDb = db as any;
 

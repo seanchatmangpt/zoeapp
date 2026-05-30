@@ -15,7 +15,7 @@ export interface HookCondition {
 
 export interface HookEffect {
   kind: 'constructQuads' | 'annotateProjection' | 'repairCandidate' | 'emitEvent' | 'blockRefuse';
-  constructQuads?: Array<{ subject: string; predicate: string; object: string; graph?: string }>;
+  constructQuads?: { subject: string; predicate: string; object: string; graph?: string }[];
   annotation?: string;
   event?: string;
 }

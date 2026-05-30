@@ -8,6 +8,8 @@ import { VirtualKnowledgeGraphClient } from '../../vkg/client';
 import { DataFactory } from '../../vkg/rdf';
 import { ActorRef, CommandEnvelope, Principal, ActorBehavior } from '../types';
 
+import { db } from '../../db/db';
+
 // Mock the database client structure
 jest.mock('../../db/db', () => {
   let mockStore: any[] = [];
@@ -195,8 +197,6 @@ jest.mock('../../sync/syncEngine', () => {
     },
   };
 });
-
-import { db } from '../../db/db';
 
 const mockedDb = db as any;
 
@@ -407,6 +407,34 @@ describe('Actor Authoritative Runtime', () => {
       // Assert quarantine record written
       const quarantineEntries = mockedDb._mockStore.filter((x: any) => x.commandId === 'cmd-reconcile-1' && x._tableName === 'actor_quarantine');
       expect(quarantineEntries).toHaveLength(1);
+    });
+  });
+
+  describe('Global State Membrane Traps', () => {
+    it('forces global state updates to generate MembraneReceipts', async () => {
+      const { Receipts } = require('../../membrane/receipts');
+      Receipts.clear();
+      
+      const { setNetworkOffline, isNetworkOffline } = require('../actorOps');
+      
+      // 1. Initial State
+      expect(isNetworkOffline()).toBe(false);
+      
+      // 2. Perform Mutation under proxy control
+      setNetworkOffline(true);
+      
+      // Since context.run is asynchronous and returns in background, wait slightly
+      await new Promise(resolve => setTimeout(resolve, 35));
+      
+      expect(isNetworkOffline()).toBe(true);
+      
+      // 3. Confirm that Membrane receipt log has registered the mutation
+      const history = Receipts.getHistory();
+      expect(history.length).toBeGreaterThan(0);
+      
+      const lastReceipt = history[history.length - 1];
+      expect(lastReceipt.capabilityId).toBe('property-mutator');
+      expect(lastReceipt.success).toBe(true);
     });
   });
 });

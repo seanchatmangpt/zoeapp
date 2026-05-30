@@ -1,5 +1,4 @@
 /// <reference types="jest" />
-/* eslint-disable @typescript-eslint/no-require-imports */
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () =>

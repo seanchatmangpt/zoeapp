@@ -1,6 +1,9 @@
 import { VirtualKnowledgeGraphClient, VKGRdfSyncEngine } from '../client';
 import { DataFactory, Quad } from '../rdf';
 
+import { db } from '../../db/db';
+import { supabase } from '@/lib/supabase';
+
 // Mock the database client structure
 jest.mock('../../db/db', () => {
   const mockReturningFn = jest.fn();
@@ -79,9 +82,6 @@ jest.mock('../../sync/syncEngine', () => {
     },
   };
 });
-
-import { db } from '../../db/db';
-import { supabase } from '@/lib/supabase';
 
 const mockedDb = db as any;
 const mockedSupabase = supabase as any;

@@ -65,7 +65,7 @@ export interface DigitalTwinScenario {
   id: string;
   name: string;
   simulationClockHorizonMs: number;
-  syntheticDeltas: Array<Record<string, unknown>>; // Mock GraphDeltas
+  syntheticDeltas: Record<string, unknown>[]; // Mock GraphDeltas
   replicaStateHash: string;
 }
 

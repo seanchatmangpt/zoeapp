@@ -2,37 +2,58 @@ import { create } from 'zustand';
 import { VirtualKnowledgeGraphClient } from '../vkg/client';
 import { ActorDispatcher, ActorSyncEngine } from './dispatcher';
 import { Principal, Receipt } from './types';
+import { MembraneContext } from '../membrane/context';
+import { ProxyableBridge } from '../membrane/proxyableBridge';
 
-// Simple global mutable state for non-hook contexts (like dispatchers and sync engines)
-let globalNetworkOffline = false;
-let globalRemoteRejectionMocked = false;
-let globalCurrentPrincipal: Principal = { id: 'usr-admin', role: 'admin' };
+// Define the global operational membrane context for simulator/dev mutations
+const globalStateMembraneContext = new MembraneContext({
+  mode: 'strict',
+  tenantId: 'tenant-default',
+  authorityRole: 'admin',
+});
+
+// Target state object that will hold the actual values under proxy protection
+const globalStateTarget = {
+  networkOffline: false,
+  remoteRejectionMocked: false,
+  currentPrincipal: { id: 'usr-admin', role: 'admin' } as Principal,
+};
+
+// Wrap the target state object in a ProxyableBridge governed by the MembraneContext
+const proxyGlobalState = ProxyableBridge.wrap(globalStateTarget, globalStateMembraneContext, {
+  onMutation: (prop, value) => {
+    if (prop === 'networkOffline') {
+      useActorOpsStore.setState({ networkOnline: !value });
+    } else if (prop === 'remoteRejectionMocked') {
+      useActorOpsStore.setState({ remoteRejectActive: value });
+    } else if (prop === 'currentPrincipal') {
+      useActorOpsStore.setState({ currentPrincipal: value });
+    }
+  },
+});
 
 export function isNetworkOffline(): boolean {
-  return globalNetworkOffline;
+  return proxyGlobalState.networkOffline;
 }
 
 export function setNetworkOffline(val: boolean) {
-  globalNetworkOffline = val;
-  useActorOpsStore.setState({ networkOnline: !val });
+  proxyGlobalState.networkOffline = val;
 }
 
 export function isRemoteRejectionMocked(): boolean {
-  return globalRemoteRejectionMocked;
+  return proxyGlobalState.remoteRejectionMocked;
 }
 
 export function setRemoteRejectionMocked(val: boolean) {
-  globalRemoteRejectionMocked = val;
-  useActorOpsStore.setState({ remoteRejectActive: val });
+  proxyGlobalState.remoteRejectionMocked = val;
 }
 
 export function getCurrentPrincipal(): Principal {
-  return globalCurrentPrincipal;
+  return proxyGlobalState.currentPrincipal;
 }
 
 export function setCurrentPrincipal(principal: Principal) {
-  globalCurrentPrincipal = principal;
-  useActorOpsStore.setState({ currentPrincipal: principal });
+  proxyGlobalState.currentPrincipal = principal;
 }
 
 // Global Singletons
@@ -58,23 +79,23 @@ interface ActorOpsState {
 }
 
 export const useActorOpsStore = create<ActorOpsState>((set) => ({
-  networkOnline: !globalNetworkOffline,
-  remoteRejectActive: globalRemoteRejectionMocked,
-  currentPrincipal: globalCurrentPrincipal,
+  networkOnline: !proxyGlobalState.networkOffline,
+  remoteRejectActive: proxyGlobalState.remoteRejectionMocked,
+  currentPrincipal: proxyGlobalState.currentPrincipal,
   latestReceipt: null,
   latestEvent: null,
   outboxCount: 0,
   quarantineCount: 0,
   setNetworkOnline: (online) => {
-    globalNetworkOffline = !online;
+    proxyGlobalState.networkOffline = !online;
     set({ networkOnline: online });
   },
   setRemoteRejectActive: (active) => {
-    globalRemoteRejectionMocked = active;
+    proxyGlobalState.remoteRejectionMocked = active;
     set({ remoteRejectActive: active });
   },
   setCurrentPrincipal: (principal) => {
-    globalCurrentPrincipal = principal;
+    proxyGlobalState.currentPrincipal = principal;
     set({ currentPrincipal: principal });
   },
   setLatestReceipt: (receipt) => set({ latestReceipt: receipt }),

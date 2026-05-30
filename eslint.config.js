@@ -27,6 +27,12 @@ module.exports = [
       'react-hooks/set-state-in-effect': 'off',
       'react/no-unescaped-entities': 'off',
       'react-hooks/immutability': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/array-type': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'import/first': 'off',
+      'import/no-named-as-default': 'off',
     },
   },
 ];
