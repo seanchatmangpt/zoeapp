@@ -181,7 +181,7 @@ export default function ActorLab() {
         </AdminCard>
 
         {/* 4. Trigger Sync Action */}
-        <AdminCard title="Trigger Outbox Sync Replay" subtitle="Manually push offline queue items up to Server Authority">
+        <AdminCard title="Trigger Outbox Sync Replay" subtitle="Manually push Pre-Admission Tension Queue items up to Server Authority">
           <CommandButton 
             title={syncing ? 'Synchronizing...' : 'Sync Outbox Now'} 
             onPress={triggerSync}
