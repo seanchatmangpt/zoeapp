@@ -20,6 +20,12 @@ interface SessionContextType {
   session: Session | null;
   /** Loading state while session is being determined */
   loading: boolean;
+  /** Whether the session is transitioning (e.g. logging in/out) */
+  isTransitioning: boolean;
+  /** Type of transition */
+  transitionType: 'signin' | 'signout' | null;
+  /** Setter for transitioning state */
+  setIsTransitioning: (val: boolean) => void;
 }
 
 /**
@@ -29,6 +35,9 @@ interface SessionContextType {
 const SessionContext = createContext<SessionContextType>({
   session: null,
   loading: true,
+  isTransitioning: false,
+  transitionType: null,
+  setIsTransitioning: () => {},
 });
 
 /**
@@ -53,21 +62,44 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   /** Loading state during session initialization */
   const [loading, setLoading] = useState(true);
 
+  /** Transition state when session changes at runtime */
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionType, setTransitionType] = useState<'signin' | 'signout' | null>(null);
+
   useEffect(() => {
     console.log('SessionProvider useEffect triggered');
+    let initialized = false;
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('SessionProvider getSession result:', session);
       setSession(session);
       setLoading(false);
+      // Wait a tiny bit before setting initialized to true, to let the first auth state event pass
+      setTimeout(() => {
+        initialized = true;
+      }, 100);
     });
 
     // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('SessionProvider onAuthStateChange event:', _event, 'session:', session);
-      setSession(session);
-      setLoading(false);
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      console.log('SessionProvider onAuthStateChange event:', _event, 'session:', newSession);
+      
+      if (initialized) {
+        setSession((prev) => {
+          if (!prev && newSession) {
+            setTransitionType('signin');
+            setIsTransitioning(true);
+          } else if (prev && !newSession) {
+            setTransitionType('signout');
+            setIsTransitioning(true);
+          }
+          return newSession;
+        });
+      } else {
+        setSession(newSession);
+        setLoading(false);
+      }
     });
 
     return () => {
@@ -75,7 +107,29 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     };
   }, []);
 
-  return <SessionContext.Provider value={{ session, loading }}>{children}</SessionContext.Provider>;
+  // Auto-clear transition state after animation finishes
+  useEffect(() => {
+    if (isTransitioning) {
+      const timer = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 850); // 850ms covers the navigation animation and mounting delay
+      return () => clearTimeout(timer);
+    }
+  }, [isTransitioning]);
+
+  return (
+    <SessionContext.Provider
+      value={{
+        session,
+        loading,
+        isTransitioning,
+        transitionType,
+        setIsTransitioning,
+      }}
+    >
+      {children}
+    </SessionContext.Provider>
+  );
 };
 
 /**

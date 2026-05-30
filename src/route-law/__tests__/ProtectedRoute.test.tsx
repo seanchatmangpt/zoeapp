@@ -5,6 +5,7 @@ import { ProtectedRoute } from '../ProtectedRoute';
 import { useRouteAdmission } from '../../hooks/useRouteAdmission';
 
 const mockUseSession = jest.fn();
+const mockReplace = jest.fn();
 
 jest.mock('@/context/SessionProvider', () => ({
   useSession: () => mockUseSession(),
@@ -15,6 +16,9 @@ jest.mock('expo-router', () => {
   return {
     Redirect: ({ href }: { href: string }) =>
       ReactMock.createElement('Text', { testID: 'redirect-mock' }, `Redirect: ${href}`),
+    useRouter: () => ({
+      replace: mockReplace,
+    }),
   };
 });
 
@@ -349,13 +353,8 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
         );
       });
 
-      // Initially it should redirect because receipt is not verified
-      expect(root.toJSON()).toEqual(
-        expect.objectContaining({
-          type: 'Text',
-          children: ['Redirect: /(tabs)'],
-        })
-      );
+      // Initially it should show the premium blocking screen because receipt is not verified
+      expect(JSON.stringify(root.toJSON())).toContain('Admission Refused');
 
       // Now update the Zustand store's latestReceipt and trigger update
       await act(async () => {
@@ -416,13 +415,8 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
         );
       });
 
-      // Initially it should redirect because receipt is not verified
-      expect(root.toJSON()).toEqual(
-        expect.objectContaining({
-          type: 'Text',
-          children: ['Redirect: /(tabs)'],
-        })
-      );
+      // Initially it should show the premium blocking screen because receipt is not verified
+      expect(JSON.stringify(root.toJSON())).toContain('Admission Refused');
 
       // Now simulate a change in MMKV and trigger the listener
       await act(async () => {

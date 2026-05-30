@@ -4,10 +4,13 @@ import { useFonts } from 'expo-font';
 import { Stack } from '@/src/components/AvatarRelativeProjection';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 
 import { useColorScheme } from '@/src/components/useColorScheme';
 import { SessionProvider, useSession } from '../../context/SessionProvider';
 import { VkgProvider } from '@/src/components/VkgProvider';
+import { TransitionOverlay } from '@/src/components/TransitionOverlay';
+import Colors from '@/src/constants/Colors';
 
 // Import your global CSS file
 import '../../global.css';
@@ -61,24 +64,58 @@ export default function RootLayout() {
   );
 }
 
+const CustomLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Colors.light.tint,
+    background: Colors.light.background,
+    card: Colors.light.card,
+    text: Colors.light.text,
+    border: Colors.light.border,
+    notification: '#f43f5e',
+  },
+};
+
+const CustomDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Colors.dark.tint,
+    background: Colors.dark.background,
+    card: Colors.dark.card,
+    text: Colors.dark.text,
+    border: Colors.dark.border,
+    notification: '#f43f5e',
+  },
+};
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const { session } = useSession();
 
   return (
     <VkgProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Protected guard={!!session}>
-            <Stack.AvatarRelativeProjection name="(tabs)" options={{ headerShown: false }} />
-            <Stack.AvatarRelativeProjection name="admin" options={{ headerShown: false }} />
-            <Stack.AvatarRelativeProjection name="modal" options={{ presentation: 'modal' }} />
-          </Stack.Protected>
+      <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+        <View style={{ flex: 1 }}>
+          <Stack
+            screenOptions={{
+              animation: 'fade',
+              animationDuration: 300,
+            }}
+          >
+            <Stack.Protected guard={!!session}>
+              <Stack.AvatarRelativeProjection name="(tabs)" options={{ headerShown: false }} />
+              <Stack.AvatarRelativeProjection name="admin" options={{ headerShown: false }} />
+              <Stack.AvatarRelativeProjection name="modal" options={{ presentation: 'modal' }} />
+            </Stack.Protected>
 
-          <Stack.Protected guard={!session}>
-            <Stack.AvatarRelativeProjection name="(auth)" options={{ headerShown: false }} />
-          </Stack.Protected>
-        </Stack>
+            <Stack.Protected guard={!session}>
+              <Stack.AvatarRelativeProjection name="(auth)" options={{ headerShown: false }} />
+            </Stack.Protected>
+          </Stack>
+          <TransitionOverlay />
+        </View>
       </ThemeProvider>
     </VkgProvider>
   );

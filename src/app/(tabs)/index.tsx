@@ -74,7 +74,7 @@ export default function ConsequenceSupervisionAvatarRelativeProjection() {
   const userName = userEmail?.split('@')[0] || 'User';
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ paddingBottom: 110 }}>
       {/* Welcome Header */}
       <View className="bg-white border-b border-gray-200">
         <View className="px-6 py-8">
