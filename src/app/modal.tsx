@@ -3,7 +3,7 @@ import { Platform, TouchableOpacity, ScrollView, View, Text } from 'react-native
 import { useRouter } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 
-export default function ModalScreen() {
+export default function ModalAvatarRelativeProjection() {
   const router = useRouter();
 
   return (
@@ -27,7 +27,7 @@ export default function ModalScreen() {
             </View>
             <Text className="text-xl font-bold text-gray-900 mb-2">Welcome to the Modal</Text>
             <Text className="text-gray-600 text-center leading-6">
-              This is a modal screen that demonstrates how modals work in Expo Router.
+              This is a modal Avatar-Relative Projection that demonstrates how modals work in Expo Router.
             </Text>
           </View>
         </View>
@@ -42,7 +42,7 @@ export default function ModalScreen() {
                 <AntDesign name="check" size={14} color="#059669" />
               </View>
               <View className="flex-1">
-                <Text className="font-medium text-gray-900">Full Screen Modal</Text>
+                <Text className="font-medium text-gray-900">Full Avatar-Relative Projection Modal</Text>
                 <Text className="text-gray-600 text-sm">
                   Presented as a modal with custom navigation
                 </Text>
@@ -68,7 +68,7 @@ export default function ModalScreen() {
               <View className="flex-1">
                 <Text className="font-medium text-gray-900">Easy Navigation</Text>
                 <Text className="text-gray-600 text-sm">
-                  Simple close button to return to previous screen
+                  Simple close button to return to previous Avatar-Relative Projection
                 </Text>
               </View>
             </View>

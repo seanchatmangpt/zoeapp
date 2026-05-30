@@ -1,5 +1,5 @@
 /**
- * @fileoverview Account Management Screen
+ * @fileoverview Account Management Avatar-Relative Projection
  * Provides user profile management functionality including username, website, and avatar URL editing.
  * Integrates with Supabase for secure profile data persistence.
  *
@@ -10,7 +10,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { View, Alert, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack } from '@/src/components/AvatarRelativeProjection';
 import { useSession } from '@/context/SessionProvider';
 
 /**
@@ -18,7 +18,7 @@ import { useSession } from '@/context/SessionProvider';
  * Allows users to view and update their profile information
  *
  * @component
- * @returns {JSX.Element} The account management screen
+ * @returns {JSX.Element} The account management Avatar-Relative Projection
  *
  * @example
  * // Used in Expo Router tab navigation
@@ -135,7 +135,7 @@ export default function Account() {
 
   return (
     <ScrollView className="flex-1 bg-gray-50">
-      <Stack.Screen options={{ title: 'Account Settings' }} />
+      <Stack.AvatarRelativeProjection options={{ title: 'Account Settings' }} />
 
       {/* Header */}
       <View className="bg-white border-b border-gray-200">

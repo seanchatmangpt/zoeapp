@@ -1,6 +1,6 @@
 /**
- * @fileoverview Home Screen Component
- * The main dashboard screen that welcomes users and provides navigation to key app features.
+ * @fileoverview Home Avatar-Relative Projection Component
+ * The main dashboard Avatar-Relative Projection that welcomes users and provides navigation to key app features.
  * Displays user information, quick action cards, and feature overview.
  *
  * @author Your Name
@@ -12,17 +12,17 @@ import { useSession } from '@/context/SessionProvider';
 import { Link } from 'expo-router';
 
 /**
- * Home screen component - main dashboard of the application
+ * Home Avatar-Relative Projection component - main dashboard of the application
  * Shows welcome message, user info, and navigation cards to key features
  *
  * @component
- * @returns {JSX.Element} The home screen with welcome message and feature cards
+ * @returns {JSX.Element} The home Avatar-Relative Projection with welcome message and feature cards
  *
  * @example
  * // Used as the main tab in Expo Router
- * <HomeScreen />
+ * <HomeAvatarRelativeProjection />
  */
-export default function HomeScreen() {
+export default function HomeAvatarRelativeProjection() {
   const { session, loading } = useSession();
 
   // Show loading state while session is being determined

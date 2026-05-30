@@ -1,6 +1,6 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
+import { Tabs } from '@/src/components/AvatarRelativeProjection';
 
 import Colors from '@/src/constants/Colors';
 import { useColorScheme } from '@/src/components/useColorScheme';
@@ -19,27 +19,27 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+      avatarRelativeProjectionOptions={{
         tabBarActiveTintColor: Colors[colorScheme === 'dark' ? 'dark' : 'light'].tint,
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
       }}>
-      <Tabs.Screen
+      <Tabs.AvatarRelativeProjection
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
-      <Tabs.Screen
+      <Tabs.AvatarRelativeProjection
         name="openai"
         options={{
           title: 'OpenAI',
           tabBarIcon: ({ color }) => <TabBarIcon name="lightbulb-o" color={color} />,
         }}
       />
-      <Tabs.Screen
+      <Tabs.AvatarRelativeProjection
         name="account"
         options={{
           title: 'Account',

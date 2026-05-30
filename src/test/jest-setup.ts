@@ -21,8 +21,9 @@ jest.mock('expo-router', () => {
     useFocusEffect: (effect: any) => {
       React.useEffect(effect, [effect]);
     },
-    Stack: {
-      Screen: jest.fn(({ options }: any) => {
+    Stack: (() => {
+      const MockStack = ({ children }: any) => children;
+      const MockScreen = jest.fn(({ options }: any) => {
         const Right = options?.headerRight;
         const Left = options?.headerLeft;
         return React.createElement(
@@ -31,8 +32,19 @@ jest.mock('expo-router', () => {
           typeof Right === 'function' ? Right() : Right,
           typeof Left === 'function' ? Left() : Left
         );
-      }),
-    },
+      });
+      MockStack.Screen = MockScreen;
+      MockStack.AvatarRelativeProjection = MockScreen;
+      MockStack.Protected = ({ children }: any) => children;
+      return MockStack;
+    })(),
+    Tabs: (() => {
+      const MockTabs = ({ children }: any) => children;
+      const MockScreen = jest.fn();
+      MockTabs.Screen = MockScreen;
+      MockTabs.AvatarRelativeProjection = MockScreen;
+      return MockTabs;
+    })(),
   };
 });
 

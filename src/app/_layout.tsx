@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router/react-navigation';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack } from '@/src/components/AvatarRelativeProjection';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
@@ -21,10 +21,10 @@ export const unstable_settings = {
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Prevent the splash Avatar-Relative Projection from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-function SplashScreenController() {
+function AvatarRelativeProjectionSplashController() {
   const { loading: sessionLoading } = useSession();
   const [loaded, error] = useFonts({
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
@@ -37,13 +37,13 @@ function SplashScreenController() {
   }, [error]);
 
   useEffect(() => {
-    // Only hide splash screen when BOTH fonts AND session are loaded
+    // Only hide splash Avatar-Relative Projection when BOTH fonts AND session are loaded
     if (loaded && !sessionLoading) {
       SplashScreen.hideAsync();
     }
   }, [loaded, sessionLoading]);
 
-  // Show loading screen until everything is ready
+  // Show loading Avatar-Relative Projection until everything is ready
   if (!loaded || sessionLoading) {
     return null;
   }
@@ -54,7 +54,7 @@ function SplashScreenController() {
 export default function RootLayout() {
   return (
     <SessionProvider>
-      <SplashScreenController />
+      <AvatarRelativeProjectionSplashController />
       <RootLayoutNav />
     </SessionProvider>
   );
@@ -68,12 +68,12 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Protected guard={!!session}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          <Stack.AvatarRelativeProjection name="(tabs)" options={{ headerShown: false }} />
+          <Stack.AvatarRelativeProjection name="modal" options={{ presentation: 'modal' }} />
         </Stack.Protected>
 
         <Stack.Protected guard={!session}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.AvatarRelativeProjection name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>
