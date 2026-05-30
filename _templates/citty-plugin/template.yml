@@ -1,0 +1,30 @@
+name: citty-plugin
+description: Create a reusable Citty plugin
+version: 1.0.0
+category: cli
+
+variables:
+  name:
+    type: string
+    required: true
+    pattern: ^[a-z][a-z0-9-]*$
+
+  exportName:
+    type: string
+    required: true
+
+  out:
+    type: string
+    required: true
+
+  description:
+    type: string
+    required: false
+    default: Reusable Citty plugin
+
+examples:
+  - title: Supabase context plugin
+    variables:
+      name: supabase-context
+      exportName: supabaseContextPlugin
+      out: scripts/cli/plugins/supabase-context.ts

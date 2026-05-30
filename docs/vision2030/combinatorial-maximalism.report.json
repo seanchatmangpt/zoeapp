@@ -1,0 +1,447 @@
+{
+  "totalCombinations": 82944,
+  "coveredCount": 44,
+  "missingCount": 0,
+  "reports": [
+    {
+      "caseId": "CASE-CLI-TRUEX-01",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-TRUEX-02",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-JTBD-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-JTBD-02",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-DRIFT-01",
+      "runtime": "cli",
+      "capability": "concept-drift-detector",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-DRIFT-02",
+      "runtime": "cli",
+      "capability": "concept-drift-detector",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-RLMON-01",
+      "runtime": "cli",
+      "capability": "rl-orchestrator-monitor",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-COMPL-01",
+      "runtime": "cli",
+      "capability": "compliance-safety-guard",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-COMPL-02",
+      "runtime": "cli",
+      "capability": "compliance-safety-guard",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-HABIT-01",
+      "runtime": "cli",
+      "capability": "habit-prompt-generator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-VOLFIT-01",
+      "runtime": "cli",
+      "capability": "volunteer-fit-suggester",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-RHYTHM-01",
+      "runtime": "cli",
+      "capability": "spiritual-rhythm-tracker",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-CAMPNAV-01",
+      "runtime": "cli",
+      "capability": "on-campus-navigator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-CARE-01",
+      "runtime": "cli",
+      "capability": "care-risk-escalator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CLI-FATIGUE-01",
+      "runtime": "cli",
+      "capability": "engagement-fatigue-controller",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-EDGE-HEALTH-01",
+      "runtime": "supabase-edge",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-EXPO-VIEW-01",
+      "runtime": "expo-view",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-MISSING_FIELD",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-BOUNDARY_LARGE",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-FORGED",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-MALFORMED",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-UNAUTHORIZED",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-MISSING_FIELD",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-BOUNDARY_LARGE",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-FORGED",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-MALFORMED",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-UNAUTHORIZED",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "refused",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-TEMPORAL-STABILITY-01",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CONCURRENCY-EQUIVALENCE-01",
+      "runtime": "cli",
+      "capability": "truex-receipt-verifier",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-OCEL-ROUNDTRIP-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-REPLICAS-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-CHAIN-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-ONTOLOGY-DRIFT-01",
+      "runtime": "cli",
+      "capability": "habit-prompt-generator",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-ISOLATION-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-DETERMINISM-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-COMPRESSION-01",
+      "runtime": "cli",
+      "capability": "jtbd-conformance-auditor",
+      "expectedOutcome": "replayed",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-HOOK-EVAL-01",
+      "runtime": "cli",
+      "capability": "hook-evaluator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-HOOK-RECEIPT-01",
+      "runtime": "cli",
+      "capability": "hook-evaluator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-SUPABASE-HOOK-01",
+      "runtime": "supabase-edge",
+      "capability": "hook-evaluator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-REALTIME-01",
+      "runtime": "cli",
+      "capability": "realtime-projector",
+      "expectedOutcome": "reconciled",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-DOE-01",
+      "runtime": "cli",
+      "capability": "doe-runner",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-SPC-01",
+      "runtime": "cli",
+      "capability": "spc-supervisor",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-TWIN-01",
+      "runtime": "cli",
+      "capability": "digital-twin-simulator",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    },
+    {
+      "caseId": "CASE-RESP-SURF-01",
+      "runtime": "cli",
+      "capability": "doe-runner",
+      "expectedOutcome": "admitted",
+      "status": "passed",
+      "severity": "critical",
+      "required": true,
+      "failures": []
+    }
+  ]
+}

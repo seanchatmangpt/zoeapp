@@ -1,0 +1,11 @@
+{
+  "pipelineName": "ProductionVerifierPipeline",
+  "timestamp": "2026-05-30T20:47:00Z",
+  "proofClosed": true,
+  "e2ePassed": true,
+  "verifierExecutionIds": ["id-1234", "id-5678"],
+  "details": {
+    "hashAlg": "SHA-256",
+    "signatureCount": 3
+  }
+}

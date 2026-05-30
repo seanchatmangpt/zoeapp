@@ -1,0 +1,32 @@
+{
+  "totalCommandsAnalyzed": 6,
+  "divergencesFoundCount": 5,
+  "divergences": [
+    {
+      "commandId": "cmd-local-102",
+      "errorType": "unexpected mutation",
+      "details": "unexpected mutation: Observed delta hash (hash_corrupted_observed) does not match expected replayed delta hash (hash_replayed_expected)"
+    },
+    {
+      "commandId": "cmd-local-103",
+      "errorType": "authority mismatch",
+      "details": "authority mismatch: Principal role 'member' is unauthorized to execute command 'PublishSermon' (allowed roles: admin, pastor)"
+    },
+    {
+      "commandId": "cmd-local-104",
+      "errorType": "missing transition",
+      "details": "missing transition: No observed receipt record found for commandId 'cmd-local-104'"
+    },
+    {
+      "commandId": "cmd-local-105",
+      "errorType": "receipt inconsistency",
+      "details": "receipt inconsistency: Replay outcome (success: false, error: ValidationError: Missing Title) contradicts observed receipt status 'applied_remote'"
+    },
+    {
+      "commandId": "cmd-local-106",
+      "errorType": "causal divergence",
+      "details": "causal divergence: Broken causation ID chain for command 'cmd-local-106' (expected causationId 'invalid_chain')"
+    }
+  ],
+  "status": "DIVERGENCES_DETECTED"
+}

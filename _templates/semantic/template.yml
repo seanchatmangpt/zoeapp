@@ -1,0 +1,11 @@
+name: semantic
+description: Scaffold W3C RDF / Schema.org class interfaces, hooks, database views, and Jest tests.
+version: 1.0.0
+category: semantic
+
+variables:
+  name:
+    type: string
+    required: true
+    description: Schema.org class name (e.g., CreativeWork)
+    pattern: ^[A-Z][a-zA-Z0-9]*$

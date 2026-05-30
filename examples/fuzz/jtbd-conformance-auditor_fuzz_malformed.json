@@ -1,0 +1,9 @@
+{
+  "declaredWorkflow": {
+    "notAnArray": true
+  },
+  "actualEvents": [
+    "PublishSermon",
+    "SendNotification"
+  ]
+}

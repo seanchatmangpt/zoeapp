@@ -1,0 +1,18 @@
+{
+  "replica_a_state": {
+    "sermons": [
+      "Sermon-101",
+      "Sermon-102"
+    ]
+  },
+  "replica_b_state": {
+    "sermons": [
+      "Sermon-101",
+      "Sermon-102"
+    ]
+  },
+  "replica_a_hash": "257433046423c3319f774ee2416775e2575702a5d3d6c04c4c7992354123332f",
+  "replica_b_hash": "257433046423c3319f774ee2416775e2575702a5d3d6c04c4c7992354123332f",
+  "converged": true,
+  "status": "passed"
+}

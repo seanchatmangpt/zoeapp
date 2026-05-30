@@ -16,8 +16,9 @@
     "prepare": "husky",
     "gen:semantic": "hypergen action semantic",
     "hygen": "hypergen",
-    "truex": "tsx scripts/truex.ts",
-    "e2e": "maestro test .maestro/"
+    "truex": "npx tsx scripts/dispatch.ts",
+    "e2e": "maestro test .maestro/",
+    "dispatch": "npx tsx scripts/dispatch.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [

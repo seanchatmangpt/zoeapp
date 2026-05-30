@@ -1,0 +1,10 @@
+{
+  "declaredWorkflow": [
+    "PublishSermon_FORGED",
+    "SendNotification_FORGED"
+  ],
+  "actualEvents": [
+    "PublishSermon_FORGED",
+    "SendNotification_FORGED"
+  ]
+}

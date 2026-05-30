@@ -1,0 +1,77 @@
+{
+  "totalExecuted": 10,
+  "passedCount": 10,
+  "failedCount": 0,
+  "cases": [
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-MISSING_FIELD",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "missing_field",
+      "status": "passed",
+      "errorMsg": "InputContract Error: Missing required property 'session_id'"
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-BOUNDARY_LARGE",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "boundary_large",
+      "status": "passed",
+      "errorMsg": "Boundary Error: Payload string length of 'session_id' exceeds 5000 characters limit"
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-FORGED",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "forged",
+      "status": "passed",
+      "errorMsg": "Truex verification failed"
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-MALFORMED",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "malformed",
+      "status": "passed",
+      "errorMsg": "InputContract Type Error: 'session_id' must be string"
+    },
+    {
+      "caseId": "FUZZ-TRUEX-RECEIPT-VERIFIER-UNAUTHORIZED",
+      "capability": "truex-receipt-verifier",
+      "inputClass": "unauthorized",
+      "status": "passed",
+      "errorMsg": "Admission Refused: Unauthorized authority context"
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-MISSING_FIELD",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "missing_field",
+      "status": "passed",
+      "errorMsg": "InputContract Error: Missing required property 'declaredWorkflow'"
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-BOUNDARY_LARGE",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "boundary_large",
+      "status": "passed",
+      "errorMsg": "Boundary Error: Array length of 'declaredWorkflow' exceeds limit of 100 elements"
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-FORGED",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "forged",
+      "status": "passed",
+      "errorMsg": "Integrity Error: Cryptographic check failed in 'declaredWorkflow'"
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-MALFORMED",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "malformed",
+      "status": "passed",
+      "errorMsg": "InputContract Type Error: 'declaredWorkflow' must be array"
+    },
+    {
+      "caseId": "FUZZ-JTBD-CONFORMANCE-AUDITOR-UNAUTHORIZED",
+      "capability": "jtbd-conformance-auditor",
+      "inputClass": "unauthorized",
+      "status": "passed",
+      "errorMsg": "Admission Refused: Unauthorized authority context"
+    }
+  ]
+}

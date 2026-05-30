@@ -1,0 +1,25 @@
+{
+  "totalSchedulesTested": 3,
+  "passedCount": 3,
+  "failedCount": 0,
+  "cases": [
+    {
+      "scheduleId": "SCHEDULE-INDEPENDENT-INTERLEAVING",
+      "permutationsTested": 4,
+      "all_converged_to_same_state": true,
+      "status": "passed"
+    },
+    {
+      "scheduleId": "SCHEDULE-IDEMPOTENCY-RACE",
+      "permutationsTested": 2,
+      "all_converged_to_same_state": true,
+      "status": "passed"
+    },
+    {
+      "scheduleId": "SCHEDULE-CAUSAL-PERTURBATION",
+      "permutationsTested": 2,
+      "all_converged_to_same_state": true,
+      "status": "passed"
+    }
+  ]
+}

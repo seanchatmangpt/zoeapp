@@ -1,0 +1,39 @@
+appId: com.truex.zoeapp
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    text: "Open"
+    optional: true
+- tapOn:
+    text: "your@email.com"
+    optional: true
+- inputText: "test@example.com"
+- tapOn:
+    text: "Enter your password"
+    optional: true
+- inputText: "password123"
+- tapOn:
+    text: "Sign in to access your AI assistant and more"
+    optional: true
+- tapOn:
+    text: "🔑 Sign In"
+    optional: true
+
+- assertVisible: "Truex Membrane"
+- assertVisible: "Pending Receipts: 0"
+- assertVisible: "Confirmed Receipts: 0"
+
+- tapOn: "Trigger Volunteer Cancellation"
+
+# The local membrane optimistic UI reacts instantly
+- assertVisible: "Processing Sync..."
+- assertVisible: "Pending Receipts: 1"
+
+# Wait for outbox batch flush and Edge Authority reconciliation
+- extendedWaitUntil:
+    visible: "All Evidence Reconciled ✅"
+    timeout: 5000
+
+- assertVisible: "Confirmed Receipts: 1"
+- assertVisible: "Pending Receipts: 0"
