@@ -41,7 +41,7 @@ src/
 │   ├── (auth)/            # Authentication screens
 │   │   └── index.tsx      # Sign in/Sign up
 │   ├── (tabs)/            # Main app tabs
-│   │   ├── index.tsx      # Home screen
+│   │   ├── index.tsx      # Consequence Supervision screen
 │   │   ├── openai.tsx     # AI assistant
 │   │   └── account.tsx    # User profile
 │   ├── _layout.tsx        # Root layout with auth protection
@@ -201,7 +201,7 @@ curl -X POST http://127.0.0.1:54321/functions/v1/openai \
 
 ## 📱 App Features
 
-### 🏠 **Home Screen**
+### 🏠 **Consequence Supervision Screen**
 
 - Welcome message with user info
 - Quick action cards for navigation
