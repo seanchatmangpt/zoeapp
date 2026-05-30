@@ -29,7 +29,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Consequence Supervision',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <TabBarIcon name="home" color={color} />,
         }}
       />
       <Tabs.AvatarRelativeProjection
@@ -42,14 +42,14 @@ export default function TabLayout() {
         name="account"
         options={{
           title: 'Account',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <TabBarIcon name="user" color={color} />,
         }}
       />
       <Tabs.Screen
         name="admin"
         options={{
           title: 'Admin',
-          tabBarIcon: ({ color }) => <TabBarIcon name="gears" color={color} />,
+          tabBarIcon: ({ color }: { color: string }) => <TabBarIcon name="gears" color={color} />,
           tabBarButtonTestID: 'dev-actor-lab-tab',
         }}
       />

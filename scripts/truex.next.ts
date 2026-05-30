@@ -21,7 +21,7 @@ const main = defineCommand({
 
     "replay": () => import("./cli/commands/replay").then((m) => m.default),
 
-    "truex": () => import("./cli/commands/truex").then((m) => m.default),
+    "dispatch": () => import("./cli/commands/dispatch").then((m) => m.default),
 
     "explain": () => import("./cli/commands/explain").then((m) => m.default),
 
