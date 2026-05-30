@@ -1,5 +1,5 @@
 {
-  "name": "expo-supabase-ai-template",
+  "name": "@truex/membrane-client",
   "version": "1.0.0",
   "description": "A modern React Native template with Expo Router, Supabase authentication, and OpenAI integration",
   "author": "Your Name",
@@ -14,11 +14,10 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "prepare": "husky",
+    "truex": "tsx scripts/dispatch.ts",
     "gen:semantic": "hypergen action semantic",
     "hygen": "hypergen",
-    "truex": "npx tsx scripts/dispatch.ts",
-    "e2e": "maestro test .maestro/",
-    "dispatch": "npx tsx scripts/dispatch.ts"
+    "e2e": "maestro test .maestro/"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -30,6 +29,10 @@
     ]
   },
   "dependencies": {
+    "@truex/unjucks": "^1.0.0",
+    "@truex/pictl": "^1.0.0",
+    "@truex/pm4wasm": "^1.0.0",
+    "@truex/zkp": "^1.0.0",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.75.0",

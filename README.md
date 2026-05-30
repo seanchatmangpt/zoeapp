@@ -41,11 +41,7 @@ src/
 │   ├── (auth)/            # Authentication Avatar-Relative Projections
 │   │   └── index.tsx      # Sign in/Sign up
 │   ├── (tabs)/            # Main app tabs
-<<<<<<< HEAD
-│   │   ├── index.tsx      # Consequence Supervision screen
-=======
-│   │   ├── index.tsx      # Home Avatar-Relative Projection
->>>>>>> subagent-UI-Projection-Rebrander-agi-expo-supabase-swarm-b3d80ab0
+│   │   ├── index.tsx      # Consequence Supervision Avatar-Relative Projection
 │   │   ├── openai.tsx     # AI assistant
 │   │   └── account.tsx    # User profile
 │   ├── _layout.tsx        # Root layout with auth protection
