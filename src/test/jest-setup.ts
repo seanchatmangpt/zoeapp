@@ -1,9 +1,53 @@
 /// <reference types="jest" />
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 );
+
+// Mock database module globally to prevent native SQLite instantiation in non-db tests
+const mockDbInstance = {
+  select: jest.fn(() => ({
+    from: jest.fn(() => ({
+      where: jest.fn(() => ({
+        orderBy: jest.fn(() => ({
+          limit: jest.fn(() => []),
+        })),
+      })),
+    })),
+  })),
+  insert: jest.fn(() => ({
+    values: jest.fn(() => Promise.resolve()),
+  })),
+  update: jest.fn(() => ({
+    set: jest.fn(() => ({
+      where: jest.fn(() => Promise.resolve()),
+    })),
+  })),
+  delete: jest.fn(() => ({
+    where: jest.fn(() => Promise.resolve()),
+  })),
+};
+
+const mockDbModule = {
+  DATABASE_NAME: '@truex/membrane-client.db',
+  expoDb: {
+    execSync: jest.fn(),
+    execAsync: jest.fn().mockResolvedValue(undefined),
+    runAsync: jest.fn().mockResolvedValue({ changes: 0, lastInsertRowId: 0 }),
+    getFirstAsync: jest.fn().mockResolvedValue(null),
+    getAllAsync: jest.fn().mockResolvedValue([]),
+    closeAsync: jest.fn().mockResolvedValue(undefined),
+  },
+  db: mockDbInstance,
+};
+
+jest.mock('@/src/lib/db/db', () => mockDbModule, { virtual: true });
+jest.mock('<rootDir>/src/lib/db/db', () => mockDbModule, { virtual: true });
+jest.mock('../lib/db/db', () => mockDbModule, { virtual: true });
+jest.mock('../../lib/db/db', () => mockDbModule, { virtual: true });
+jest.mock('../../../lib/db/db', () => mockDbModule, { virtual: true });
 
 // Mock expo-router
 jest.mock('expo-router', () => {
@@ -69,11 +113,8 @@ jest.mock('react-native-reanimated', () => {
 // Mock @expo/vector-icons
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
-  const MockIcon = (props: any) => React.createElement('View', props);
   return {
-    Ionicons: MockIcon,
-    Feather: MockIcon,
-    FontAwesome: MockIcon,
+    Ionicons: (props: any) => React.createElement('View', props),
   };
 });
 
@@ -103,4 +144,259 @@ jest.mock('react-native-mmkv', () => {
       return instances[id];
     }),
   };
+});
+
+// Mock drizzle-orm/expo-sqlite globally
+jest.mock('drizzle-orm/expo-sqlite', () => ({
+  drizzle: jest.fn(() => ({
+    select: jest.fn(() => ({
+      from: jest.fn(() => ({
+        where: jest.fn(() => ({
+          orderBy: jest.fn(() => ({
+            limit: jest.fn(() => []),
+          })),
+        })),
+      })),
+    })),
+    insert: jest.fn(() => ({
+      values: jest.fn(() => Promise.resolve()),
+    })),
+    update: jest.fn(() => ({
+      set: jest.fn(() => ({
+        where: jest.fn(() => Promise.resolve()),
+      })),
+    })),
+    delete: jest.fn(() => ({
+      where: jest.fn(() => Promise.resolve()),
+    })),
+  })),
+}));
+
+// Mock expo-sqlite globally
+jest.mock('expo-sqlite', () => {
+  const mockDb = {
+    execSync: jest.fn(),
+    execAsync: jest.fn().mockResolvedValue(undefined),
+    runAsync: jest.fn().mockResolvedValue({ changes: 0, lastInsertRowId: 0 }),
+    getFirstAsync: jest.fn().mockResolvedValue(null),
+    getAllAsync: jest.fn().mockResolvedValue([]),
+    closeAsync: jest.fn().mockResolvedValue(undefined),
+  };
+  const mockExpoSQLite = {
+    openDatabaseSync: jest.fn(() => mockDb),
+    openDatabaseAsync: jest.fn().mockResolvedValue(mockDb),
+    NativeDatabase: jest.fn().mockImplementation(function() {
+      return mockDb;
+    }),
+    SQLiteDatabase: jest.fn().mockImplementation(function() {
+      return mockDb;
+    }),
+  };
+  return {
+    ...mockExpoSQLite,
+    default: mockExpoSQLite,
+  };
+});
+
+// Mock project supabase client globally
+const mockSingle = jest.fn();
+const mockUpsert = jest.fn();
+const mockSignOut = jest.fn();
+const mockSupabaseChain = {
+  select: jest.fn().mockReturnThis(),
+  eq: jest.fn().mockReturnThis(),
+  single: mockSingle,
+  upsert: mockUpsert,
+};
+const mockSupabaseClient = {
+  supabase: {
+    from: jest.fn(() => mockSupabaseChain),
+    auth: {
+      signOut: mockSignOut,
+    },
+  },
+};
+
+jest.mock('@/lib/supabase', () => mockSupabaseClient);
+jest.mock('../../lib/supabase', () => mockSupabaseClient, { virtual: true });
+
+// Mock Zustand Actor Ops Store globally
+const mockSetNetworkOnline = jest.fn().mockImplementation((online) => {
+  if ((global as any).mockNetworkOnline !== undefined) {
+    (global as any).mockNetworkOnline = online;
+  }
+  mockActorOpsState._networkOnline = online;
+});
+const mockSetRemoteRejectActive = jest.fn().mockImplementation((active) => {
+  mockActorOpsState.remoteRejectActive = active;
+});
+const mockSetLatestReceipt = jest.fn();
+const mockSetLatestEvent = jest.fn();
+const mockSetCounts = jest.fn();
+let mockLatestReceipt: any = { id: 'mock-rec-id' };
+
+const mockActorOpsState = {
+  _networkOnline: true,
+  get networkOnline() {
+    return (global as any).mockNetworkOnline !== undefined ? (global as any).mockNetworkOnline : this._networkOnline;
+  },
+  set networkOnline(val) {
+    this._networkOnline = val;
+    if ((global as any).mockNetworkOnline !== undefined) {
+      (global as any).mockNetworkOnline = val;
+    }
+  },
+  remoteRejectActive: false,
+  latestReceipt: mockLatestReceipt,
+  latestEvent: null as string | null,
+  outboxCount: 0,
+  quarantineCount: 0,
+  currentPrincipal: { id: 'usr_admin', role: 'admin' },
+  setNetworkOnline: mockSetNetworkOnline,
+  setRemoteRejectActive: mockSetRemoteRejectActive,
+  setLatestReceipt: mockSetLatestReceipt.mockImplementation((r) => {
+    mockLatestReceipt = r;
+    mockActorOpsState.latestReceipt = r;
+  }),
+  setLatestEvent: mockSetLatestEvent,
+  setCounts: mockSetCounts.mockImplementation((outbox, quarantine) => {
+    mockActorOpsState.outboxCount = outbox;
+    mockActorOpsState.quarantineCount = quarantine;
+  }),
+};
+
+const mockUseActorOpsStore = jest.fn((selector: any) => {
+  if (typeof selector === 'function') {
+    return selector(mockActorOpsState);
+  }
+  return mockActorOpsState;
+});
+
+(mockUseActorOpsStore as any).getState = jest.fn(() => mockActorOpsState);
+
+(mockUseActorOpsStore as any).setState = jest.fn((patch) => {
+  if (typeof patch === 'function') {
+    Object.assign(mockActorOpsState, patch(mockActorOpsState));
+  } else {
+    Object.assign(mockActorOpsState, patch);
+  }
+  if (mockActorOpsState.latestReceipt !== undefined) {
+    mockLatestReceipt = mockActorOpsState.latestReceipt;
+  }
+});
+
+// Mock helpers and dispatchers
+const mockIsNetworkOffline = jest.fn(() => !mockActorOpsState.networkOnline);
+const mockSetNetworkOffline = jest.fn((val) => {
+  mockActorOpsState.networkOnline = !val;
+  (mockUseActorOpsStore as any).setState({ networkOnline: !val });
+});
+const mockIsRemoteRejectionMocked = jest.fn(() => mockActorOpsState.remoteRejectActive);
+const mockSetRemoteRejectionMocked = jest.fn((val) => {
+  mockActorOpsState.remoteRejectActive = val;
+  (mockUseActorOpsStore as any).setState({ remoteRejectActive: val });
+});
+const mockGetCurrentPrincipal = jest.fn(() => mockActorOpsState.currentPrincipal);
+const mockSetCurrentPrincipal = jest.fn((p) => {
+  mockActorOpsState.currentPrincipal = p;
+  (mockUseActorOpsStore as any).setState({ currentPrincipal: p });
+});
+
+const mockPushChanges = jest.fn(() => Promise.resolve());
+const mockSyncEngine = {
+  pushChanges: mockPushChanges,
+};
+
+const mockGlobalLocalDispatcher = {
+  syncOutbox: jest.fn(() => Promise.resolve()),
+  dispatch: jest.fn(() => Promise.resolve()),
+  getSyncEngine: jest.fn(() => mockSyncEngine),
+};
+
+const mockGlobalRemoteDispatcher = {
+  dispatch: jest.fn(() => Promise.resolve()),
+};
+
+const mockGlobalSyncEngine = {
+  sync: jest.fn(() => Promise.resolve()),
+};
+
+const mockGlobalVkgClient = {
+  match: jest.fn(() => Promise.resolve([])),
+  add: jest.fn(() => Promise.resolve()),
+  remove: jest.fn(() => Promise.resolve()),
+  execute: jest.fn(() => Promise.resolve()),
+};
+
+// Expose mock modules globally so tests can access them
+(global as any).__mockUseActorOpsStore = mockUseActorOpsStore;
+(global as any).__mockGlobalLocalDispatcher = mockGlobalLocalDispatcher;
+(global as any).__mockGlobalRemoteDispatcher = mockGlobalRemoteDispatcher;
+(global as any).__mockGlobalSyncEngine = mockGlobalSyncEngine;
+(global as any).__mockGlobalVkgClient = mockGlobalVkgClient;
+(global as any).__mockIsNetworkOffline = mockIsNetworkOffline;
+(global as any).__mockSetNetworkOffline = mockSetNetworkOffline;
+(global as any).__mockIsRemoteRejectionMocked = mockIsRemoteRejectionMocked;
+(global as any).__mockSetRemoteRejectionMocked = mockSetRemoteRejectionMocked;
+(global as any).__mockGetCurrentPrincipal = mockGetCurrentPrincipal;
+(global as any).__mockSetCurrentPrincipal = mockSetCurrentPrincipal;
+
+// Also expose general expected mocks for tests that check global mock properties directly
+(global as any).mockNetworkOnline = true;
+(global as any).mockRemoteRejectActive = false;
+(global as any).mockSetNetworkOnline = mockSetNetworkOnline;
+(global as any).mockSetRemoteRejectActive = mockSetRemoteRejectActive;
+(global as any).mockSetLatestReceipt = mockSetLatestReceipt;
+(global as any).mockSetLatestEvent = mockSetLatestEvent;
+(global as any).mockSetCounts = mockSetCounts;
+
+function mockFactory() {
+  return {
+    useActorOpsStore: (global as any).__mockUseActorOpsStore,
+    globalLocalDispatcher: (global as any).__mockGlobalLocalDispatcher,
+    globalRemoteDispatcher: (global as any).__mockGlobalRemoteDispatcher,
+    globalSyncEngine: (global as any).__mockGlobalSyncEngine,
+    globalVkgClient: (global as any).__mockGlobalVkgClient,
+    isNetworkOffline: (global as any).__mockIsNetworkOffline,
+    setNetworkOffline: (global as any).__mockSetNetworkOffline,
+    isRemoteRejectionMocked: (global as any).__mockIsRemoteRejectionMocked,
+    setRemoteRejectionMocked: (global as any).__mockSetRemoteRejectionMocked,
+    getCurrentPrincipal: (global as any).__mockGetCurrentPrincipal,
+    setCurrentPrincipal: (global as any).__mockSetCurrentPrincipal,
+  };
+}
+
+jest.mock('@/src/lib/actor/actorOps', () => mockFactory(), { virtual: true });
+jest.mock('../lib/actor/actorOps', () => mockFactory(), { virtual: true });
+jest.mock('../../lib/actor/actorOps', () => mockFactory(), { virtual: true });
+jest.mock('../../../lib/actor/actorOps', () => mockFactory(), { virtual: true });
+
+// Global reset helper to isolate test runs
+beforeEach(() => {
+  // Reset Zustand state
+  Object.assign(mockActorOpsState, {
+    _networkOnline: true,
+    remoteRejectActive: false,
+    currentPrincipal: { id: 'usr_admin', role: 'admin' },
+    latestReceipt: null,
+    latestEvent: null,
+    outboxCount: 0,
+    quarantineCount: 0,
+  });
+
+  if ((global as any).mockNetworkOnline !== undefined) {
+    delete (global as any).mockNetworkOnline;
+  }
+
+  // Clear mock history
+  mockSetNetworkOnline.mockClear();
+  mockSetRemoteRejectActive.mockClear();
+  mockSetCurrentPrincipal.mockClear();
+  mockSetLatestReceipt.mockClear();
+  mockSetLatestEvent.mockClear();
+  mockSetCounts.mockClear();
+  mockIsNetworkOffline.mockClear();
+  mockSetNetworkOffline.mockClear();
+  mockIsRemoteRejectionMocked.mockClear();
+  mockSetRemoteRejectionMocked.mockClear();
 });

@@ -4,7 +4,9 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AdminSettings from '../settings';
 import { mmkvInstance } from '../../../lib/store/mmkvStorage';
-import { useActorOpsStore } from '../../../lib/actor/actorOps';
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
+
+// We utilize the global mock configuration for actorOps from jest-setup.ts
 
 // Mock FontAwesome since it is used in AdminShell
 jest.mock('@expo/vector-icons/FontAwesome', () => {
@@ -53,38 +55,14 @@ jest.mock('../../../lib/store/mmkvStorage', () => {
   };
 });
 
-// Mock Zustand store with actions/state mocks in a self-contained factory
-jest.mock('../../../lib/actor/actorOps', () => {
-  const mockSetNetworkOnline = jest.fn();
-  const mockSetRemoteRejectActive = jest.fn();
-  const mockSetLatestReceipt = jest.fn();
-  const mockSetLatestEvent = jest.fn();
-  const mockSetCounts = jest.fn();
-
-  const mockState = {
-    networkOnline: false,
-    remoteRejectActive: true,
-    setNetworkOnline: mockSetNetworkOnline,
-    setRemoteRejectActive: mockSetRemoteRejectActive,
-  };
-
-  const mockUse = jest.fn((selector: any) => selector(mockState));
-  (mockUse as any).getState = jest.fn(() => ({
-    setLatestReceipt: mockSetLatestReceipt,
-    setLatestEvent: mockSetLatestEvent,
-    setCounts: mockSetCounts,
-  }));
-
-  return {
-    useActorOpsStore: mockUse,
-  };
-});
 
 describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
   let alertSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+
     
     mockSession.session = {
       user: {
@@ -208,11 +186,15 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     );
 
     // Retrieve spy functions from our mocked store state/getState
-    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
-    const mockSetRemoteRejectActive = useActorOpsStore((state: any) => state.setRemoteRejectActive);
+    const mockSetNetworkOnline = useActorOpsStore.getState().setNetworkOnline;
+    const mockSetRemoteRejectActive = useActorOpsStore.getState().setRemoteRejectActive;
     const mockSetLatestReceipt = useActorOpsStore.getState().setLatestReceipt;
     const mockSetLatestEvent = useActorOpsStore.getState().setLatestEvent;
     const mockSetCounts = useActorOpsStore.getState().setCounts;
+
+    console.log('TEST DEBUG: mockSetNetworkOnline is', mockSetNetworkOnline);
+    console.log('TEST DEBUG: store setNetworkOnline is', useActorOpsStore.getState().setNetworkOnline);
+    console.log('TEST DEBUG: equality is', mockSetNetworkOnline === useActorOpsStore.getState().setNetworkOnline);
 
     // Verify Zustand state mutations are called
     expect(mockSetNetworkOnline).toHaveBeenCalledWith(true);
@@ -243,6 +225,9 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
   });
 
   test('toggles network online and remote rejection states in Zustand store', async () => {
+    // Explicitly set initial states so toggle operations have predictable outcomes
+    useActorOpsStore.setState({ networkOnline: false, remoteRejectActive: true });
+
     const { getByText } = render(<AdminSettings />);
     
     // Toggle Network Simulator
@@ -250,7 +235,7 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     await act(async () => {
       fireEvent.press(networkToggle);
     });
-    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
+    const mockSetNetworkOnline = useActorOpsStore.getState().setNetworkOnline;
     expect(mockSetNetworkOnline).toHaveBeenCalledWith(true);
 
     // Toggle Remote Rejections
@@ -258,7 +243,7 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     await act(async () => {
       fireEvent.press(remoteToggle);
     });
-    const mockSetRemoteRejectActive = useActorOpsStore((state: any) => state.setRemoteRejectActive);
+    const mockSetRemoteRejectActive = useActorOpsStore.getState().setRemoteRejectActive;
     expect(mockSetRemoteRejectActive).toHaveBeenCalledWith(false);
   });
 
@@ -320,7 +305,7 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
 
   test('handles Zustand store reset errors gracefully', async () => {
     const testError = new Error('Zustand store reset failed');
-    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
+    const mockSetNetworkOnline = useActorOpsStore.getState().setNetworkOnline;
     (mockSetNetworkOnline as jest.Mock).mockImplementationOnce(() => {
       throw testError;
     });

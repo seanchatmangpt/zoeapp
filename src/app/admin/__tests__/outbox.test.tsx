@@ -2,7 +2,10 @@ import React from 'react';
 import { render, fireEvent, act, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import AdminOutbox, { formatTimestamp, CodePayload } from '../outbox';
-import { globalLocalDispatcher, globalRemoteDispatcher } from '../../../lib/actor/actorOps';
+import { globalLocalDispatcher, globalRemoteDispatcher } from '@/src/lib/actor/actorOps';
+
+
+
 
 // Mock FontAwesome icon used inside AdminShell
 jest.mock('@expo/vector-icons/FontAwesome', () => {
@@ -72,57 +75,11 @@ jest.mock('../../../lib/db/db', () => {
   };
 });
 
-// Mock actorOps dispatcher singletons and Zustand store
-jest.mock('../../../lib/actor/actorOps', () => {
-  const mockSyncOutbox = jest.fn(() => Promise.resolve());
-  const mockPushChanges = jest.fn(() => Promise.resolve());
-  
-  const mockSyncEngine = {
-    pushChanges: mockPushChanges,
-  };
-  
-  const mockLocalDispatcher = {
-    syncOutbox: mockSyncOutbox,
-    getSyncEngine: jest.fn(() => mockSyncEngine),
-  };
-  
-  const mockRemoteDispatcher = {};
-  
-  const mockSetNetworkOnline = jest.fn();
-  const mockSetRemoteRejectActive = jest.fn();
-  const mockSetLatestReceipt = jest.fn();
-  const mockSetLatestEvent = jest.fn();
-  const mockSetCounts = jest.fn();
 
-  const mockState = {
-    networkOnline: true,
-    remoteRejectActive: false,
-    setNetworkOnline: mockSetNetworkOnline,
-    setRemoteRejectActive: mockSetRemoteRejectActive,
-  };
-
-  const mockUse = jest.fn((selector: any) => {
-    if (typeof selector === 'function') {
-      return selector(mockState);
-    }
-    return mockState;
-  });
-  (mockUse as any).getState = jest.fn(() => ({
-    setLatestReceipt: mockSetLatestReceipt,
-    setLatestEvent: mockSetLatestEvent,
-    setCounts: mockSetCounts,
-  }));
-
-  return {
-    globalLocalDispatcher: mockLocalDispatcher,
-    globalRemoteDispatcher: mockRemoteDispatcher,
-    useActorOpsStore: mockUse,
-  };
-});
 
 describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
   let alertSpy: jest.SpyInstance;
-  const mockLocalDispatcherTyped = globalLocalDispatcher as any;
+  
 
   // Helper to flush asynchronous tasks/microtasks in tests
   const flushPromises = () => new Promise<void>((resolve) => {
@@ -250,8 +207,8 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
   });
 
   test('successfully executes sync process when Flush Outbox button is pressed', async () => {
-    mockLocalDispatcherTyped.syncOutbox.mockResolvedValueOnce(undefined);
-    mockLocalDispatcherTyped.getSyncEngine().pushChanges.mockResolvedValueOnce(undefined);
+    (globalLocalDispatcher as any).syncOutbox.mockResolvedValueOnce(undefined);
+    (globalLocalDispatcher as any).getSyncEngine().pushChanges.mockResolvedValueOnce(undefined);
 
     const { getByTestId, getByText } = render(<AdminOutbox />);
     await act(async () => {
@@ -266,8 +223,8 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
     });
 
     // Verify dispatcher operations were called in correct sequence
-    expect(mockLocalDispatcherTyped.syncOutbox).toHaveBeenCalledWith(globalRemoteDispatcher);
-    expect(mockLocalDispatcherTyped.getSyncEngine().pushChanges).toHaveBeenCalled();
+    expect((globalLocalDispatcher as any).syncOutbox).toHaveBeenCalledWith(globalRemoteDispatcher);
+    expect((globalLocalDispatcher as any).getSyncEngine().pushChanges).toHaveBeenCalled();
 
     // Verify status transitions
     expect(getByText('Sync Completed Successfully!')).toBeTruthy();
@@ -280,8 +237,8 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
   });
 
   test('successfully executes sync process when Sync Outbox Now button is pressed', async () => {
-    mockLocalDispatcherTyped.syncOutbox.mockResolvedValueOnce(undefined);
-    mockLocalDispatcherTyped.getSyncEngine().pushChanges.mockResolvedValueOnce(undefined);
+    (globalLocalDispatcher as any).syncOutbox.mockResolvedValueOnce(undefined);
+    (globalLocalDispatcher as any).getSyncEngine().pushChanges.mockResolvedValueOnce(undefined);
 
     const { getByTestId, getByText } = render(<AdminOutbox />);
     await act(async () => {
@@ -296,8 +253,8 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
     });
 
     // Verify dispatcher operations were called in correct sequence
-    expect(mockLocalDispatcherTyped.syncOutbox).toHaveBeenCalledWith(globalRemoteDispatcher);
-    expect(mockLocalDispatcherTyped.getSyncEngine().pushChanges).toHaveBeenCalled();
+    expect((globalLocalDispatcher as any).syncOutbox).toHaveBeenCalledWith(globalRemoteDispatcher);
+    expect((globalLocalDispatcher as any).getSyncEngine().pushChanges).toHaveBeenCalled();
 
     // Verify success Alert is triggered
     expect(alertSpy).toHaveBeenCalledWith(
@@ -308,7 +265,7 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
 
   test('handles synchronization errors gracefully', async () => {
     const errorMsg = 'Failed to fetch Supabase Edge Function: Network Error';
-    mockLocalDispatcherTyped.syncOutbox.mockRejectedValueOnce(new Error(errorMsg));
+    (globalLocalDispatcher as any).syncOutbox.mockRejectedValueOnce(new Error(errorMsg));
 
     const { getByTestId, getByText } = render(<AdminOutbox />);
     await act(async () => {
@@ -385,7 +342,7 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
     const syncPromise = new Promise<void>((resolve) => {
       resolveSync = resolve;
     });
-    mockLocalDispatcherTyped.syncOutbox.mockReturnValueOnce(syncPromise);
+    (globalLocalDispatcher as any).syncOutbox.mockReturnValueOnce(syncPromise);
 
     const { getByTestId, getByText } = render(<AdminOutbox />);
     await act(async () => {
