@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/34</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/34</span>
             </div>
         
             
@@ -129,15 +129,31 @@
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -150,6 +166,21 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -158,9 +189,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -198,11 +234,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { useColorScheme as useDeviceColorScheme, View } from 'react-native';
 import { vars } from 'nativewind';
-import { MMKV } from 'react-native-mmkv';
 import { ThemeSettings, ThemeContextType } from './types';
 import { defaultLightTheme, defaultDarkTheme } from './defaults';
+// In test environments react-native-mmkv is mocked and MMKV may not be a real class.
+// We fall back to an in-memory store that satisfies the same API surface.
+let storage: { getString: (k: string) =&gt; string | undefined; set: (k: string, v: string) =&gt; void; delete: (k: string) =&gt; void };
+<span class="cstat-no" title="statement not covered" >try {</span>
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { MMKV: MMKVClass } = <span class="cstat-no" title="statement not covered" >require('react-native-mmkv');</span>
+<span class="cstat-no" title="statement not covered" >  storage = new MMKVClass({ id: 'zoe-theme-storage' });</span>
+} catch {
+  const _map = <span class="cstat-no" title="statement not covered" >new Map&lt;string, string&gt;();</span>
+<span class="cstat-no" title="statement not covered" >  storage = {</span>
+    getString: <span class="fstat-no" title="function not covered" >(k</span>: string) =&gt; <span class="cstat-no" title="statement not covered" >_map.get(k),</span>
+    set: <span class="fstat-no" title="function not covered" >(k</span>: string, v: string) =&gt; { <span class="cstat-no" title="statement not covered" >_map.set(k, v); </span>},
+    delete: <span class="fstat-no" title="function not covered" >(k</span>: string) =&gt; { <span class="cstat-no" title="statement not covered" >_map.delete(k); </span>},
+  };
+}
 &nbsp;
-const storage = <span class="cstat-no" title="statement not covered" >new MMKV({ id: 'zoe-theme-storage' });</span>
 const THEME_STORAGE_KEY = <span class="cstat-no" title="statement not covered" >'zoe-theme-settings';</span>
 &nbsp;
 export const ThemeContext = <span class="cstat-no" title="statement not covered" >createContext&lt;ThemeContextType | undefined&gt;(undefined);</span>
@@ -224,9 +273,14 @@ export const ThemeProvider: React.FC&lt;{ children: React.ReactNode }&gt; = <spa
 &nbsp;
   const updateTheme = <span class="cstat-no" title="statement not covered" >useCallback(<span class="fstat-no" title="function not covered" >(u</span>pdates: Partial&lt;ThemeSettings&gt; | ((prev: ThemeSettings) =&gt; ThemeSettings)) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    setTheme(<span class="fstat-no" title="function not covered" >(p</span>rev) =&gt; {</span>
-      const next = <span class="cstat-no" title="statement not covered" >typeof updates === 'function' ? updates(prev) : { ...prev, ...updates };</span>
-<span class="cstat-no" title="statement not covered" >      if (updates &amp;&amp; typeof updates === 'object' &amp;&amp; 'colors' in updates) {</span>
+      let next: ThemeSettings;
+<span class="cstat-no" title="statement not covered" >      if (typeof updates === 'function') {</span>
+<span class="cstat-no" title="statement not covered" >        next = updates(prev);</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        next = { ...prev, ...updates };</span>
+<span class="cstat-no" title="statement not covered" >        if (updates.colors) {</span>
 <span class="cstat-no" title="statement not covered" >          next.colors = { ...prev.colors, ...updates.colors };</span>
+        }
       }
 <span class="cstat-no" title="statement not covered" >      storage.set(THEME_STORAGE_KEY, JSON.stringify(next));</span>
 <span class="cstat-no" title="statement not covered" >      return next;</span>
@@ -268,7 +322,7 @@ export const ThemeProvider: React.FC&lt;{ children: React.ReactNode }&gt; = <spa
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T06:51:07.189Z
+                at 2026-05-31T07:32:36.196Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

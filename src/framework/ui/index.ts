@@ -5,3 +5,4 @@ export * from './AvatarRelativeProjection';
 export * from './OfflineBanner';
 export * from './Button';
 export * from './Badge';
+export * from './haptics';
