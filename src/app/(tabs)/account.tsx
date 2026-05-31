@@ -74,8 +74,6 @@ export default function Account() {
           .eq('id', session.user.id)
           .single();
 
-        console.log("DEBUG GETPROFILE RESULT", { data, error, status });
-
         if (error && status !== 406) {
           throw error;
         }

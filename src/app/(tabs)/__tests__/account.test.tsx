@@ -39,28 +39,17 @@ const mockUseSession = useSession as any;
 // Mock Supabase client
 jest.mock('@/lib/supabase', () => {
   const mockSingle = jest.fn();
-  const mockEq = jest.fn(() => ({
-    single: mockSingle,
-  }));
-  const mockSelect = jest.fn(() => ({
-    eq: mockEq,
-  }));
   const mockUpsert = jest.fn();
-  const mockFrom = jest.fn((table: string) => {
-    if (table === 'profiles') {
-      return {
-        select: mockSelect,
-        upsert: mockUpsert,
-      };
-    }
-    return {};
-  });
-
   const mockSignOut = jest.fn();
-
+  const mockSupabaseChain = {
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    single: mockSingle,
+    upsert: mockUpsert,
+  };
   return {
     supabase: {
-      from: mockFrom,
+      from: jest.fn(() => mockSupabaseChain),
       auth: {
         signOut: mockSignOut,
       },
@@ -119,6 +108,7 @@ describe('Account Tab Dashboard Unit Tests', () => {
   let mockSingleSpy: jest.Mock;
 
   beforeEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
     if (AsyncStorage.clear && (AsyncStorage.clear as any).mockClear) {
       (AsyncStorage.clear as any).mockClear();
@@ -128,7 +118,7 @@ describe('Account Tab Dashboard Unit Tests', () => {
     mockFromSpy = supabase.from as jest.Mock;
     const profilesTableMock = mockFromSpy('profiles');
     mockUpsertSpy = profilesTableMock.upsert as jest.Mock;
-    mockSingleSpy = profilesTableMock.select().eq().single as jest.Mock;
+    mockSingleSpy = profilesTableMock.select().eq('id', 'test-user-uuid').single as jest.Mock;
 
     // Reset default profile mock return values
     mockSingleSpy.mockResolvedValue({
@@ -172,9 +162,10 @@ describe('Account Tab Dashboard Unit Tests', () => {
 
     // Wait for the mock profile data to load and render
     await waitFor(() => {
-      expect(getByText('initialuser')).toBeTruthy();
-      expect(getByText('test@example.com')).toBeTruthy();
-    });
+      expect(getByTestId('username-input').props.value).toBe('initialuser');
+    }, { timeout: 4000 });
+
+    expect(getByText('test@example.com')).toBeTruthy();
 
     // Check key inputs are pre-populated
     expect(getByTestId('username-input').props.value).toBe('initialuser');

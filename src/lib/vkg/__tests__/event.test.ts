@@ -125,6 +125,45 @@ describe('VKG Telemetry Mapping and Rebrand Translation', () => {
     expect(event.consequenceSupervision).toBe('MainSupervision');
   });
 
+  it('correctly maps Form Submit/Intake to Operational Intake', () => {
+    const telemetry = {
+      type: 'form_submit_sermon',
+      payload: {
+        intake: 'new_sermon_data',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Operational Intake Event');
+    expect(event.operationalIntake).toBe('new_sermon_data');
+  });
+
+  it('correctly maps Webhook/API Response/Settlement to Settlement Adjudication', () => {
+    const telemetry = {
+      type: 'api_response_settled',
+      payload: {
+        settlement: 'success_receipt',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Settlement Adjudication Event');
+    expect(event.settlementAdjudication).toBe('success_receipt');
+  });
+
+  it('correctly maps Admin Panel/Supervision Geometry to Supervision Geometry', () => {
+    const telemetry = {
+      type: 'admin_panel_open',
+      payload: {
+        adminPanel: 'SupervisionConfig',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Supervision Geometry Event');
+    expect(event.supervisionGeometry).toBe('SupervisionConfig');
+  });
+
   it('throws on invalid telemetry input', () => {
     expect(() => telemetryToSchemaOrgEvent({} as any)).toThrow();
   });

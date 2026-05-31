@@ -681,7 +681,7 @@ describe('OpenAIAvatarRelativeProjection Component', () => {
 
     const originalTrim = String.prototype.trim;
     let mockTrimActive = false;
-    String.prototype.trim = function(this: string) {
+    String.prototype.trim = function(this: string) { // eslint-disable-line no-extend-native
       if (mockTrimActive && this.toString() === 'valid prompt') {
         return '';
       }
@@ -696,7 +696,7 @@ describe('OpenAIAvatarRelativeProjection Component', () => {
 
       expect(alertSpy).toHaveBeenCalledWith('Please enter a prompt');
     } finally {
-      String.prototype.trim = originalTrim;
+      String.prototype.trim = originalTrim; // eslint-disable-line no-extend-native
     }
   });
 
