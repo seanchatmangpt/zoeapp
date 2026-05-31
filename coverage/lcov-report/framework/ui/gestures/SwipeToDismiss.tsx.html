@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.58% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/48</span>
+                <span class='fraction'>0/48</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">5.66% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/53</span>
+                <span class='fraction'>0/53</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/5</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.27% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/43</span>
+                <span class='fraction'>0/43</span>
             </div>
         
             
@@ -267,7 +267,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -275,12 +275,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -352,7 +352,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -414,20 +414,20 @@ export interface SwipeToDismissProps {
  * &lt;/SwipeToDismiss&gt;
  * ```
  */
-export const SwipeToDismiss: React.FC&lt;SwipeToDismissProps&gt; = ({
+export const SwipeToDismiss: React.FC&lt;SwipeToDismissProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span></span>
   children,
-  directions = ['right'],
-  threshold = 0.4,
+  directions = <span class="branch-0 cbranch-no" title="branch not covered" >['right'],</span>
+  threshold = <span class="branch-0 cbranch-no" title="branch not covered" >0.4,</span>
   onDismiss,
   onSwipeCancel,
-  enabled = true,
+  enabled = <span class="branch-0 cbranch-no" title="branch not covered" >true,</span>
 }) =&gt; {
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const opacity = useSharedValue(1);
+  const { width: screenWidth, height: screenHeight } = <span class="cstat-no" title="statement not covered" >useWindowDimensions();</span>
+  const translateX = <span class="cstat-no" title="statement not covered" >useSharedValue(0);</span>
+  const translateY = <span class="cstat-no" title="statement not covered" >useSharedValue(0);</span>
+  const opacity = <span class="cstat-no" title="statement not covered" >useSharedValue(1);</span>
 &nbsp;
-  const gesture = Gesture.Pan()
+  const gesture = <span class="cstat-no" title="statement not covered" >Gesture.Pan()</span>
     .enabled(enabled)
     .onUpdate(<span class="fstat-no" title="function not covered" >(e</span>vent) =&gt; {
       const canSwipeHorizontal = <span class="cstat-no" title="statement not covered" >directions.includes('left') || directions.includes('right');</span>
@@ -499,7 +499,7 @@ export const SwipeToDismiss: React.FC&lt;SwipeToDismissProps&gt; = ({
   );
 };
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   container: {
     flexShrink: 1,
   },
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T07:32:36.196Z
+                at 2026-05-31T07:44:16.785Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

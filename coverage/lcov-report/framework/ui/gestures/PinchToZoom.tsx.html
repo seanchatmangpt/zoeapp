@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/33</span>
+                <span class='fraction'>0/33</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">27.27% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.28% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28.12% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/32</span>
+                <span class='fraction'>0/32</span>
             </div>
         
             
@@ -240,21 +240,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -322,7 +322,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -372,21 +372,21 @@ export interface PinchToZoomProps {
  * &lt;/PinchToZoom&gt;
  * ```
  */
-export const PinchToZoom: React.FC&lt;PinchToZoomProps&gt; = ({
+export const PinchToZoom: React.FC&lt;PinchToZoomProps&gt; = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span></span>
   children,
-  maxScale = 5,
-  minScale = 1,
-  enableDoubleTap = true,
+  maxScale = <span class="branch-0 cbranch-no" title="branch not covered" >5,</span>
+  minScale = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span>
+  enableDoubleTap = <span class="branch-0 cbranch-no" title="branch not covered" >true,</span>
 }) =&gt; {
-  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = <span class="cstat-no" title="statement not covered" >useWindowDimensions();</span>
   
-  const scale = useSharedValue(1);
-  const focalX = useSharedValue(0);
-  const focalY = useSharedValue(0);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+  const scale = <span class="cstat-no" title="statement not covered" >useSharedValue(1);</span>
+  const focalX = <span class="cstat-no" title="statement not covered" >useSharedValue(0);</span>
+  const focalY = <span class="cstat-no" title="statement not covered" >useSharedValue(0);</span>
+  const translateX = <span class="cstat-no" title="statement not covered" >useSharedValue(0);</span>
+  const translateY = <span class="cstat-no" title="statement not covered" >useSharedValue(0);</span>
 &nbsp;
-  const pinchGesture = Gesture.Pinch()
+  const pinchGesture = <span class="cstat-no" title="statement not covered" >Gesture.Pinch()</span>
     .onUpdate(<span class="fstat-no" title="function not covered" >(e</span>vent) =&gt; {
 <span class="cstat-no" title="statement not covered" >      scale.value = Math.min(Math.max(event.scale, minScale), maxScale);</span>
 <span class="cstat-no" title="statement not covered" >      focalX.value = event.focalX;</span>
@@ -454,7 +454,7 @@ export const PinchToZoom: React.FC&lt;PinchToZoomProps&gt; = ({
   );
 };
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   container: {
     flex: 1,
   },
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T07:32:36.196Z
+                at 2026-05-31T07:44:16.785Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

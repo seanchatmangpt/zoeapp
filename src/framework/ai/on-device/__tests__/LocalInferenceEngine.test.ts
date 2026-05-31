@@ -1,0 +1,39 @@
+import { LocalInferenceEngine } from '../LocalInferenceEngine';
+
+describe('LocalInferenceEngine', () => {
+  let engine: LocalInferenceEngine;
+
+  beforeEach(() => {
+    engine = new LocalInferenceEngine();
+  });
+
+  it('should perform non-streaming inference', async () => {
+    const prompt = 'Hello world';
+    const result = await engine.infer({ prompt });
+
+    expect(result.text).toContain(prompt);
+    expect(result.usage).toBeDefined();
+    expect(result.usage?.promptTokens).toBeGreaterThan(0);
+    expect(result.usage?.completionTokens).toBeGreaterThan(0);
+  });
+
+  it('should use specified modelId', async () => {
+    const prompt = 'Hello';
+    const modelId = 'test-model';
+    const result = await engine.infer({ prompt, modelId });
+
+    expect(result.text).toContain(modelId);
+  });
+
+  it('should perform streaming inference', async () => {
+    const prompt = 'Streaming test';
+    const tokens: string[] = [];
+    const onToken = jest.fn((token: string) => tokens.push(token));
+
+    const result = await engine.streamInfer({ prompt }, onToken);
+
+    expect(onToken).toHaveBeenCalled();
+    expect(result.text).toEqual(tokens.join('').trim());
+    expect(result.usage?.completionTokens).toEqual(tokens.length);
+  });
+});
