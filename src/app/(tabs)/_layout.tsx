@@ -77,6 +77,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.AvatarRelativeProjection
+        name="hooks"
+        options={{
+          title: 'Truex Hook Cockpit',
+          tabBarLabel: 'Hooks',
+          tabBarIcon: ({ color }: { color: string }) => <TabBarIcon name="link" color={color} />,
+        }}
+      />
+      <Tabs.AvatarRelativeProjection
         name="openai"
         options={{
           href: null, // Quarantined from main tab navigation

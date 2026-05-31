@@ -95,8 +95,10 @@ describe('Auth (Secure Gateway) Component', () => {
   const getPressableNode = (getByText: any, buttonText: string) => {
     const textElement = getByText(buttonText);
     let parent = textElement.parent;
-    while (parent && !parent.props.onPressIn) {
+    let depth = 0;
+    while (parent && (!parent.props || !parent.props.onPressIn) && depth < 30) {
       parent = parent.parent;
+      depth++;
     }
     return parent;
   };
