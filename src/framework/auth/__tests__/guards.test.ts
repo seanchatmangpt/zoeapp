@@ -82,4 +82,40 @@ describe('admitRoute', () => {
     );
     expect(admitted).toBe(true);
   });
+
+  it('rejects if missing roles', () => {
+    const { admitted, refusal } = admitRoute(
+      { identityBoundary: 'verified', disclosures: [], roles: ['user'] },
+      { requiredRoles: ['admin', 'manager'] }
+    );
+    expect(admitted).toBe(false);
+    expect(refusal?.code).toBe('MISSING_ROLE');
+    expect(refusal?.missingRoles).toEqual(['admin', 'manager']);
+  });
+
+  it('allows if all required roles are present', () => {
+    const { admitted } = admitRoute(
+      { identityBoundary: 'verified', disclosures: [], roles: ['user', 'admin'] },
+      { requiredRoles: ['admin'] }
+    );
+    expect(admitted).toBe(true);
+  });
+
+  it('rejects if missing permissions', () => {
+    const { admitted, refusal } = admitRoute(
+      { identityBoundary: 'verified', disclosures: [], permissions: ['read'] },
+      { requiredPermissions: ['read', 'write'] }
+    );
+    expect(admitted).toBe(false);
+    expect(refusal?.code).toBe('MISSING_PERMISSION');
+    expect(refusal?.missingPermissions).toEqual(['write']);
+  });
+
+  it('allows if all required permissions are present', () => {
+    const { admitted } = admitRoute(
+      { identityBoundary: 'verified', disclosures: [], permissions: ['read', 'write', 'delete'] },
+      { requiredPermissions: ['read', 'write'] }
+    );
+    expect(admitted).toBe(true);
+  });
 });

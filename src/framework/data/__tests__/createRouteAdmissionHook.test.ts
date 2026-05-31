@@ -10,7 +10,7 @@ describe('createRouteAdmissionHook', () => {
       must_be_active: true,
       roles_allowed: ['admin'],
     },
-  };
+  } as any;
 
   const mockDefaultResolveParticipant = jest.fn();
   const mockAdmitRoute = jest.fn();
@@ -51,7 +51,7 @@ describe('createRouteAdmissionHook', () => {
 
   it('evaluates admission if session is loaded', () => {
     const mockSession = { user: 'test' };
-    const mockParticipant: ParticipantBasis = { auth_state: 'authenticated' };
+    const mockParticipant: ParticipantBasis = { auth_state: 'authenticated' } as any;
     
     const config = createConfig({ session: mockSession, loading: false });
     mockDefaultResolveParticipant.mockReturnValue(mockParticipant);
@@ -72,7 +72,7 @@ describe('createRouteAdmissionHook', () => {
     const config = createConfig({ session: null, loading: true }); // even if loading
     const useMyRouteAdmission = createRouteAdmissionHook(config);
 
-    const explicitParticipant: ParticipantBasis = { auth_state: 'authenticated' };
+    const explicitParticipant: ParticipantBasis = { auth_state: 'authenticated' } as any;
     mockAdmitRoute.mockReturnValue({ admitted: false, refusal: { code: 'FORBIDDEN', label: 'Forbidden' } });
 
     const { result } = renderHook(() => useMyRouteAdmission(mockRoute, { participant: explicitParticipant }));

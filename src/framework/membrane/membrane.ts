@@ -4,6 +4,7 @@ import { ReceiptManager } from './managers/receipts';
 import { QuarantineManager } from './managers/quarantine';
 import { TrajectoryManager } from './managers/trajectories';
 import { TelemetryManager } from './managers/telemetry';
+import { AuditManager } from './managers/audit';
 import { sha256, canonicalStringify } from '../../lib/crypto/receipts';
 
 export class Membrane {
@@ -13,6 +14,7 @@ export class Membrane {
   public quarantine: QuarantineManager;
   public trajectories: TrajectoryManager;
   public telemetry: TelemetryManager;
+  public audit: AuditManager;
 
   constructor(config: MembraneConfig) {
     this.config = config;
@@ -21,6 +23,7 @@ export class Membrane {
     this.quarantine = new QuarantineManager();
     this.trajectories = new TrajectoryManager();
     this.telemetry = new TelemetryManager();
+    this.audit = new AuditManager();
   }
 
   /**
@@ -34,6 +37,10 @@ export class Membrane {
   ): Promise<ExecutionResult<T>> {
     const timestamp = new Date().toISOString();
     const prevHash = this.receipts.getLastHash();
+    
+    // Start trace for membrane execution
+    const traceId = `trace_cmd_${commandId}`;
+    const spanId = this.telemetry.startSpan(`membrane.run.${capabilityId}`, traceId);
 
     // 1. Run Interceptor chain (Gate Admissibility)
     const interceptCtx = { commandId, capabilityId, input, config: this.config };
@@ -46,6 +53,8 @@ export class Membrane {
         prevHash,
         'Admissibility denied by membrane interceptor'
       );
+      this.audit.log('warn', 'Execution Denied', { input }, commandId, capabilityId);
+      this.telemetry.endSpan(spanId);
       return { success: false, result: null, receipt, error: 'Denied by membrane' };
     }
 
@@ -56,6 +65,8 @@ export class Membrane {
         const errorMsg = `Illegal state transition in ${input.flowName}: ${input.fromState} -> ${input.toState}`;
         const receipt = await this.receipts.emitRefusal(commandId, capabilityId, prevHash, errorMsg);
         await this.quarantine.isolate(commandId, input, errorMsg);
+        this.audit.log('critical', 'Illegal State Transition', { errorMsg, flowName: input.flowName }, commandId, capabilityId);
+        this.telemetry.endSpan(spanId);
         return { success: false, result: null, receipt, error: 'Illegal trajectory transition' };
       }
     }
@@ -80,6 +91,7 @@ export class Membrane {
       };
 
       this.receipts.append(receipt);
+      this.telemetry.endSpan(spanId);
 
       return { success: true, result: executionResult, receipt };
     } catch (err: any) {
@@ -87,6 +99,9 @@ export class Membrane {
       const errorMsg = err.message || 'Unknown execution fault';
       const receipt = await this.receipts.emitRefusal(commandId, capabilityId, prevHash, errorMsg);
       await this.quarantine.isolate(commandId, input, errorMsg);
+      
+      this.audit.log('critical', 'Execution Crash', { errorMsg, stack: err.stack }, commandId, capabilityId);
+      this.telemetry.endSpan(spanId);
 
       return { success: false, result: null, receipt, error: errorMsg };
     }

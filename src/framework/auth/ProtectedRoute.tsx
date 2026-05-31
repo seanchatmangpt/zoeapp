@@ -47,7 +47,7 @@ export function ProtectedRoute({
   hierarchy = DEFAULT_IDENTITY_HIERARCHY,
   participant,
 }: ProtectedRouteProps) {
-  const { session, loading, isTransitioning } = useAuth();
+  const { session, participant: contextParticipant, loading, isTransitioning } = useAuth();
   
   const [checkingExternal, setCheckingExternal] = useState(!!verifyExternalState);
   const [externalRefusal, setExternalRefusal] = useState<RefusalReason | null>(null);
@@ -82,7 +82,7 @@ export function ProtectedRoute({
     return <>{loadingComponent}</>;
   }
 
-  const activeParticipant = participant ?? resolveParticipant(session);
+  const activeParticipant = participant ?? (resolveParticipant ? resolveParticipant(session) : contextParticipant);
   const { admitted, refusal } = admitRoute(activeParticipant, route, hierarchy);
 
   if (!admitted) {

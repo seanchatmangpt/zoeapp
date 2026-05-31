@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -123,27 +123,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
  * Learn more about Light and Dark modes:
@@ -163,28 +163,28 @@ type ThemeProps = {
 export type TextProps = ThemeProps &amp; DefaultText['props'];
 export type ViewProps = ThemeProps &amp; DefaultView['props'];
 &nbsp;
-export function useThemedColor(styleType: 'text' | 'background') {
-  const theme = useColorScheme();
+export function <span class="fstat-no" title="function not covered" >useThemedColor(</span>styleType: 'text' | 'background') {
+  const theme = <span class="cstat-no" title="statement not covered" >useColorScheme();</span>
 &nbsp;
-  if (styleType === 'background') {
-    return theme === 'light' ? 'bg-light-background' : 'bg-dark-background';
-  } else <span class="missing-if-branch" title="else path not taken" >E</span>if (styleType === 'text') {
-    return theme === 'light' ? 'text-light-text' : 'text-dark-text';
+<span class="cstat-no" title="statement not covered" >  if (styleType === 'background') {</span>
+<span class="cstat-no" title="statement not covered" >    return theme === 'light' ? 'bg-light-background' : 'bg-dark-background';</span>
+  } else <span class="cstat-no" title="statement not covered" >if (styleType === 'text') {</span>
+<span class="cstat-no" title="statement not covered" >    return theme === 'light' ? 'text-light-text' : 'text-dark-text';</span>
   }
 }
 &nbsp;
-export function Text(props: TextProps) {
-  const { className, ...otherProps } = props;
-  const textColor = useThemedColor('text');
+export function <span class="fstat-no" title="function not covered" >Text(</span>props: TextProps) {
+  const { className, ...otherProps } = <span class="cstat-no" title="statement not covered" >props;</span>
+  const textColor = <span class="cstat-no" title="statement not covered" >useThemedColor('text');</span>
 &nbsp;
-  return &lt;DefaultText className={cn(textColor, className)} {...otherProps} /&gt;;
+<span class="cstat-no" title="statement not covered" >  return &lt;DefaultText className={cn(textColor, className)} {...otherProps} /&gt;;</span>
 }
 &nbsp;
-export function View(props: ViewProps) {
-  const { className, ...otherProps } = props;
-  const backgroundColor = useThemedColor('background');
+export function <span class="fstat-no" title="function not covered" >View(</span>props: ViewProps) {
+  const { className, ...otherProps } = <span class="cstat-no" title="statement not covered" >props;</span>
+  const backgroundColor = <span class="cstat-no" title="statement not covered" >useThemedColor('background');</span>
 &nbsp;
-  return &lt;DefaultView className={cn(backgroundColor, className)} {...otherProps} /&gt;;
+<span class="cstat-no" title="statement not covered" >  return &lt;DefaultView className={cn(backgroundColor, className)} {...otherProps} /&gt;;</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -193,7 +193,7 @@ export function View(props: ViewProps) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:53:22.824Z
+                at 2026-05-31T06:51:07.189Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

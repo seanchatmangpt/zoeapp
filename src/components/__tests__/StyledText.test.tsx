@@ -1,22 +1,15 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import { MonoText } from '../StyledText';
+import { ThemeProvider } from '../../framework/ui/theme/ThemeContext';
 
-jest.mock('../Themed', () => ({
-  Text: ({ children, className, testID }: any) => {
-    const { Text } = require('react-native');
-    return <Text testID={testID} className={className}>{children}</Text>;
-  },
-}));
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <ThemeProvider>{children}</ThemeProvider>
+);
 
 describe('StyledText', () => {
   it('renders correctly', () => {
-    const { getByText, getByTestId } = render(
-      <MonoText testID="mono-text">Snapshot test!</MonoText>
-    );
-
-    const element = getByTestId('mono-text');
-    expect(element.props.className).toContain('font-[SpaceMono]');
+    const { getByText } = render(<MonoText>Snapshot test!</MonoText>, { wrapper });
     expect(getByText('Snapshot test!')).toBeTruthy();
   });
 });

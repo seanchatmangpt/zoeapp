@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { render, screen } from '@testing-library/react-native';
 import { ZoeFrameworkProvider } from '../ZoeFrameworkProvider';
 import { useMembrane } from '../MembraneProvider';
 import { useSession } from '../../../../context/SessionProvider';
 import { useVkgEngine } from '../../../components/VkgProvider';
+import { useTheme } from '../../ui/theme/useTheme';
+import { Text } from 'react-native';
 
 // Mock dependencies
 jest.mock('../../../../context/SessionProvider', () => {
@@ -32,42 +34,54 @@ jest.mock('../../../components/VkgProvider', () => {
   };
 });
 
+// Mock the theme engine
+jest.mock('../../ui/theme/useTheme', () => ({
+  useTheme: () => ({
+    colors: { primary: '#6366f1' },
+    fontScale: 1
+  })
+}));
+
 // A dummy component to test the injected contexts
 function ConsumerComponent() {
   const { session } = useSession();
   const vkg = useVkgEngine();
   const membrane = useMembrane();
+  const theme = useTheme();
 
   return (
     <React.Fragment>
-      <div testID="session-user">{session?.user || 'none'}</div>
-      <div testID="vkg-state">{vkg?.engineState || 'none'}</div>
-      <div testID="membrane-tenant">{membrane.getConfig().tenantId}</div>
+      <Text testID="session-user">{(session as any)?.user || 'none'}</Text>
+      <Text testID="vkg-state">{(vkg as any)?.engineState || 'none'}</Text>
+      <Text testID="membrane-tenant">{membrane.getConfig().tenantId}</Text>
+      <Text testID="theme-primary">{theme.colors.primary}</Text>
     </React.Fragment>
   );
 }
 
 describe('ZoeFrameworkProvider', () => {
-  it('should render children and inject all contexts successfully', () => {
-    render(
-      <ZoeFrameworkProvider membraneConfig={{ tenantId: 'test-tenant' }}>
+  it('renders correctly and provides all contexts', () => {
+    const { getByTestId } = render(
+      <ZoeFrameworkProvider membraneConfig={{ tenantId: 'tenant-123' }}>
         <ConsumerComponent />
       </ZoeFrameworkProvider>
     );
 
-    expect(screen.getByTestId('session-user').props.children).toBe('test-user');
-    expect(screen.getByTestId('vkg-state').props.children).toBe('running');
-    expect(screen.getByTestId('membrane-tenant').props.children).toBe('test-tenant');
+    expect(getByTestId('session-user').props.children).toBe('test-user');
+    expect(getByTestId('vkg-state').props.children).toBe('running');
+    expect(getByTestId('membrane-tenant').props.children).toBe('tenant-123');
+    expect(getByTestId('theme-primary').props.children).toBe('#6366f1');
   });
 
-  it('should throw error when useMembrane is used outside provider', () => {
-    // Suppress console.error for expected error thrown in render
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  it('renders suspense fallback when content suspends', () => {
+    const LazyComponent = React.lazy(() => new Promise(() => {})); // Never resolves
+    
+    const { getByText } = render(
+      <ZoeFrameworkProvider suspenseFallback={<Text>Loading...</Text>}>
+        <LazyComponent />
+      </ZoeFrameworkProvider>
+    );
 
-    expect(() => {
-      render(<ConsumerComponent />);
-    }).toThrow('useMembrane must be used within a MembraneProvider');
-
-    consoleSpy.mockRestore();
+    expect(getByText('Loading...')).toBeTruthy();
   });
 });

@@ -5,3 +5,6 @@
 
 export * from './storage';
 export * from './proxyStore';
+export * from './middleware';
+export * from './hooks';
+export * from './sync';

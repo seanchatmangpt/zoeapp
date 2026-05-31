@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import { ParticipantBasis } from './types';
 
 export interface AuthState<TUser = any> {
   session: TUser | null;
+  participant: ParticipantBasis | null;
   loading: boolean;
   isTransitioning: boolean;
   transitionType: 'signin' | 'signout' | null;
@@ -14,6 +16,7 @@ export interface AuthContextValue<TUser = any> extends AuthState<TUser> {
 
 const AuthContext = createContext<AuthContextValue<any>>({
   session: null,
+  participant: null,
   loading: true,
   isTransitioning: false,
   transitionType: null,
@@ -29,6 +32,8 @@ export interface AuthProviderProps<TUser = any> {
   onAuthStateChange?: (callback: (event: string, session: TUser | null) => void) => () => void;
   /** Transition delay to allow animations to finish (ms) */
   transitionDurationMs?: number;
+  /** Optional function to resolve a participant basis from the session for RBAC hooks */
+  resolveParticipant?: (session: TUser) => ParticipantBasis;
 }
 
 export function AuthProvider<TUser = any>({
@@ -36,11 +41,17 @@ export function AuthProvider<TUser = any>({
   getInitialSession,
   onAuthStateChange,
   transitionDurationMs = 850,
+  resolveParticipant,
 }: AuthProviderProps<TUser>) {
   const [session, setSessionState] = useState<TUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionType, setTransitionType] = useState<'signin' | 'signout' | null>(null);
+
+  const participant = useMemo(() => {
+    if (!session || !resolveParticipant) return null;
+    return resolveParticipant(session);
+  }, [session, resolveParticipant]);
 
   const setSession = (newSession: TUser | null) => {
     setSessionState((prev) => {
@@ -111,6 +122,7 @@ export function AuthProvider<TUser = any>({
     <AuthContext.Provider
       value={{
         session,
+        participant,
         loading,
         isTransitioning,
         transitionType,

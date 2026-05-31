@@ -6,3 +6,4 @@ export * from './managers/quarantine';
 export * from './managers/receipts';
 export * from './managers/telemetry';
 export * from './managers/trajectories';
+export * from './managers/audit';

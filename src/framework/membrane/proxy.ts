@@ -2,6 +2,7 @@ import { Membrane } from './membrane';
 import { ProxyWrapperOptions, MembraneTelemetryEvent } from './types';
 
 const IS_PROXY = Symbol('IS_PROXY');
+const proxyCache = new WeakMap<object, any>();
 
 export class ProxyFactory {
   /**
@@ -21,7 +22,13 @@ export class ProxyFactory {
       return target;
     }
 
+    // Proxy performance optimization: cache proxies to prevent recreating
+    if (proxyCache.has(target)) {
+      return proxyCache.get(target) as T;
+    }
+
     const emit = (event: MembraneTelemetryEvent) => {
+
       // Ignore symbols in telemetry to prevent pollution
       if (typeof event.property === 'string' && event.property.startsWith('Symbol(')) {
         return;
@@ -312,6 +319,9 @@ export class ProxyFactory {
       }
     };
 
-    return new Proxy(target, handler);
+    const proxy = new Proxy(target, handler);
+    proxyCache.set(target, proxy);
+    return proxy;
   }
 }
+

@@ -86,6 +86,42 @@ export function admitRoute(
     }
   }
 
+  if (route.requiredRoles && route.requiredRoles.length > 0) {
+    const participantRolesSet = new Set(activeParticipant.roles || []);
+    const missingRoles = route.requiredRoles.filter(
+      (role) => !participantRolesSet.has(role)
+    );
+
+    if (missingRoles.length > 0) {
+      return {
+        admitted: false,
+        refusal: {
+          code: 'MISSING_ROLE',
+          message: `Missing required role(s): ${missingRoles.join(', ')}.`,
+          missingRoles,
+        },
+      };
+    }
+  }
+
+  if (route.requiredPermissions && route.requiredPermissions.length > 0) {
+    const participantPermissionsSet = new Set(activeParticipant.permissions || []);
+    const missingPermissions = route.requiredPermissions.filter(
+      (permission) => !participantPermissionsSet.has(permission)
+    );
+
+    if (missingPermissions.length > 0) {
+      return {
+        admitted: false,
+        refusal: {
+          code: 'MISSING_PERMISSION',
+          message: `Missing required permission(s): ${missingPermissions.join(', ')}.`,
+          missingPermissions,
+        },
+      };
+    }
+  }
+
   if (route.customGuard) {
     const customRefusal = route.customGuard(activeParticipant);
     if (customRefusal) {

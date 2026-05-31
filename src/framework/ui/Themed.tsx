@@ -5,7 +5,7 @@
 
 import { Text as DefaultText, View as DefaultView } from 'react-native';
 
-import { useColorScheme } from '../../components/useColorScheme';
+import { useTheme } from './theme/useTheme';
 import { cn } from '../../utils/cn';
 
 type ThemeProps = {
@@ -17,25 +17,34 @@ export type TextProps = ThemeProps & DefaultText['props'];
 export type ViewProps = ThemeProps & DefaultView['props'];
 
 export function useThemedColor(styleType: 'text' | 'background') {
-  const theme = useColorScheme();
+  const theme = useTheme();
 
   if (styleType === 'background') {
-    return theme === 'light' ? 'bg-light-background' : 'bg-dark-background';
+    return 'bg-background';
   } else if (styleType === 'text') {
-    return theme === 'light' ? 'text-light-text' : 'text-dark-text';
+    return 'text-text';
   }
 }
 
 export function Text(props: TextProps) {
-  const { className, ...otherProps } = props;
-  const textColor = useThemedColor('text');
+  const { className, style, ...otherProps } = props;
+  const theme = useTheme();
+  
+  const dynamicStyle = {
+    color: theme.colors.text,
+    fontSize: 16 * theme.fontScale,
+  };
 
-  return <DefaultText className={cn(textColor, className)} {...otherProps} />;
+  return <DefaultText style={[dynamicStyle, style]} className={className} {...otherProps} />;
 }
 
 export function View(props: ViewProps) {
-  const { className, ...otherProps } = props;
-  const backgroundColor = useThemedColor('background');
+  const { className, style, ...otherProps } = props;
+  const theme = useTheme();
+  
+  const dynamicStyle = {
+    backgroundColor: theme.colors.background,
+  };
 
-  return <DefaultView className={cn(backgroundColor, className)} {...otherProps} />;
+  return <DefaultView style={[dynamicStyle, style]} className={className} {...otherProps} />;
 }

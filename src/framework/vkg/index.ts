@@ -10,3 +10,5 @@ export * from './client';
 export * from './rdf';
 export * from './engine';
 export * from './react';
+export * from './query';
+export * from './cache';

@@ -234,7 +234,7 @@ describe('SyncEngine Outbox System', () => {
         status: 'pending',
         attempts: 0,
         entityId: null,
-        createdAt: new Date(),
+        createdAt: new Date('2020-01-01T00:00:00.000Z'),
       };
 
       const error = new Error('Network timeout');
@@ -250,6 +250,12 @@ describe('SyncEngine Outbox System', () => {
         attempts: 1,
       });
       expect(engine.mockOnFailure).toHaveBeenCalled();
+
+      // Wait for any background re-triggered pushes from handleJobFailure to settle
+      await new Promise(process.nextTick);
+      await new Promise(process.nextTick);
+      await new Promise(process.nextTick);
+      await new Promise(process.nextTick);
 
       // Reset mocks for second run
       jest.clearAllMocks();

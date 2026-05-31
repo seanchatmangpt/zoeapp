@@ -5,8 +5,8 @@ import { AvatarRelativeProjectionMatrixView, StackProtected, TabsProtected, Stac
 
 jest.mock('expo-router', () => {
   const React = require('react');
-  const StackComponent = React.forwardRef(({ children, ...props }, ref) => <>{children}</>);
-  const TabsComponent = React.forwardRef(({ children, ...props }, ref) => <>{children}</>);
+  const StackComponent = React.forwardRef(({ children, ...props }: { children?: React.ReactNode; [key: string]: any }, ref: React.Ref<any>) => <>{children}</>);
+  const TabsComponent = React.forwardRef(({ children, ...props }: { children?: React.ReactNode; [key: string]: any }, ref: React.Ref<any>) => <>{children}</>);
   return {
     Stack: Object.assign(StackComponent, { Screen: () => null }),
     Tabs: Object.assign(TabsComponent, { Screen: () => null }),

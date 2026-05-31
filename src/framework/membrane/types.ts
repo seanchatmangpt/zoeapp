@@ -37,16 +37,30 @@ export interface TrajectoryFlow {
 
 export interface MembraneTelemetryEvent {
   timestamp: string;
-  type: 'set' | 'get' | 'delete' | 'rollback';
-  property: string;
-  originalValue: any;
-  value: any;
+  type: 'set' | 'get' | 'delete' | 'rollback' | 'span_start' | 'span_end';
+  property?: string;
+  originalValue?: any;
+  value?: any;
   flowName?: string;
   success?: boolean;
   error?: string;
+  traceId?: string;
+  spanId?: string;
+  parentSpanId?: string;
+  durationMs?: number;
 }
 
 export type TelemetryListener = (event: MembraneTelemetryEvent) => void;
+
+export interface SecurityAuditEvent {
+  timestamp: string;
+  level: 'info' | 'warn' | 'critical';
+  action: string;
+  commandId?: string;
+  capabilityId?: string;
+  details: Record<string, any>;
+  actorId?: string;
+}
 
 export interface QuarantineRecord {
   commandId: string;

@@ -25,7 +25,7 @@ describe('OfflineBanner', () => {
   });
 
   it('renders nothing when initially online', () => {
-    (useActorOpsStore as jest.Mock).mockImplementation((selector) => {
+    (useActorOpsStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ networkOnline: true, setNetworkOnline: mockSetNetworkOnline });
     });
 
@@ -34,7 +34,7 @@ describe('OfflineBanner', () => {
   });
 
   it('renders offline message when network is offline', () => {
-    (useActorOpsStore as jest.Mock).mockImplementation((selector) => {
+    (useActorOpsStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ networkOnline: false, setNetworkOnline: mockSetNetworkOnline });
     });
 
@@ -44,7 +44,7 @@ describe('OfflineBanner', () => {
   });
 
   it('handles reconnect button press', () => {
-    (useActorOpsStore as jest.Mock).mockImplementation((selector) => {
+    (useActorOpsStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ networkOnline: false, setNetworkOnline: mockSetNetworkOnline });
     });
 
@@ -63,7 +63,7 @@ describe('OfflineBanner', () => {
   it('transitions to connected state and hides after delay', () => {
     // Start offline
     let isOnline = false;
-    (useActorOpsStore as jest.Mock).mockImplementation((selector) => {
+    (useActorOpsStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ networkOnline: isOnline, setNetworkOnline: mockSetNetworkOnline });
     });
 
@@ -72,7 +72,7 @@ describe('OfflineBanner', () => {
 
     // Go online
     isOnline = true;
-    (useActorOpsStore as jest.Mock).mockImplementation((selector) => {
+    (useActorOpsStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ networkOnline: isOnline, setNetworkOnline: mockSetNetworkOnline });
     });
     

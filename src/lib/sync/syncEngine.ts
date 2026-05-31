@@ -26,6 +26,10 @@ class DrizzleSyncStorageAdapter implements SyncStorageAdapter<SyncJob> {
     await db.update(syncQueue).set(updates).where(eq(syncQueue.id, id));
   }
 
+  async updateJob(id: number, updates: Partial<Omit<SyncJob, 'id' | 'status' | 'attempts' | 'createdAt'>>): Promise<void> {
+    await db.update(syncQueue).set(updates as any).where(eq(syncQueue.id, id));
+  }
+
   async deleteJob(id: number): Promise<void> {
     await db.delete(syncQueue).where(eq(syncQueue.id, id));
   }

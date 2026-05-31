@@ -345,5 +345,48 @@ describe('Membrane Framework', () => {
       const verdict = await membrane.interceptors.evaluate({} as any);
       expect(verdict).toBe('allow');
     });
+
+    it('telemetry manager spans', () => {
+      const events: MembraneTelemetryEvent[] = [];
+      membrane.telemetry.register((e) => events.push(e));
+      const spanId = membrane.telemetry.startSpan('testFlow', 'trace_1', 'parent_1');
+      expect(spanId).toBeDefined();
+      expect(events[0].type).toBe('span_start');
+      
+      membrane.telemetry.endSpan(spanId);
+      expect(events[1].type).toBe('span_end');
+      expect(events[1].durationMs).toBeGreaterThanOrEqual(0);
+
+      // test endSpan with invalid spanId
+      membrane.telemetry.endSpan('invalid_span_id');
+      expect(events.length).toBe(2);
+    });
+
+    it('audit manager logs events and catches listener errors', () => {
+      const logs = membrane.audit.getLogs();
+      expect(logs.length).toBe(0);
+
+      const badListener = () => { throw new Error('Bad audit listener'); };
+      membrane.audit.registerListener(badListener);
+      
+      membrane.audit.log('info', 'Test Action', { data: 1 });
+      
+      const newLogs = membrane.audit.getLogs();
+      expect(newLogs.length).toBe(1);
+      expect(newLogs[0].level).toBe('info');
+      
+      membrane.audit.unregisterListener(badListener);
+      membrane.audit.clear();
+      expect(membrane.audit.getLogs().length).toBe(0);
+    });
+  });
+
+  describe('Proxy Caching', () => {
+    it('should cache proxy creation and return the same proxy for the same target', () => {
+      const target = { x: 10 };
+      const proxy1 = ProxyFactory.wrap(target, membrane);
+      const proxy2 = ProxyFactory.wrap(target, membrane);
+      expect(proxy1).toBe(proxy2); // Should be strictly equal due to WeakMap caching
+    });
   });
 });

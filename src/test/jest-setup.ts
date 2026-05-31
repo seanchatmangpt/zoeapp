@@ -123,28 +123,44 @@ jest.mock('@expo/vector-icons', () => {
 // Mock react-native-mmkv globally
 jest.mock('react-native-mmkv', () => {
   const instances: Record<string, any> = {};
+  const createInstance = (options?: { id?: string }) => {
+    const id = options?.id || 'default';
+    if (!instances[id]) {
+      const store: Record<string, string> = {};
+      instances[id] = {
+        id,
+        set: jest.fn((key: string, val: string | boolean | number) => {
+          store[key] = val.toString();
+        }),
+        getString: jest.fn((key: string) => {
+          return store[key] !== undefined ? store[key] : undefined;
+        }),
+        getBoolean: jest.fn((key: string) => {
+          return store[key] !== undefined ? store[key] === 'true' : undefined;
+        }),
+        getNumber: jest.fn((key: string) => {
+          return store[key] !== undefined ? parseFloat(store[key]) : undefined;
+        }),
+        getAllKeys: jest.fn(() => Object.keys(store)),
+        delete: jest.fn((key: string) => {
+          delete store[key];
+        }),
+        remove: jest.fn((key: string) => {
+          delete store[key];
+        }),
+        clearAll: jest.fn(() => {
+          for (const key in store) delete store[key];
+        }),
+        addOnValueChangedListener: jest.fn(() => ({ remove: jest.fn() })),
+        _store: store,
+      };
+    }
+    return instances[id];
+  };
+
   return {
-    createMMKV: jest.fn((options?: { id?: string }) => {
-      const id = options?.id || 'default';
-      if (!instances[id]) {
-        const store: Record<string, string> = {};
-        instances[id] = {
-          id,
-          set: jest.fn((key: string, val: string) => {
-            store[key] = val;
-          }),
-          getString: jest.fn((key: string) => {
-            return store[key] !== undefined ? store[key] : undefined;
-          }),
-          remove: jest.fn((key: string) => {
-            delete store[key];
-          }),
-          addOnValueChangedListener: jest.fn(() => ({ remove: jest.fn() })),
-          _store: store,
-        };
-      }
-      return instances[id];
-    }),
+    MMKV: jest.fn().mockImplementation((options) => createInstance(options)),
+    createMMKV: jest.fn((options) => createInstance(options)),
   };
 });
 

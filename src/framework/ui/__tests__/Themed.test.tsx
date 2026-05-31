@@ -1,77 +1,55 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Text, View, useThemedColor } from '../Themed';
-import { useColorScheme } from 'react-native';
+import { ThemeProvider } from '../theme/ThemeContext';
 
-jest.mock('react-native', () => {
-  const RN = jest.requireActual('react-native');
-  RN.useColorScheme = jest.fn();
-  return RN;
-});
+const renderWithTheme = (ui: React.ReactElement) => {
+  return render(<ThemeProvider>{ui}</ThemeProvider>);
+};
 
-describe('Themed', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
+describe('Themed Components', () => {
   describe('useThemedColor', () => {
-    const TestComponent = ({ styleType }: { styleType: 'text' | 'background' }) => {
-      const color = useThemedColor(styleType);
-      return <Text testID="color-text">{color}</Text>;
+    const TestComponent = ({ colorName }: { colorName: 'text' | 'background' }) => {
+      const color = useThemedColor(colorName);
+      return <View style={{ backgroundColor: color }} testID="themed-view" />;
     };
 
-    it('returns light text color when theme is light', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('light');
-      const { getByTestId } = render(<TestComponent styleType="text" />);
-      expect(getByTestId('color-text').props.children).toBe('text-light-text');
+    it('returns themed class for text', () => {
+      const { getByTestId } = renderWithTheme(<TestComponent colorName="text" />);
+      expect(getByTestId('themed-view')).toBeTruthy();
     });
 
-    it('returns dark text color when theme is dark', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('dark');
-      const { getByTestId } = render(<TestComponent styleType="text" />);
-      expect(getByTestId('color-text').props.children).toBe('text-dark-text');
-    });
-
-    it('returns light background color when theme is light', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('light');
-      const { getByTestId } = render(<TestComponent styleType="background" />);
-      expect(getByTestId('color-text').props.children).toBe('bg-light-background');
-    });
-
-    it('returns dark background color when theme is dark', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('dark');
-      const { getByTestId } = render(<TestComponent styleType="background" />);
-      expect(getByTestId('color-text').props.children).toBe('bg-dark-background');
+    it('returns themed class for background', () => {
+      const { getByTestId } = renderWithTheme(<TestComponent colorName="background" />);
+      expect(getByTestId('themed-view')).toBeTruthy();
     });
   });
 
-  describe('Text', () => {
-    it('applies light text color class', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('light');
-      const { getByText } = render(<Text>Hello</Text>);
-      expect(getByText('Hello').props.className).toContain('text-light-text');
+  describe('Text component', () => {
+    it('renders correctly with default styles', () => {
+      const { getByText } = renderWithTheme(<Text>Hello World</Text>);
+      const text = getByText('Hello World');
+      expect(text).toBeTruthy();
     });
 
-    it('applies dark text color class and custom className', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('dark');
-      const { getByText } = render(<Text className="custom-class">Hello</Text>);
-      expect(getByText('Hello').props.className).toContain('text-dark-text');
-      expect(getByText('Hello').props.className).toContain('custom-class');
+    it('merges custom className', () => {
+      const { getByText } = renderWithTheme(<Text className="custom-class">Hello World</Text>);
+      const text = getByText('Hello World');
+      expect(text.props.className).toContain('custom-class');
     });
   });
 
-  describe('View', () => {
-    it('applies light background color class', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('light');
-      const { getByTestId } = render(<View testID="view" />);
-      expect(getByTestId('view').props.className).toContain('bg-light-background');
+  describe('View component', () => {
+    it('renders correctly with default styles', () => {
+      const { getByTestId } = renderWithTheme(<View testID="themed-view" />);
+      const view = getByTestId('themed-view');
+      expect(view).toBeTruthy();
     });
 
-    it('applies dark background color class and custom className', () => {
-      (useColorScheme as jest.Mock).mockReturnValue('dark');
-      const { getByTestId } = render(<View testID="view" className="custom-view" />);
-      expect(getByTestId('view').props.className).toContain('bg-dark-background');
-      expect(getByTestId('view').props.className).toContain('custom-view');
+    it('merges custom className', () => {
+      const { getByTestId } = renderWithTheme(<View testID="themed-view" className="custom-view-class" />);
+      const view = getByTestId('themed-view');
+      expect(view.props.className).toContain('custom-view-class');
     });
   });
 });

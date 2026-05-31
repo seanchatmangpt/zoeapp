@@ -12,7 +12,17 @@ describe('AutonomicFramework', () => {
         floodWindowMs: 1000,
         maxQueueLength: 10,
         maxOscillationDepth: 3,
-        maxLoadFactor: 0.85
+        maxLoadFactor: 0.85,
+        anomalyDetection: {
+          enableBurstDetection: true,
+          maxBurstRate: 10,
+          abnormalPayloadSize: 1000
+        },
+        retryPolicy: {
+          maxRetries: 2,
+          baseDelayMs: 10,
+          backoffMultiplier: 2
+        }
       }
     });
   });
@@ -58,7 +68,7 @@ describe('AutonomicFramework', () => {
     });
   });
 
-  describe('Message Supervision Evaluation', () => {
+  describe('Message Supervision Evaluation (Sync)', () => {
     it('should suppress message if flood limit is exceeded', async () => {
       const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h1', instanceId: 'i1' };
       const behavior: HookBehavior = {
@@ -109,6 +119,253 @@ describe('AutonomicFramework', () => {
       const result = framework.send(ref, msg, 0.90); // 0.90 > 0.85 (default maxLoadFactor)
       expect(result.success).toBe(false);
       expect(result.action).toBe('suppress');
+    });
+  });
+
+  describe('DX Innovations: Anomaly Detection & Async Hooks', () => {
+    it('should detect burst anomalies synchronously', async () => {
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_burst', instanceId: 'i1' };
+      await framework.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { id: 'b1', type: 'graph_delta', payload: {} };
+      let finalResult;
+      
+      // Send 11 times, limit is 10
+      for (let i = 0; i < 11; i++) {
+        finalResult = framework.send(ref, msg);
+      }
+      
+      expect(finalResult?.success).toBe(false);
+      expect(finalResult?.action).toBe('quarantine');
+      expect(finalResult?.reason).toContain('burst_rate_exceeded');
+    });
+
+    it('should detect payload size anomalies synchronously', async () => {
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_payload', instanceId: 'i1' };
+      await framework.spawnActor(ref, { init: async () => ({}) });
+
+      const payloadStr = 'a'.repeat(1500); // Exceeds 1000
+      const msg: HookMessage = { id: 'ps1', type: 'graph_delta', payload: { data: payloadStr } };
+      
+      const result = framework.send(ref, msg);
+      expect(result.success).toBe(false);
+      expect(result.action).toBe('quarantine');
+      expect(result.reason).toContain('abnormal_payload_size');
+    });
+
+    it('should use async hooks to override quarantine', async () => {
+      const onQuarantine = jest.fn().mockResolvedValue(true); // Allow override
+      const onAnomalyDetected = jest.fn();
+
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          anomalyDetection: { abnormalPayloadSize: 100 },
+          quarantineHooks: { onQuarantine, onAnomalyDetected }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_async1', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: { data: 'a'.repeat(200) } };
+      
+      const result = await fwAsync.sendAsync(ref, msg);
+      
+      expect(onQuarantine).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(result.action).toBe('allow');
+    });
+
+    it('should use async hooks and fail if override is false', async () => {
+      const onQuarantine = jest.fn().mockResolvedValue(false); // Reject
+
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          anomalyDetection: { abnormalPayloadSize: 100 },
+          quarantineHooks: { onQuarantine }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_async2', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      const payloadStr = 'a'.repeat(200); // Exceeds 100
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: { data: payloadStr } };
+      
+      const result = await fwAsync.sendAsync(ref, msg);
+      
+      expect(onQuarantine).toHaveBeenCalled();
+      expect(result.success).toBe(false);
+      expect(result.action).toBe('anomaly_detected');
+    });
+
+    it('should retry asynchronously on suppression before failing', async () => {
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          maxLoadFactor: 0.85,
+          retryPolicy: {
+            maxRetries: 2,
+            baseDelayMs: 10,
+            backoffMultiplier: 2
+          }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_retry', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: {} };
+      
+      // Force suppression via high load factor
+      const start = Date.now();
+      const result = await fwAsync.sendAsync(ref, msg, 0.90);
+      const elapsed = Date.now() - start;
+      
+      expect(result.success).toBe(false);
+      expect(result.action).toBe('retry_failed');
+      // Should have taken at least 10 + 20 = 30ms due to retries
+      expect(elapsed).toBeGreaterThanOrEqual(30);
+    });
+
+    it('should retry asynchronously and succeed if condition improves', async () => {
+      let currentLoad = 0.90;
+      
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          maxLoadFactor: 0.85,
+          retryPolicy: {
+            maxRetries: 3,
+            baseDelayMs: 10,
+            backoffMultiplier: 1
+          }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_retry2', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      // We override evaluateAndDispatch temporarily to simulate load improving
+      const originalEval = fwAsync['evaluateAndDispatch'].bind(fwAsync);
+      let callCount = 0;
+      fwAsync['evaluateAndDispatch'] = async (r, m, load) => {
+        callCount++;
+        if (callCount === 2) currentLoad = 0.80; // Improves on 2nd attempt
+        return originalEval(r, m, currentLoad);
+      };
+
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: {} };
+      const result = await fwAsync.sendAsync(ref, msg, currentLoad);
+      
+      expect(result.success).toBe(true);
+      expect(result.action).toBe('allow');
+      expect(callCount).toBe(2);
+    });
+
+    it('should return retry_failed if attempts exceed maxRetries without improving', async () => {
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          maxLoadFactor: 0.85,
+          retryPolicy: {
+            maxRetries: 1, // Only 1 retry (2 attempts total)
+            baseDelayMs: 1,
+          }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_retry_fail', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: {} };
+      
+      // Override to always suppress
+      jest.spyOn(fwAsync as any, 'evaluateAndDispatch').mockResolvedValue({ success: false, action: 'suppress', reason: 'High load' });
+
+      const result = await fwAsync.sendAsync(ref, msg, 0.90);
+      
+      expect(result.success).toBe(false);
+      expect(result.action).toBe('retry_failed');
+    });
+
+    it('should return null from detectAnomaly if no config', () => {
+      const fwNoConfig = new AutonomicFramework();
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h1', instanceId: 'i1' };
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: {} };
+      
+      const anomaly = fwNoConfig['detectAnomaly'](ref, msg);
+      expect(anomaly).toBeNull();
+    });
+
+    it('should reset burst tracker window after 1 second', async () => {
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_burst_reset', instanceId: 'i1' };
+      await framework.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { id: 'b1', type: 'graph_delta', payload: {} };
+      
+      // Override Date.now for this test
+      const originalDateNow = Date.now;
+      let currentTime = 10000;
+      Date.now = jest.fn(() => currentTime);
+
+      // Send 1 to start window
+      framework.send(ref, msg);
+
+      // Advance time by 1001ms
+      currentTime += 1001;
+
+      // Send again, should hit the reset branch
+      const result = framework.send(ref, msg);
+      expect(result.success).toBe(true);
+
+      Date.now = originalDateNow;
+    });
+
+    it('should use async hooks to override standard conformance quarantine', async () => {
+      const onQuarantine = jest.fn().mockResolvedValue(true); // Allow override
+
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          maxOscillationDepth: 1, // small depth to force quarantine
+          quarantineHooks: { onQuarantine }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_async_conf', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { 
+        id: 'm1', 
+        type: 'graph_delta', 
+        actorRef: ref,
+        payload: { trace: ['h_async_conf', 'h_async_conf'] }, // 2 visits > maxDepth 1
+        causationId: 'cause_1' 
+      };
+      
+      const result = await fwAsync.sendAsync(ref, msg);
+      
+      expect(onQuarantine).toHaveBeenCalled();
+      expect(result.success).toBe(true);
+      expect(result.action).toBe('allow');
+    });
+
+    it('should fail immediately if maxRetries causes 0 maxAttempts', async () => {
+      const fwAsync = new AutonomicFramework({
+        supervision: {
+          retryPolicy: {
+            maxRetries: -1, // causes maxAttempts = 0
+            baseDelayMs: 10,
+          }
+        }
+      });
+
+      const ref: HookActorRef = { tenantId: 't1', packId: 'p1', hookId: 'h_zero', instanceId: 'i1' };
+      await fwAsync.spawnActor(ref, { init: async () => ({}) });
+
+      const msg: HookMessage = { id: 'm1', type: 'graph_delta', payload: {} };
+      const result = await fwAsync.sendAsync(ref, msg);
+      
+      expect(result.success).toBe(false);
+      expect(result.action).toBe('retry_failed');
+      expect(result.reason).toContain('Max retries exceeded');
     });
   });
 
