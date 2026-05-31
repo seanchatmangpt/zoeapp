@@ -10,23 +10,20 @@ export function useCrdtState<TState, TDelta, TCRDT extends CRDT<TState, TDelta>,
   peerId: string,
   initialState?: TState,
   getValue?: (crdt: TCRDT) => TValue
-): [TValue, TCRDT, (other: TState | TDelta) => void] {
-  const crdt = useMemo(() => factory(peerId, initialState), [factory, peerId, initialState]);
-  const [internalState, setInternalState] = useState<TState>(() => crdt.state);
+): [TValue, TCRDT, (other: TState | TDelta) => void, () => void] {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const crdt = useMemo(() => factory(peerId, initialState), [peerId, initialState]);
+  const [tick, setTick] = useState(0);
+  const forceUpdate = useCallback(() => setTick(t => t + 1), []);
 
-  const value = useMemo(() => (getValue ? getValue(crdt) : (crdt as any).value as TValue), [crdt, internalState, getValue]);
+  const value = useMemo(() => (getValue ? getValue(crdt) : (crdt as any).value as TValue), [crdt, tick, getValue]);
 
   const merge = useCallback((other: TState | TDelta) => {
     crdt.merge(other);
-    setInternalState(crdt.state);
-  }, [crdt]);
+    forceUpdate();
+  }, [crdt, forceUpdate]);
 
-  // We need a way to trigger re-renders when the CRDT is mutated locally.
-  // Since the CRDT instance is stable (via useMemo), we can wrap its mutation methods
-  // or provide a proxy. For simplicity, we'll expect the user to use the crdt instance
-  // and we might need a forceUpdate or a wrapper.
-
-  return [value, crdt, merge];
+  return [value, crdt, merge, forceUpdate];
 }
 
 /**
@@ -39,7 +36,7 @@ export function useLWWRegister<T>(
   peerId: string,
   initialValue: T
 ): [T, (val: T) => void, (state: LWWRegisterState<T>) => void] {
-  const [value, crdt, merge] = useCrdtState<LWWRegisterState<T>, LWWRegisterState<T>, LWWRegister<T>, T>(
+  const [value, crdt, merge, forceUpdate] = useCrdtState<LWWRegisterState<T>, LWWRegisterState<T>, LWWRegister<T>, T>(
     (pid, initial) => new LWWRegister(pid, initial?.value ?? initialValue, initial?.timestamp),
     peerId,
     undefined,
@@ -56,7 +53,8 @@ export function useLWWRegister<T>(
   const setValue = useCallback((val: T) => {
     crdt.set(val);
     setLocalValue(crdt.value);
-  }, [crdt]);
+    forceUpdate();
+  }, [crdt, forceUpdate]);
 
   return [localValue, setValue, merge];
 }
@@ -71,15 +69,12 @@ export function usePNCounter(
   peerId: string,
   initialValue: number = 0
 ): [number, { increment: (amt?: number) => void; decrement: (amt?: number) => void }, (state: PNCounterState) => void] {
-  const [value, crdt, merge] = useCrdtState<PNCounterState, PNCounterState, PNCounter, number>(
+  const [value, crdt, merge, forceUpdate] = useCrdtState<PNCounterState, PNCounterState, PNCounter, number>(
     (pid) => new PNCounter(pid),
     peerId,
     undefined,
     (c) => c.value
   );
-
-  const [, setTick] = useState(0);
-  const forceUpdate = useCallback(() => setTick(t => t + 1), []);
 
   const ops = useMemo(() => ({
     increment: (amt?: number) => {
@@ -105,15 +100,12 @@ export function useLWWMap<V>(
   peerId: string,
   initialState: LWWMapState<V> = {}
 ): [LWWMapState<V>, { set: (key: string, val: V) => void; delete: (key: string) => void; get: (key: string) => V | undefined }, (state: LWWMapState<V>) => void] {
-  const [state, crdt, merge] = useCrdtState<LWWMapState<V>, LWWMapState<V>, LWWMap<V>, LWWMapState<V>>(
+  const [state, crdt, merge, forceUpdate] = useCrdtState<LWWMapState<V>, LWWMapState<V>, LWWMap<V>, LWWMapState<V>>(
     (pid, initial) => new LWWMap(pid, initial ?? initialState),
     peerId,
     undefined,
     (c) => c.state
   );
-
-  const [, setTick] = useState(0);
-  const forceUpdate = useCallback(() => setTick(t => t + 1), []);
 
   const ops = useMemo(() => ({
     set: (key: string, val: V) => {
