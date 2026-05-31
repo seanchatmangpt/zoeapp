@@ -4,8 +4,77 @@ import { Alert } from 'react-native';
 import AdminOutbox, { formatTimestamp, CodePayload } from '../outbox';
 import { globalLocalDispatcher, globalRemoteDispatcher } from '@/src/lib/actor/actorOps';
 
+jest.mock('@/src/lib/actor/actorOps', () => {
+  if (!(global as any).__mockActorOps) {
+    const mockPushChanges = jest.fn();
+    const mockSyncEngine = {
+      pushChanges: mockPushChanges,
+    };
+    const mockLocalDispatcher = {
+      dispatch: jest.fn(),
+      syncOutbox: jest.fn(),
+      getSyncEngine: jest.fn(() => mockSyncEngine),
+    };
+    const mockStore = jest.fn((selector: any) => {
+      const state = {
+        networkOnline: true,
+        remoteRejectActive: false,
+        setNetworkOnline: jest.fn(),
+        setRemoteRejectActive: jest.fn(),
+      };
+      if (typeof selector === 'function') return selector(state);
+      return state;
+    });
+    (mockStore as any).getState = jest.fn(() => ({
+      setLatestReceipt: jest.fn(),
+      setLatestEvent: jest.fn(),
+      setCounts: jest.fn(),
+    }));
+    (global as any).__mockActorOps = {
+      useActorOpsStore: mockStore,
+      globalLocalDispatcher: mockLocalDispatcher,
+      globalRemoteDispatcher: {},
+    };
+  }
+  return (global as any).__mockActorOps;
+});
 
+jest.mock('../../../lib/actor/actorOps', () => {
+  if (!(global as any).__mockActorOps) {
+    const mockPushChanges = jest.fn();
+    const mockSyncEngine = {
+      pushChanges: mockPushChanges,
+    };
+    const mockLocalDispatcher = {
+      dispatch: jest.fn(),
+      syncOutbox: jest.fn(),
+      getSyncEngine: jest.fn(() => mockSyncEngine),
+    };
+    const mockStore = jest.fn((selector: any) => {
+      const state = {
+        networkOnline: true,
+        remoteRejectActive: false,
+        setNetworkOnline: jest.fn(),
+        setRemoteRejectActive: jest.fn(),
+      };
+      if (typeof selector === 'function') return selector(state);
+      return state;
+    });
+    (mockStore as any).getState = jest.fn(() => ({
+      setLatestReceipt: jest.fn(),
+      setLatestEvent: jest.fn(),
+      setCounts: jest.fn(),
+    }));
+    (global as any).__mockActorOps = {
+      useActorOpsStore: mockStore,
+      globalLocalDispatcher: mockLocalDispatcher,
+      globalRemoteDispatcher: {},
+    };
+  }
+  return (global as any).__mockActorOps;
+});
 
+const mockLocalDispatcherTyped = globalLocalDispatcher as any;
 
 // Mock FontAwesome icon used inside AdminShell
 jest.mock('@expo/vector-icons/FontAwesome', () => {

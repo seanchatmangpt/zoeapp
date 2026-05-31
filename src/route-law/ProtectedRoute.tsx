@@ -287,7 +287,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   hierarchy = DEFAULT_IDENTITY_HIERARCHY,
   participant,
 }) => {
-  const { session, loading } = useSession();
+  const { session, loading, isTransitioning = false } = useSession();
   const router = useRouter();
   const latestReceipt = useActorOpsStore((state: any) => state.latestReceipt);
   const [receiptVerified, setReceiptVerified] = React.useState(false);
@@ -463,8 +463,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     };
   }, [route.requiredReceiptCommandId, verifyReceipt]);
 
-  // If loading and no explicit participant is provided, render loading UI
-  if (loading && !participant) {
+  // If loading or transitioning and no explicit participant is provided, render loading UI
+  if ((loading || isTransitioning) && !participant) {
     if (loadingComponent) {
       return <>{loadingComponent}</>;
     }

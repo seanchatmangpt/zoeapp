@@ -29,14 +29,21 @@ jest.mock('expo-router', () => {
   };
 });
 
-let mockLatestReceipt: any = null;
-jest.mock('../../lib/actor/actorOps', () => {
-  const mockStore = jest.fn((selector: any) => selector({ latestReceipt: mockLatestReceipt }));
-  return {
-    useActorOpsStore: mockStore,
-  };
-});
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
 
+declare global {
+  var mockLatestReceipt: any;
+}
+
+Object.defineProperty(global, 'mockLatestReceipt', {
+  get() {
+    return useActorOpsStore.getState().latestReceipt;
+  },
+  set(val) {
+    useActorOpsStore.setState({ latestReceipt: val });
+  },
+  configurable: true,
+});
 let mockDbRecords: any[] = [];
 jest.mock('../../lib/db/db', () => ({
   db: {

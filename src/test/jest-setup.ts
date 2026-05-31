@@ -1,5 +1,4 @@
 /// <reference types="jest" />
-/* eslint-disable @typescript-eslint/no-require-imports */
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -371,6 +370,53 @@ jest.mock('../lib/actor/actorOps', () => mockFactory(), { virtual: true });
 jest.mock('../../lib/actor/actorOps', () => mockFactory(), { virtual: true });
 jest.mock('../../../lib/actor/actorOps', () => mockFactory(), { virtual: true });
 
+function setupMockImplementations() {
+  mockSetNetworkOnline.mockImplementation((online) => {
+    if ((global as any).mockNetworkOnline !== undefined) {
+      (global as any).mockNetworkOnline = online;
+    }
+    mockActorOpsState._networkOnline = online;
+  });
+
+  mockSetRemoteRejectActive.mockImplementation((active) => {
+    mockActorOpsState.remoteRejectActive = active;
+  });
+
+  mockSetLatestReceipt.mockImplementation((r) => {
+    mockLatestReceipt = r;
+    mockActorOpsState.latestReceipt = r;
+  });
+
+  mockSetCounts.mockImplementation((outbox, quarantine) => {
+    mockActorOpsState.outboxCount = outbox;
+    mockActorOpsState.quarantineCount = quarantine;
+  });
+
+  mockIsNetworkOffline.mockImplementation(() => !mockActorOpsState.networkOnline);
+
+  mockSetNetworkOffline.mockImplementation((val) => {
+    mockActorOpsState.networkOnline = !val;
+    (mockUseActorOpsStore as any).setState({ networkOnline: !val });
+  });
+
+  mockIsRemoteRejectionMocked.mockImplementation(() => mockActorOpsState.remoteRejectActive);
+
+  mockSetRemoteRejectionMocked.mockImplementation((val) => {
+    mockActorOpsState.remoteRejectActive = val;
+    (mockUseActorOpsStore as any).setState({ remoteRejectActive: val });
+  });
+
+  mockGetCurrentPrincipal.mockImplementation(() => mockActorOpsState.currentPrincipal);
+
+  mockSetCurrentPrincipal.mockImplementation((p) => {
+    mockActorOpsState.currentPrincipal = p;
+    (mockUseActorOpsStore as any).setState({ currentPrincipal: p });
+  });
+}
+
+// Initial setup of implementations
+setupMockImplementations();
+
 // Global reset helper to isolate test runs
 beforeEach(() => {
   // Reset Zustand state
@@ -388,15 +434,19 @@ beforeEach(() => {
     delete (global as any).mockNetworkOnline;
   }
 
-  // Clear mock history
-  mockSetNetworkOnline.mockClear();
-  mockSetRemoteRejectActive.mockClear();
-  mockSetCurrentPrincipal.mockClear();
-  mockSetLatestReceipt.mockClear();
-  mockSetLatestEvent.mockClear();
-  mockSetCounts.mockClear();
-  mockIsNetworkOffline.mockClear();
-  mockSetNetworkOffline.mockClear();
-  mockIsRemoteRejectionMocked.mockClear();
-  mockSetRemoteRejectionMocked.mockClear();
+  // Reset all mock implementations and call history to prevent leakage
+  mockSetNetworkOnline.mockReset();
+  mockSetRemoteRejectActive.mockReset();
+  mockSetCurrentPrincipal.mockReset();
+  mockSetLatestReceipt.mockReset();
+  mockSetLatestEvent.mockReset();
+  mockSetCounts.mockReset();
+  mockIsNetworkOffline.mockReset();
+  mockSetNetworkOffline.mockReset();
+  mockIsRemoteRejectionMocked.mockReset();
+  mockSetRemoteRejectionMocked.mockReset();
+
+  // Reapply default implementations
+  setupMockImplementations();
 });
+
