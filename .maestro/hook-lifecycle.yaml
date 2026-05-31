@@ -2,23 +2,11 @@ appId: com.truex.membraneclient
 ---
 - launchApp:
     clearState: true
-- tapOn:
-    text: "Open"
-    optional: true
-- tapOn:
-    text: "your@email.com"
-    optional: true
+- tapOn: "your@email.com"
 - inputText: "test@example.com"
-- tapOn:
-    text: "Enter your password"
-    optional: true
+- tapOn: "Enter your password"
 - inputText: "password123"
-- tapOn:
-    text: "Sign in to access your AI assistant and more"
-    optional: true
-- tapOn:
-    text: "🔑 Sign In"
-    optional: true
+- tapOn: "Establish Secure Session"
 
 - assertVisible: "Truex Membrane"
 - assertVisible: "Pending Receipts: 0"

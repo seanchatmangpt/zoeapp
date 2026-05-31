@@ -6,6 +6,6 @@ appId: com.truex.membraneclient
 - inputText: "test@example.com"
 - tapOn: "Enter your password"
 - inputText: "password123"
-- tapOn: "🔑 Sign In"
+- tapOn: "Establish Secure Session"
 - assertVisible: "Welcome back, test! 👋"
 - assertVisible: "What would you like to do today?"

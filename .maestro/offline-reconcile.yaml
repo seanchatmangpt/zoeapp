@@ -2,6 +2,12 @@ appId: com.truex.membraneclient
 ---
 - launchApp:
     clearState: true
+- tapOn: "your@email.com"
+- inputText: "test@example.com"
+- tapOn: "Enter your password"
+- inputText: "password123"
+- tapOn: "Establish Secure Session"
+- tapOn: "Hooks"
 
 - assertVisible: "Truex Hook Cockpit"
 

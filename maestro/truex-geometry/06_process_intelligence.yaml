@@ -2,6 +2,8 @@ appId: com.truex.membraneclient
 ---
 - launchApp:
     clearState: false
+- tapOn:
+    id: "dev-actor-lab-tab"
 - tapOn: "Process Intel"
 - assertVisible: "Process Intelligence"
 - assertVisible: "Truex OCEL 2.0 Receipt Verifier"
