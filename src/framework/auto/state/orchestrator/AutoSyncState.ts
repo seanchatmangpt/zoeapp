@@ -48,7 +48,7 @@ export function useAutoSyncState<V>(options: AutoSyncOptions<V>) {
   useEffect(() => {
     if (isHydrated.current) return;
 
-    const saved = storageAdapter.storage.getItem(`state`);
+    const saved = storageAdapter.storage.getItem(`state`) as string | null;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);

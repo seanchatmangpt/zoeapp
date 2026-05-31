@@ -250,6 +250,7 @@ eas submit --platform all
 
 ## 📚 Documentation
 
+- [Zoe 2030 Innovation Peak Guide](./docs/vision2030/framework-2030-peak.md) - Comprehensive developer guide for 2030 Peak integrations
 - [DATABASE.md](./DATABASE.md) - Database schema and setup
 - [Expo Router Docs](https://docs.expo.dev/router/)
 - [Supabase Docs](https://supabase.com/docs)

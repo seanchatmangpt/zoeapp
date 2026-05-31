@@ -1,0 +1,3057 @@
+PASS src/framework/compositions/platform-orchestration/__tests__/PlatformKernel.test.tsx
+PASS src/framework/auto/state/orchestrator/__tests__/AutoSyncState.test.ts
+PASS src/framework/auto/i18n/a11y/__tests__/AutoInclusiveWrapper.test.tsx
+PASS src/framework/ui/theme/__tests__/Theme.test.tsx
+PASS src/framework/vkg/__tests__/react.test.tsx
+PASS src/framework/compositions/semantic-crud/__tests__/SemanticListView.test.tsx
+PASS src/framework/compositions/intelligent-search/__tests__/useIntelligentSearch.test.ts
+PASS src/framework/compositions/mission-control/__tests__/SystemHealthDashboard.test.tsx
+PASS src/framework/auto/ux/adaptive/__tests__/AdaptiveUX.test.tsx
+PASS src/framework/2030/ui-holographic/__tests__/Holographic.test.tsx
+PASS src/framework/compositions/mission-control/__tests__/MissionControl.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      36 |
+      37 |   return (
+    > 38 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      39 |       <View style={styles.container}>
+      40 |         {headerBanner}
+      41 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/framework/admin/components/AdminShell.tsx:38:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/framework/compositions/mission-control/__tests__/MissionControl.test.tsx:38:46)
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/ai/on-device/__tests__/LocalInferenceEngine.test.ts
+PASS src/framework/2030/core/__tests__/Zoe2030.test.tsx
+  ● Console
+
+    console.log
+      SessionProvider useEffect triggered
+
+      at log (context/SessionProvider.tsx:70:13)
+
+    console.log
+      SessionProvider getSession result: null
+
+      at log (context/SessionProvider.tsx:75:15)
+
+    console.error
+      An update to SessionProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      75 |       console.log('SessionProvider getSession result:', session);
+      76 |       setSession(session);
+    > 77 |       setLoading(false);
+         |       ^
+      78 |       // Wait a tiny bit before setting initialized to true, to let the first auth state event pass
+      79 |       setTimeout(() => {
+      80 |         initialized = true;
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setLoading (context/SessionProvider.tsx:77:7)
+
+    console.error
+      An update to VkgProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      65 |         new DefaultHookSupervisor(3, 10)
+      66 |       );
+    > 67 |       setActorState(instance.state);
+         |       ^
+      68 |       setProjection(projectHookOutput('volunteer_shortage', instance.state, avatar));
+      69 |     };
+      70 |     initActor();
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setActorState (src/components/VkgProvider.tsx:67:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to VkgProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      66 |       );
+      67 |       setActorState(instance.state);
+    > 68 |       setProjection(projectHookOutput('volunteer_shortage', instance.state, avatar));
+         |       ^
+      69 |     };
+      70 |     initActor();
+      71 |   }, []);
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setProjection (src/components/VkgProvider.tsx:68:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/core/micro-frontend/__tests__/useModuleFederation.test.ts
+PASS src/framework/2030/i18n-semantic/SemanticLayout.test.tsx
+PASS src/app/(tabs)/__tests__/openai.test.tsx
+  ● Console
+
+    console.warn
+      Clipboard has been extracted from react-native core and will be removed in a future release. It can now be installed and imported from '@react-native-clipboard/clipboard' instead of 'react-native'. See https://github.com/react-native-clipboard/clipboard
+
+      159 |
+      160 |     // Set up spies on standard RN modules
+    > 161 |     clipboardSpy = jest.spyOn(Clipboard, 'setString').mockImplementation(() => {});
+          |                               ^
+      162 |     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+      163 |   });
+      164 |
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as Clipboard] (node_modules/react-native/index.js:190:5)
+      at Object.Clipboard (/Users/sac/zoeapp/src/app/(tabs)../../../__tests__/openai.test.tsx:161:31)
+
+PASS src/framework/2030/sync-extreme/__tests__/adapters.test.ts
+  ● Console
+
+    console.log
+      [SatelliteSyncAdapter] Broadcasted 7 bytes for ws-1 via Orbital Mesh
+
+      at Timeout.log [as _onTimeout] (src/framework/2030/sync-extreme/adapters/SatelliteSyncAdapter.ts:17:17)
+
+    console.log
+      [LoRaSyncAdapter] Transmitted burst for ws-1 over 868MHz/915MHz
+
+      at Timeout.log [as _onTimeout] (src/framework/2030/sync-extreme/adapters/LoRaSyncAdapter.ts:19:17)
+
+    console.log
+      [QuantumSyncAdapter] State collapsed for ws-1 across entangled pair
+
+      at QuantumSyncAdapter.log (src/framework/2030/sync-extreme/adapters/QuantumSyncAdapter.ts:15:13)
+
+PASS src/route-law/__tests__/ProtectedRoute.test.tsx
+  ● Console
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      442 |         if (active) {
+      443 |           setReceiptVerified(false);
+    > 444 |           setRefusalReason({
+          |           ^
+      445 |             code: 'RECEIPT_NOT_FOUND',
+      446 |             message: `Required BLAKE3 receipt for command '${route.requiredReceiptCommandId}' was not found in local storage (Zustand, MMKV, SQLite).`,
+      447 |           });
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setRefusalReason (src/route-law/ProtectedRoute.tsx:444:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      458 |     } finally {
+      459 |       if (active) {
+    > 460 |         setCheckingReceipt(false);
+          |         ^
+      461 |       }
+      462 |     }
+      463 |   }, [route.requiredReceiptCommandId, route.requiredReceiptDeltaHash, latestReceipt]);
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setCheckingReceipt (src/route-law/ProtectedRoute.tsx:460:9)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      442 |         if (active) {
+      443 |           setReceiptVerified(false);
+    > 444 |           setRefusalReason({
+          |           ^
+      445 |             code: 'RECEIPT_NOT_FOUND',
+      446 |             message: `Required BLAKE3 receipt for command '${route.requiredReceiptCommandId}' was not found in local storage (Zustand, MMKV, SQLite).`,
+      447 |           });
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setRefusalReason (src/route-law/ProtectedRoute.tsx:444:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      458 |     } finally {
+      459 |       if (active) {
+    > 460 |         setCheckingReceipt(false);
+          |         ^
+      461 |       }
+      462 |     }
+      463 |   }, [route.requiredReceiptCommandId, route.requiredReceiptDeltaHash, latestReceipt]);
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setCheckingReceipt (src/route-law/ProtectedRoute.tsx:460:9)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      441 |       } else {
+      442 |         if (active) {
+    > 443 |           setReceiptVerified(false);
+          |           ^
+      444 |           setRefusalReason({
+      445 |             code: 'RECEIPT_NOT_FOUND',
+      446 |             message: `Required BLAKE3 receipt for command '${route.requiredReceiptCommandId}' was not found in local storage (Zustand, MMKV, SQLite).`,
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setReceiptVerified (src/route-law/ProtectedRoute.tsx:443:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      442 |         if (active) {
+      443 |           setReceiptVerified(false);
+    > 444 |           setRefusalReason({
+          |           ^
+      445 |             code: 'RECEIPT_NOT_FOUND',
+      446 |             message: `Required BLAKE3 receipt for command '${route.requiredReceiptCommandId}' was not found in local storage (Zustand, MMKV, SQLite).`,
+      447 |           });
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setRefusalReason (src/route-law/ProtectedRoute.tsx:444:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to ProtectedRoute inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      458 |     } finally {
+      459 |       if (active) {
+    > 460 |         setCheckingReceipt(false);
+          |         ^
+      461 |       }
+      462 |     }
+      463 |   }, [route.requiredReceiptCommandId, route.requiredReceiptDeltaHash, latestReceipt]);
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setCheckingReceipt (src/route-law/ProtectedRoute.tsx:460:9)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/ui/animations/__tests__/ScalePress.test.tsx
+PASS src/framework/2030/sync-extreme/__tests__/ExtremeFusionSyncEngine.test.ts
+  ● Console
+
+    console.log
+      [QuantumSyncAdapter] State collapsed for test-workspace across entangled pair
+
+      at QuantumSyncAdapter.log (src/framework/2030/sync-extreme/adapters/QuantumSyncAdapter.ts:15:13)
+          at Array.map (<anonymous>)
+
+    console.log
+      [LoRaSyncAdapter] Transmitted burst for test-workspace over 868MHz/915MHz
+
+      at Timeout.log [as _onTimeout] (src/framework/2030/sync-extreme/adapters/LoRaSyncAdapter.ts:19:17)
+
+    console.log
+      [SatelliteSyncAdapter] Broadcasted 32 bytes for test-workspace via Orbital Mesh
+
+      at Timeout.log [as _onTimeout] (src/framework/2030/sync-extreme/adapters/SatelliteSyncAdapter.ts:17:17)
+
+PASS src/app/admin/__tests__/realtime.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/realtime.test.tsx:65:33)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+    console.log
+      Realtime subscription status: SUBSCRIBED
+
+      at log (src/app/admin/realtime.tsx:225:17)
+
+PASS src/framework/2030/optimization/__tests__/useOptimizationProfile.test.ts
+PASS src/framework/fusion/admin/__tests__/FusionAdminConsole.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      36 |
+      37 |   return (
+    > 38 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      39 |       <View style={styles.container}>
+      40 |         {headerBanner}
+      41 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/framework/admin/components/AdminShell.tsx:38:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/framework/fusion/admin/__tests__/FusionAdminConsole.test.tsx:77:46)
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/2030/qa-autonomous/__tests__/AutonomousRepairAgent.test.ts
+PASS src/framework/2030/predictive/__tests__/PredictiveActionLayer.test.ts
+PASS src/app/(tabs)/__tests__/account.test.tsx
+  ● Console
+
+    console.log
+      DEBUG: mockSetNetworkOnline from store: [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      }
+
+      at Object.log (/Users/sac/zoeapp/src/app/(tabs)../../../__tests__/account.test.tsx:390:13)
+
+    console.log
+      DEBUG: global mockSetNetworkOnline: [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      }
+
+      at Object.log (/Users/sac/zoeapp/src/app/(tabs)../../../__tests__/account.test.tsx:391:13)
+
+PASS src/framework/core/micro-frontend/__tests__/FederatedComponent.test.tsx
+PASS src/framework/2030/agent-native/__tests__/agent-native.test.ts
+PASS src/framework/2030/i18n-semantic/SemanticTranslationEngine.test.ts
+  ● Console
+
+    console.warn
+      [SemanticI18n] Missing mapping for key: unknown.key
+
+      52 |
+      53 |     if (!mapping) {
+    > 54 |       console.warn(`[SemanticI18n] Missing mapping for key: ${key}`);
+         |               ^
+      55 |       return {
+      56 |         intent: 'unknown',
+      57 |         text: key,
+
+      at SemanticTranslationEngine.warn [as translate] (src/framework/2030/i18n-semantic/SemanticTranslationEngine.ts:54:15)
+      at Object.translate (src/framework/2030/i18n-semantic/SemanticTranslationEngine.test.ts:50:27)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/2030/identity/__tests__/PostQuantumIdentity.test.ts
+  ● Console
+
+    console.log
+      [PQ-Identity] Verifying Dilithium5 signature...
+
+      at PostQuantumZkEngine.log [as verifyPqSignature] (src/framework/2030/identity/PostQuantumZkEngine.ts:64:13)
+
+    console.log
+      [PQ-Identity] Verifying Dilithium5 signature...
+
+      at PostQuantumZkEngine.log [as verifyPqSignature] (src/framework/2030/identity/PostQuantumZkEngine.ts:64:13)
+
+    console.log
+      [PQ-Identity] Verifying Falcon-1024 signature...
+
+      at PostQuantumZkEngine.log [as verifyPqSignature] (src/framework/2030/identity/PostQuantumZkEngine.ts:64:13)
+
+    console.log
+      [PQ-Identity] Verifying Dilithium5 signature...
+
+      at PostQuantumZkEngine.log [as verifyPqSignature] (src/framework/2030/identity/PostQuantumZkEngine.ts:64:13)
+
+    console.log
+      [PQ-Identity] Verifying Falcon-1024 signature...
+
+      at PostQuantumZkEngine.log [as verifyPqSignature] (src/framework/2030/identity/PostQuantumZkEngine.ts:64:13)
+
+    console.log
+      [PQ-Identity] Verifying Falcon-1024 signature...
+
+      at PostQuantumZkEngine.log [as verifyPqSignature] (src/framework/2030/identity/PostQuantumZkEngine.ts:64:13)
+
+PASS src/framework/admin/telemetry-3d/__tests__/TelemetryGraph3D.test.tsx
+PASS src/app/admin/__tests__/settings.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/settings.test.tsx:92:33)
+
+    console.log
+      DEBUG handleResetZustand: setNetworkOnline is [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      } isMock: true
+
+      at log (src/app/admin/settings.tsx:122:13)
+
+    console.log
+      TEST DEBUG: mockSetNetworkOnline is [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      }
+
+      at Object.log (src/app/admin/__tests__/settings.test.tsx:197:13)
+
+    console.log
+      TEST DEBUG: store setNetworkOnline is [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      }
+
+      at Object.log (src/app/admin/__tests__/settings.test.tsx:198:13)
+
+    console.log
+      TEST DEBUG: equality is true
+
+      at Object.log (src/app/admin/__tests__/settings.test.tsx:199:13)
+
+    console.log
+      DEBUG handleResetZustand: setNetworkOnline is [Function: mockConstructor] {
+        _isMockFunction: true,
+        getMockImplementation: [Function (anonymous)],
+        mock: [Getter/Setter],
+        mockClear: [Function (anonymous)],
+        mockReset: [Function (anonymous)],
+        mockRestore: [Function (anonymous)],
+        mockReturnValueOnce: [Function (anonymous)],
+        mockResolvedValueOnce: [Function (anonymous)],
+        mockRejectedValueOnce: [Function (anonymous)],
+        mockReturnValue: [Function (anonymous)],
+        mockResolvedValue: [Function (anonymous)],
+        mockRejectedValue: [Function (anonymous)],
+        mockImplementationOnce: [Function (anonymous)],
+        withImplementation: [Function: bound withImplementation],
+        mockImplementation: [Function (anonymous)],
+        mockReturnThis: [Function (anonymous)],
+        mockName: [Function (anonymous)],
+        getMockName: [Function (anonymous)]
+      } isMock: true
+
+      at log (src/app/admin/settings.tsx:122:13)
+
+PASS src/lib/actor/__tests__/dispatcher.test.ts
+PASS src/framework/fusion/data/__tests__/FusionDataManager.test.tsx
+PASS src/framework/ui/particles/__tests__/ConfettiCannon.test.tsx
+PASS src/framework/2030/optimization/__tests__/SelfOptimizingUXEngine.test.ts
+PASS src/framework/ui/__tests__/TransitionOverlay.test.tsx
+PASS src/components/__tests__/AvatarRelativeProjection.test.tsx
+PASS src/app/(auth)/__tests__/index.test.tsx
+  ● Console
+
+    console.log
+      [Auth Debug] signInWithEmail called with: { email: 'user@example.com', password: 'securePass123' }
+
+      at log (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:158:13)
+
+    console.log
+      [Auth Debug] signInWithPassword result: { data: {}, error: null }
+
+      at log (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:172:15)
+
+    console.log
+      [Auth Debug] signInWithEmail called with: { email: 'user@example.com', password: 'pass' }
+
+      at log (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:158:13)
+
+    console.log
+      [Auth Debug] signInWithPassword result: { data: null, error: { message: 'Invalid credentials' } }
+
+      at log (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:172:15)
+
+    console.log
+      [Auth Debug] signInWithEmail called with: { email: '', password: '' }
+
+      at Object.log (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:158:13)
+
+    console.log
+      [Auth Debug] signInWithEmail called with: { email: 'user@example.com', password: 'pass' }
+
+      at log (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:158:13)
+
+    console.error
+      [Auth Debug] Unexpected error during sign in: Error: Network failure
+          at Object.<anonymous> (/Users/sac/zoeapp/src/app/(auth)/__tests__/index.test.tsx:436:50)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+      175 |       }
+      176 |     } catch (e: any) {
+    > 177 |       console.error('[Auth Debug] Unexpected error during sign in:', e);
+          |               ^
+      178 |       setBanner({ type: 'error', message: e?.message || 'An unexpected error occurred' });
+      179 |     } finally {
+      180 |       setLoading(false);
+
+      at error (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:177:15)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+    console.error
+      [Auth Debug] Unexpected error during sign up: Error: Sign up exploded
+          at Object.<anonymous> (/Users/sac/zoeapp/src/app/(auth)/__tests__/index.test.tsx:471:38)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+      230 |       }
+      231 |     } catch (e: any) {
+    > 232 |       console.error('[Auth Debug] Unexpected error during sign up:', e);
+          |               ^
+      233 |       setBanner({ type: 'error', message: e?.message || 'An unexpected error occurred' });
+      234 |     } finally {
+      235 |       setLoading(false);
+
+      at error (/Users/sac/zoeapp/src/app/(auth)../../../index.tsx:232:15)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS src/app/admin/__tests__/outbox.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/outbox.test.tsx:171:46)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+    console.error
+      Error: Failed to fetch Supabase Edge Function: Network Error
+          at Object.<anonymous> (/Users/sac/zoeapp/src/app/admin/__tests__/outbox.test.tsx:337:69)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at Object.<anonymous> (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+          at Promise.then.completed (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/sac/zoeapp/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      111 |       Alert.alert('Outbox Sync', 'Synchronization and queue flush completed successfully.');
+      112 |     } catch (err: any) {
+    > 113 |       console.error(err);
+          |               ^
+      114 |       setSyncStatusMsg(`Sync Failed: ${err.message}`);
+      115 |       Alert.alert('Outbox Sync Error', err.message);
+      116 |     } finally {
+
+      at error (src/app/admin/outbox.tsx:113:15)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS src/framework/fusion/i18n/__tests__/FusionAccessibilityLayer.test.tsx
+PASS src/framework/fusion/dx/__tests__/FusionDevTools.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      42 |         testID="fusion-devtools-modal"
+      43 |       >
+    > 44 |         <SafeAreaView style={styles.modalContainer}>
+         |          ^
+      45 |           <View style={styles.header}>
+      46 |             <View>
+      47 |               <Text style={styles.headerTitle}>Fusion DX Tools</Text>
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/framework/fusion/dx/FusionDevTools.tsx:44:10)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/framework/fusion/dx/__tests__/FusionDevTools.test.tsx:46:11)
+
+    console.log
+      Successfully scaffolded: Test Blueprint
+
+      at log (src/framework/fusion/dx/FusionDevTools.tsx:112:15)
+
+PASS src/app/(tabs)/__tests__/offline-interactions.test.tsx
+  ● Console
+
+    console.log
+      DEBUG test mockNetworkOnline: false
+
+      at Object.log (/Users/sac/zoeapp/src/app/(tabs)../../../__tests__/offline-interactions.test.tsx:131:13)
+
+    console.log
+      DEBUG test store state: {
+        _networkOnline: true,
+        networkOnline: [Getter/Setter],
+        remoteRejectActive: false,
+        latestReceipt: null,
+        latestEvent: null,
+        outboxCount: 0,
+        quarantineCount: 0,
+        packetDropRate: 0,
+        cdcEventsCount: 0,
+        currentPrincipal: { id: 'usr_admin', role: 'admin' },
+        setNetworkOnline: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setRemoteRejectActive: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setCurrentPrincipal: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setLatestReceipt: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setLatestEvent: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setCounts: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setPacketDropRate: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        setCdcEventsCount: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (/Users/sac/zoeapp/src/app/(tabs)../../../__tests__/offline-interactions.test.tsx:132:13)
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (/Users/sac/zoeapp/src/app/(tabs)../../../__tests__/offline-interactions.test.tsx:191:35)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+PASS src/framework/ui/gestures/__tests__/PinchToZoom.test.tsx
+PASS src/hooks/__tests__/useCreativeWork.test.ts
+PASS src/app/admin/__tests__/actor-lab.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at src/app/admin/__tests__/actor-lab.test.tsx:101:32
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/app/admin/__tests__/actor-lab.test.tsx:100:23)
+      at Object.renderActorLab (src/app/admin/__tests__/actor-lab.test.tsx:146:46)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+    console.error
+      Error: Sync failed due to timeout
+          at Object.<anonymous> (/Users/sac/zoeapp/src/app/admin/__tests__/actor-lab.test.tsx:493:63)
+          at /Users/sac/zoeapp/node_modules/jest-mock/build/index.js:397:39
+          at Object.<anonymous> (/Users/sac/zoeapp/node_modules/jest-mock/build/index.js:404:13)
+          at Object.mockConstructor [as syncOutbox] (/Users/sac/zoeapp/node_modules/jest-mock/build/index.js:148:19)
+          at syncOutbox (/Users/sac/zoeapp/src/app/admin/actor-lab.tsx:238:35)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+          at apply (/Users/sac/zoeapp/src/app/admin/actor-lab.tsx:234:20)
+          at onPress (/Users/sac/zoeapp/src/components/admin/CommandButton.tsx:29:13)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+          at apply (/Users/sac/zoeapp/src/components/admin/CommandButton.tsx:25:20)
+          at handler (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/fire-event.ts:123:19)
+          at callback (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/act.ts:31:24)
+          at Object.<anonymous>.process.env.NODE_ENV.exports.act (/Users/sac/zoeapp/node_modules/react/cjs/react.development.js:814:22)
+          at actImplementation (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/act.ts:30:25)
+          at fireEvent (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/fire-event.ts:122:11)
+          at Function.fireEvent [as press] (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/fire-event.ts:130:3)
+          at press (/Users/sac/zoeapp/src/app/admin/__tests__/actor-lab.test.tsx:498:17)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+          at callback (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/act.ts:31:24)
+          at Object.<anonymous>.process.env.NODE_ENV.exports.act (/Users/sac/zoeapp/node_modules/react/cjs/react.development.js:814:22)
+          at actImplementation (/Users/sac/zoeapp/node_modules/@testing-library/react-native/src/act.ts:30:25)
+          at Object.<anonymous> (/Users/sac/zoeapp/src/app/admin/__tests__/actor-lab.test.tsx:497:14)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+      240 |       Alert.alert('Outbox Sync', 'Synchronization completed.');
+      241 |     } catch (err: any) {
+    > 242 |       console.error(err);
+          |               ^
+      243 |       addLog('ERROR', 'SYNC', `Manual sync aborted due to error: ${err.message}`);
+      244 |       Alert.alert('Outbox Sync Error', err.message);
+      245 |     } finally {
+
+      at error (src/app/admin/actor-lab.tsx:242:15)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS src/framework/compositions/collaborative-state/__tests__/CollaborativeWorkspace.test.ts
+PASS src/hooks/__tests__/useSermon.test.ts
+PASS src/framework/fusion/xr/__tests__/FusionSpatialScene.test.tsx
+PASS src/framework/compositions/intelligent-search/__tests__/AiSmartSearch.test.tsx
+PASS src/framework/auth/__tests__/ProtectedRoute.test.tsx
+PASS src/app/admin/__tests__/intelligence.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/intelligence.test.tsx:51:33)
+
+PASS src/lib/actor/__tests__/actor.test.ts
+PASS src/components/__tests__/TransitionOverlay.test.tsx
+PASS src/framework/membrane/__tests__/membrane.test.ts
+  ● Console
+
+    console.error
+      Error in membrane telemetry listener: Error: Bad listener
+          at listener (/Users/sac/zoeapp/src/framework/membrane/__tests__/membrane.test.ts:311:38)
+          at TelemetryManager.listener [as emit] (/Users/sac/zoeapp/src/framework/membrane/managers/telemetry.ts:37:9)
+          at emit (/Users/sac/zoeapp/src/framework/membrane/__tests__/membrane.test.ts:314:28)
+          at Object.<anonymous> (/Users/sac/zoeapp/node_modules/expect/build/toThrowMatchers.js:74:11)
+          at Object.throwingMatcher [as toThrow] (/Users/sac/zoeapp/node_modules/expect/build/index.js:320:21)
+          at Object.toThrow (/Users/sac/zoeapp/src/framework/membrane/__tests__/membrane.test.ts:315:14)
+          at Promise.then.completed (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/sac/zoeapp/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      37 |         listener(event);
+      38 |       } catch (e) {
+    > 39 |         console.error('Error in membrane telemetry listener:', e);
+         |                 ^
+      40 |       }
+      41 |     }
+      42 |   }
+
+      at TelemetryManager.error [as emit] (src/framework/membrane/managers/telemetry.ts:39:17)
+      at emit (src/framework/membrane/__tests__/membrane.test.ts:314:28)
+      at Object.<anonymous> (node_modules/expect/build/toThrowMatchers.js:74:11)
+      at Object.throwingMatcher [as toThrow] (node_modules/expect/build/index.js:320:21)
+      at Object.toThrow (src/framework/membrane/__tests__/membrane.test.ts:315:14)
+
+    console.error
+      Error in membrane audit listener: Error: Bad audit listener
+          at badListener (/Users/sac/zoeapp/src/framework/membrane/__tests__/membrane.test.ts:369:41)
+          at AuditManager.listener [as log] (/Users/sac/zoeapp/src/framework/membrane/managers/audit.ts:59:9)
+          at Object.log (/Users/sac/zoeapp/src/framework/membrane/__tests__/membrane.test.ts:372:22)
+          at Promise.then.completed (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/sac/zoeapp/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      59 |         listener(event);
+      60 |       } catch (e) {
+    > 61 |         console.error('Error in membrane audit listener:', e);
+         |                 ^
+      62 |       }
+      63 |     }
+      64 |   }
+
+      at AuditManager.error [as log] (src/framework/membrane/managers/audit.ts:61:17)
+      at Object.log (src/framework/membrane/__tests__/membrane.test.ts:372:22)
+
+PASS src/app/admin/__tests__/prayer.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/prayer.test.tsx:7:33)
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/hooks/__tests__/useEvent.test.ts
+PASS src/components/admin/__tests__/AdminShell.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/components/admin/__tests__/AdminShell.test.tsx:25:33)
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/data/neuro-symbolic/__tests__/useNeuroSymbolicQuery.test.ts
+PASS src/framework/sync/__tests__/engine.test.ts
+  ● Console
+
+    console.error
+      [SyncEngine] Error in onConflict hook: Error: Resolver blew up
+          at Object.<anonymous> (/Users/sac/zoeapp/src/framework/sync/__tests__/engine.test.ts:211:41)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at Object.<anonymous> (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+          at Object.apply [as onConflict] (/Users/sac/zoeapp/src/framework/sync/__tests__/engine.test.ts:211:19)
+          at TestEngine.onConflict (/Users/sac/zoeapp/src/framework/sync/engine.ts:212:44)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at TestEngine.<anonymous> (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+          at TestEngine.apply [as handleJobFailure] (/Users/sac/zoeapp/src/framework/sync/engine.ts:207:35)
+          at TestEngine.handleJobFailure (/Users/sac/zoeapp/src/framework/sync/engine.ts:162:18)
+          at Generator.throw (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _throw (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+      212 |         resolvedAction = await this.config.onConflict({ job, error });
+      213 |       } catch (conflictError) {
+    > 214 |         console.error('[SyncEngine] Error in onConflict hook:', conflictError);
+          |                 ^
+      215 |       }
+      216 |     }
+      217 |
+
+      at TestEngine.error (src/framework/sync/engine.ts:214:17)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+    console.error
+      [SyncEngine] Error in onJobSuccess hook: Error: Hook Error
+          at Object.<anonymous> (/Users/sac/zoeapp/src/framework/sync/__tests__/engine.test.ts:277:35)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at Object.<anonymous> (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+          at Promise.then.completed (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/sac/zoeapp/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      187 |           await this.onJobSuccess(job);
+      188 |         } catch (hookError) {
+    > 189 |           console.error('[SyncEngine] Error in onJobSuccess hook:', hookError);
+          |                   ^
+      190 |         }
+      191 |       }
+      192 |     } catch (error: any) {
+
+      at TestEngine.error (src/framework/sync/engine.ts:189:19)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS src/framework/auth/__tests__/hooks.test.tsx
+PASS src/framework/vkg/semantic/__tests__/hooks.test.tsx
+PASS src/app/admin/__tests__/sermons.test.tsx
+  ● Console
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+    console.log
+      DEBUG globalLocalDispatcher: {
+        syncOutbox: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        dispatch: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        },
+        getSyncEngine: [Function: mockConstructor] {
+          _isMockFunction: true,
+          getMockImplementation: [Function (anonymous)],
+          mock: [Getter/Setter],
+          mockClear: [Function (anonymous)],
+          mockReset: [Function (anonymous)],
+          mockRestore: [Function (anonymous)],
+          mockReturnValueOnce: [Function (anonymous)],
+          mockResolvedValueOnce: [Function (anonymous)],
+          mockRejectedValueOnce: [Function (anonymous)],
+          mockReturnValue: [Function (anonymous)],
+          mockResolvedValue: [Function (anonymous)],
+          mockRejectedValue: [Function (anonymous)],
+          mockImplementationOnce: [Function (anonymous)],
+          withImplementation: [Function: bound withImplementation],
+          mockImplementation: [Function (anonymous)],
+          mockReturnThis: [Function (anonymous)],
+          mockName: [Function (anonymous)],
+          getMockName: [Function (anonymous)]
+        }
+      }
+
+      at Object.log (src/app/admin/__tests__/sermons.test.tsx:50:13)
+
+PASS src/lib/truex/hook-otp/__tests__/hook-otp.test.ts
+PASS src/framework/admin/__tests__/AdminShell.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      36 |
+      37 |   return (
+    > 38 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      39 |       <View style={styles.container}>
+      40 |         {headerBanner}
+      41 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/framework/admin/components/AdminShell.tsx:38:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/framework/admin/__tests__/AdminShell.test.tsx:8:33)
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/ui/auto-fix/__tests__/AutoFixer.test.tsx
+PASS src/components/admin/__tests__/AdminMetric.test.tsx
+  ● Console
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/app/admin/__tests__/receipts.test.tsx
+PASS src/framework/core/__tests__/ZoeFrameworkProvider.test.tsx
+PASS src/lib/truex/packs/__tests__/packs.test.ts
+  ● Console
+
+    console.log
+      [Pack Upgrade] Upgrading volunteer from v1.0.0 to v1.1.0...
+
+      at HookPackUpgrade.log (src/lib/truex/packs/upgrade.ts:17:13)
+
+    console.log
+      [Pack Upgrade] Upgrading volunteer from v1.0.0 to v1.1.0...
+
+      at HookPackUpgrade.log (src/lib/truex/packs/upgrade.ts:17:13)
+
+    console.log
+      [Pack Rollback] Rolling back volunteer from v1.1.0 to v1.0.0...
+
+      at HookPackRollback.log (src/lib/truex/packs/rollback.ts:16:13)
+
+    console.error
+      [TensionQueueMapper] Error parsing actor_outbox job job-bad-actor: SyntaxError: Expected property name or '}' in JSON at position 1
+          at JSON.parse (<anonymous>)
+          at TensionQueueMapper.parse (/Users/sac/zoeapp/src/lib/truex/packs/packs.ts:50:29)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+      63 |         }
+      64 |       } catch (err) {
+    > 65 |         console.error(`[TensionQueueMapper] Error parsing actor_outbox job ${job.id}:`, err);
+         |                 ^
+      66 |       }
+      67 |     }
+      68 |
+
+      at TensionQueueMapper.error (src/lib/truex/packs/packs.ts:65:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      [TensionQueueMapper] Error parsing sync_queue job 102: SyntaxError: Expected property name or '}' in JSON at position 1
+          at JSON.parse (<anonymous>)
+          at TensionQueueMapper.parse (/Users/sac/zoeapp/src/lib/truex/packs/packs.ts:72:29)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+      89 |         }
+      90 |       } catch (err) {
+    > 91 |         console.error(`[TensionQueueMapper] Error parsing sync_queue job ${job.id}:`, err);
+         |                 ^
+      92 |       }
+      93 |     }
+      94 |
+
+      at TensionQueueMapper.error (src/lib/truex/packs/packs.ts:91:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/app/admin/__tests__/volunteers.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/volunteers.test.tsx:7:33)
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/app/admin/__tests__/consequence-supervision.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/consequence-supervision.test.tsx:245:46)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+    console.error
+      An update to AdminConsequenceSupervision inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      254 |
+      255 |       const quadsRes = await db.select({ value: count() }).from(quads);
+    > 256 |       setTotalQuads(quadsRes[0]?.value || 0);
+          |       ^
+      257 |
+      258 |       const refusals = await db.select().from(actorReceipts).where(
+      259 |         or(eq(actorReceipts.status, 'rejected_local'), eq(actorReceipts.status, 'rejected_remote'), eq(actorReceipts.status, 'quarantined'))
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setTotalQuads (src/app/admin/consequence-supervision.tsx:256:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AdminConsequenceSupervision inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      259 |         or(eq(actorReceipts.status, 'rejected_local'), eq(actorReceipts.status, 'rejected_remote'), eq(actorReceipts.status, 'quarantined'))
+      260 |       ).orderBy(desc(actorReceipts.createdAt)).limit(1);
+    > 261 |       setLatestRefusal(refusals[0] || null);
+          |       ^
+      262 |
+      263 |       const receipts = await db.select().from(actorReceipts).orderBy(actorReceipts.createdAt);
+      264 |       let isValid = true;
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setLatestRefusal (src/app/admin/consequence-supervision.tsx:261:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AdminConsequenceSupervision inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      272 |         prevHash = rec.deltaHash || expectedHash;
+      273 |       }
+    > 274 |       setReceiptChainValid(isValid);
+          |       ^
+      275 |
+      276 |       setReconciliationLag(pendingOutbox > 0 ? '1.2s (Replaying)' : '0ms (Reconciled)');
+      277 |
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setReceiptChainValid (src/app/admin/consequence-supervision.tsx:274:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AdminConsequenceSupervision inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      274 |       setReceiptChainValid(isValid);
+      275 |
+    > 276 |       setReconciliationLag(pendingOutbox > 0 ? '1.2s (Replaying)' : '0ms (Reconciled)');
+          |       ^
+      277 |
+      278 |       const qList = await db.select().from(actorQuarantine).orderBy(desc(actorQuarantine.createdAt)).limit(10);
+      279 |       
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setReconciliationLag (src/app/admin/consequence-supervision.tsx:276:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AdminConsequenceSupervision inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      282 |         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      283 |       }
+    > 284 |       setQuarantinedItems(qList);
+          |       ^
+      285 |
+      286 |       const receiptStatusRes = await db.select({ status: actorReceipts.status, value: count() }).from(actorReceipts).groupBy(actorReceipts.status);
+      287 |       const countsMap: Record<string, number> = { accepted_pending: 0, rejected_local: 0, applied_local: 0, applied_remote: 0, rejected_remote: 0, quarantined: 0 };
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setQuarantinedItems (src/app/admin/consequence-supervision.tsx:284:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AdminConsequenceSupervision inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      291 |         }
+      292 |       }
+    > 293 |       setReceiptCounts(countsMap);
+          |       ^
+      294 |
+      295 |     } catch (e) {
+      296 |       console.error('Failed to load metrics:', e);
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setReceiptCounts (src/app/admin/consequence-supervision.tsx:293:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/ui/__tests__/AvatarRelativeProjection.test.tsx
+PASS src/lib/crypto/__tests__/receipts.test.ts
+PASS src/framework/admin/__tests__/CommandButton.test.tsx
+  ● Console
+
+    console.error
+      An update to CommandButton inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      31 |       console.error('[CommandButton] execution failed:', e);
+      32 |     } finally {
+    > 33 |       setLoading(false);
+         |       ^
+      34 |     }
+      35 |   };
+      36 |
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6208:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:6165:7)
+      at setLoading (src/framework/admin/components/CommandButton.tsx:33:7)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/lib/actor/__tests__/actorOps.test.ts
+PASS src/framework/supervision/__tests__/supervision.test.ts
+PASS src/components/admin/__tests__/PermissionGate.test.tsx
+  ● Console
+
+    console.error
+      An update to Icon inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14402:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:14401:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12086:9)
+      at Object.enqueueSetState (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:16926:13)
+      at Icon.Object.<anonymous>.process.env.NODE_ENV.Component.setState (node_modules/react/cjs/react.development.js:655:20)
+      at Icon.setState (node_modules/@expo/vector-icons/src/createIconSet.tsx:180:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/framework/membrane/self-healing/__tests__/self-healing.test.ts
+PASS src/framework/ui/animations/__tests__/SlideTransition.test.tsx
+PASS src/components/admin/__tests__/CommandButton.test.tsx
+PASS src/lib/membrane/__tests__/membrane.test.ts
+PASS src/components/__tests__/VkgProvider.test.tsx (5.031 s)
+PASS src/framework/ui/particles/__tests__/ParticleEmitter.test.tsx
+PASS src/components/__tests__/OfflineBanner.test.tsx
+PASS src/lib/sync/__tests__/syncEngine.test.ts
+PASS src/framework/ui/__tests__/StyledText.test.tsx
+PASS src/framework/sync/replay/__tests__/SyncReplayDebugger.test.tsx
+PASS src/components/__tests__/VkgProvider.line120.test.tsx
+PASS src/framework/ui/auto-fix/__tests__/AutoFixErrorBoundary.test.tsx
+PASS src/framework/dx/ab-testing/__tests__/ab-testing.test.tsx
+PASS src/framework/ui/__tests__/Themed.test.tsx
+PASS src/app/(tabs)/__tests__/index.test.tsx
+  ● Console
+
+    console.error
+      [cancelVolunteer error] Error: Network Error
+          at /Users/sac/zoeapp/src/app/(tabs)/__tests__/index.test.tsx:177:22
+          at /Users/sac/zoeapp/node_modules/jest-mock/build/index.js:397:39
+          at /Users/sac/zoeapp/node_modules/jest-mock/build/index.js:404:13
+          at mockConstructor (/Users/sac/zoeapp/node_modules/jest-mock/build/index.js:148:19)
+          at fetch (/Users/sac/zoeapp/src/app/(tabs)/index.tsx:91:25)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+      192 |       }
+      193 |     } catch (e) {
+    > 194 |       console.error('[cancelVolunteer error]', e);
+          |               ^
+      195 |       setChecklist(prev => prev.map(step => step.status === 'running' ? { ...step, status: 'failed' } : step));
+      196 |       setStatus('error');
+      197 |     }
+
+      at error (/Users/sac/zoeapp/src/app/(tabs)../../../index.tsx:194:15)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS src/framework/core/docs/__tests__/DocExplorer.test.tsx
+PASS src/framework/auth/__tests__/AuthProvider.test.tsx
+PASS src/lib/truex/hook-otp/__tests__/client-runtime.test.ts
+PASS src/app/(tabs)/__tests__/hooks-projection.test.tsx
+PASS src/framework/ui/gestures/__tests__/SwipeToDismiss.test.tsx
+PASS src/framework/core/i18n/__tests__/i18n.test.tsx
+PASS src/framework/admin/__tests__/JsonInspector.test.tsx
+PASS src/framework/data/forms/__tests__/SemanticForm.test.tsx
+PASS src/components/__tests__/ExternalLink.test.tsx
+PASS src/framework/ui/generative/__tests__/GenerativeView.test.tsx
+PASS src/framework/compositions/spatial-dashboards/__tests__/GlassSpatialContainer.test.tsx
+PASS src/framework/admin/__tests__/LogViewer.test.tsx
+PASS src/components/__tests__/VkgProvider.line37.test.tsx
+PASS src/app/admin/__tests__/people.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/people.test.tsx:13:33)
+
+PASS src/framework/ui/voice/__tests__/VoiceCommandBoundary.test.tsx
+PASS src/components/__tests__/Themed.test.tsx
+PASS src/components/admin/__tests__/AdminCard.test.tsx
+PASS src/framework/ui/animations/__tests__/FadeIn.test.tsx
+PASS src/framework/data/__tests__/useSemanticNode.test.ts
+PASS src/app/admin/__tests__/content.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/content.test.tsx:13:33)
+
+PASS src/app/admin/__tests__/groups.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/groups.test.tsx:13:33)
+
+PASS src/framework/admin/__tests__/QuadDeltaPreview.test.tsx
+PASS src/framework/admin/__tests__/StatusBadge.test.tsx
+PASS src/app/admin/__tests__/church.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/church.test.tsx:13:33)
+
+PASS src/app/admin/__tests__/events.test.tsx
+  ● Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context
+
+      34 |
+      35 |   return (
+    > 36 |     <SafeAreaView style={styles.safeArea} testID={testID}>
+         |      ^
+      37 |       <View style={styles.container}>
+      38 |         <OfflineBanner />
+      39 |         {/* Header */}
+
+      at warn (node_modules/react-native/Libraries/Utilities/warnOnce.js:27:11)
+      at Object.warnOnce [as SafeAreaView] (node_modules/react-native/index.js:101:5)
+      at SafeAreaView (src/components/admin/AdminShell.tsx:36:6)
+      at Object.react_stack_bottom_frame (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:15670:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:4863:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:7018:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:8499:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2315:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13224:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13068:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:13049:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:12181:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cjs/react-test-renderer.development.js:2908:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at actImplementation (node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct (node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal (node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (src/app/admin/__tests__/events.test.tsx:13:33)
+
+PASS src/framework/auth/zkp/__tests__/zkp.test.ts
+PASS src/components/admin/__tests__/JsonInspector.test.tsx
+PASS src/lib/vkg/__tests__/client.test.ts
+PASS src/framework/auth/mfa/__tests__/mfa.test.tsx
+  ● Console
+
+    console.error
+      MFA verification error: Error: Verification service down
+          at Object.<anonymous> (/Users/sac/zoeapp/src/framework/auth/mfa/__tests__/mfa.test.tsx:288:40)
+          at Generator.next (<anonymous>)
+          at asyncGeneratorStep (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+          at _next (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+          at /Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+          at new Promise (<anonymous>)
+          at Object.<anonymous> (/Users/sac/zoeapp/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+          at Promise.then.completed (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/sac/zoeapp/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:316:40)
+          at _runTest (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/sac/zoeapp/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/sac/zoeapp/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/sac/zoeapp/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/sac/zoeapp/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      80 |         return false;
+      81 |       } catch (error) {
+    > 82 |         console.error('MFA verification error:', error);
+         |                 ^
+      83 |         return false;
+      84 |       }
+      85 |     },
+
+      at Object.error (src/framework/auth/mfa/MfaProvider.tsx:82:17)
+          at Generator.throw (<anonymous>)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _throw (node_modules/@babel/runtime/helpers/asyncToGenerator.js:20:9)
+
+PASS src/app/__tests__/+html.test.tsx
+PASS src/app/(tabs)/__tests__/_layout.test.tsx
+PASS src/framework/ui/animations/__tests__/Stagger.test.tsx
+PASS src/lib/vkg/__tests__/creativework.test.ts
+PASS src/framework/core/__tests__/ErrorBoundary.test.tsx
+PASS src/components/admin/__tests__/OutboxBadge.test.tsx
+PASS src/framework/data/forms/__tests__/useSemanticForm.test.ts
+PASS src/framework/admin/collaboration/__tests__/usePresence.test.ts
+PASS src/framework/ai/on-device/__tests__/useLocalInference.test.ts
+PASS src/framework/ui/__tests__/Button.test.tsx
+PASS src/lib/vkg/__tests__/event.test.ts
+PASS src/framework/auth/behavioral/__tests__/useBehavioralAuth.test.ts
+PASS src/components/admin/__tests__/ActorRefView.test.tsx
+PASS src/app/__tests__/+not-found.test.tsx
+PASS src/app/__tests__/_layout.test.tsx
+PASS src/framework/data/__tests__/createRouteAdmissionHook.test.ts
+PASS src/framework/ui/__tests__/OfflineBanner.test.tsx
+PASS src/framework/ui/a11y/__tests__/useA11y.test.ts
+PASS src/framework/state/__tests__/hooks.test.ts
+PASS src/components/__tests__/EditProjectionInfo.test.tsx
+PASS src/lib/v2030/__tests__/temporal-concurrency.test.ts
+PASS src/framework/xr/spatial/__tests__/SpatialView.test.tsx
+PASS src/framework/ui/a11y/__tests__/withA11y.test.tsx
+PASS src/framework/sync/p2p/__tests__/hooks.test.tsx
+PASS src/framework/sync/compression/__tests__/usePayloadCompression.test.ts
+PASS src/framework/admin/__tests__/usePerformanceMonitor.test.ts
+PASS src/framework/data/fetching/__tests__/useOptimisticMutation.test.ts
+PASS src/components/__tests__/StyledText.test.tsx
+PASS src/framework/sync/replay/__tests__/useSyncReplay.test.ts
+PASS src/components/admin/__tests__/ReceiptBadge.test.tsx
+PASS src/framework/ui/generative/hooks/__tests__/useGenerativeLayout.test.ts
+PASS src/framework/data/export/__tests__/export.test.ts
+PASS src/framework/data/vkg/__tests__/usePaginatedSemanticNode.test.ts
+PASS src/components/admin/__tests__/QuadDeltaPreview.test.tsx
+PASS src/framework/admin/collaboration/__tests__/useCollaborationEvents.test.ts
+PASS src/framework/data/predictive/__tests__/predictive.test.ts
+PASS src/lib/truex/supervision/__tests__/supervision.test.ts
+PASS src/app/admin/__tests__/_layout.test.tsx
+PASS src/lib/vkg/__tests__/sermon.test.ts
+PASS src/framework/admin/metrics/__tests__/useAppVitals.test.ts
+PASS src/lib/v2030/intelligence/__tests__/runner.test.ts
+PASS src/framework/ui/auto-fix/__tests__/analyzer.test.ts
+PASS src/app/admin/__tests__/index.test.tsx
+PASS src/framework/vkg/__tests__/engine.test.ts
+PASS src/framework/auth/identity/__tests__/IdentityManager.test.ts
+PASS src/framework/xr/spatial/__tests__/useSpatialPosition.test.ts
+PASS src/lib/truex/__tests__/runtime-boundary.test.ts
+PASS src/framework/ui/__tests__/Badge.test.tsx
+PASS src/framework/ui/voice/__tests__/useVoiceIntent.test.tsx
+PASS src/framework/admin/telemetry-3d/__tests__/hooks.test.ts
+PASS src/components/__tests__/useClientOnlyValue.test.ts
+PASS src/lib/truex/hook-otp/__tests__/runtime.test.ts
+PASS src/lib/crypto/verify-release-gate.test.ts
+  ● Console
+
+    console.log
+      Release gate verification passed! All E2E proofs are fully closed (no stubbed/mocked flags detected).
+
+      at log (scripts/verify-release-gate.ts:154:11)
+
+PASS src/framework/sync/crdt/__tests__/counter.test.ts
+PASS src/framework/supervision/heuristics/__tests__/heuristics.test.ts
+PASS src/framework/ui/haptics/__tests__/useHaptics.test.ts
+PASS src/lib/truex/__tests__/reconciliation.test.ts
+PASS src/framework/vkg/inference/__tests__/engine.test.ts
+PASS src/lib/truex/avatar/__tests__/avatar-projection.test.ts
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "An error occurred while requiring the 'ExpoModulesCoreJSLogger' module: Cannot read properties of undefined (reading 'get')".
+
+      at console.warn (node_modules/@jest/console/build/BufferedConsole.js:191:10)
+      at warn (node_modules/expo-modules-core/src/requireNativeModule.ts:46:13)
+      at Object.<anonymous> (node_modules/expo-modules-core/src/sweet/setUpJsLogger.fx.ts:14:53)
+      at Object.require (node_modules/expo-modules-core/src/index.ts:2:1)
+      at node_modules/jest-expo/src/preset/setup.js:234:32
+      at Object.require (node_modules/expo/src/winter/fetch/ExpoFetchModule.ts:1:1)
+      at Object.require (node_modules/expo/src/winter/fetch/fetch.ts:1:1)
+      at Object.require (node_modules/expo/src/winter/fetch/index.ts:1:1)
+      at require (node_modules/expo/src/winter/runtime.native.ts:48:26)
+      at getValue (node_modules/expo/src/winter/installGlobal.ts:102:21)
+      at Object.get [as fetch] (node_modules/expo/src/winter/installGlobal.ts:44:16)
+          at Array.forEach (<anonymous>)
+
+PASS src/framework/data/__tests__/createSemanticHook.test.ts
+PASS src/framework/membrane/governance/__tests__/governance.test.ts
+PASS src/framework/ui/a11y/__tests__/useFocusTrap.test.tsx
+PASS src/lib/v2030/__tests__/intelligence.test.ts
+PASS src/lib/truex/contracts/__tests__/packets.test.ts
+PASS src/lib/store/mmkvStorage.test.ts
+PASS src/components/__tests__/ErrorBoundary.test.tsx
+PASS src/framework/vkg/__tests__/client.test.ts
+PASS src/framework/sync/p2p/__tests__/engine.test.ts
+  ● Console
+
+    console.debug
+      [Mesh] Broadcasting message from peer-local {
+        type: 'sync_state',
+        senderId: 'peer-local',
+        payload: {
+          id: 'reg-1',
+          state: {
+            value: 'initial',
+            timestamp: 1780244863504,
+            peerId: 'peer-local'
+          }
+        },
+        timestamp: 1780244863504
+      }
+
+      at StubMeshAdapter.debug (src/framework/sync/p2p/adapter.ts:29:13)
+
+    console.debug
+      [Mesh] Broadcasting message from peer-local {
+        type: 'sync_delta',
+        senderId: 'peer-local',
+        payload: { id: 'delta-1', delta: 'delta' },
+        timestamp: 1780244863509
+      }
+
+      at StubMeshAdapter.debug (src/framework/sync/p2p/adapter.ts:29:13)
+
+PASS src/lib/v2030/__tests__/trajectories.test.ts
+PASS src/framework/auth/__tests__/guards.test.ts
+PASS src/framework/sync/crdt/__tests__/map.test.ts
+PASS src/route-law/__tests__/guards.test.ts
+PASS src/lib/vkg/sync/__tests__/outbox.test.ts
+PASS src/lib/vkg/hooks/__tests__/engine.test.ts
+PASS src/framework/state/__tests__/storage.test.ts
+PASS src/framework/state/__tests__/sync.test.ts
+PASS src/framework/state/__tests__/middleware.test.ts
+
+  ●  Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "An error occurred while requiring the 'ExpoModulesCoreJSLogger' module: Cannot read properties of undefined (reading 'get')".
+
+      at console.warn (node_modules/@jest/console/build/BufferedConsole.js:191:10)
+      at warn (node_modules/expo-modules-core/src/requireNativeModule.ts:46:13)
+      at Object.<anonymous> (node_modules/expo-modules-core/src/sweet/setUpJsLogger.fx.ts:14:53)
+      at Object.require (node_modules/expo-modules-core/src/index.ts:2:1)
+      at node_modules/jest-expo/src/preset/setup.js:234:32
+      at Object.require (node_modules/expo/src/winter/fetch/ExpoFetchModule.ts:1:1)
+      at Object.require (node_modules/expo/src/winter/fetch/fetch.ts:1:1)
+      at Object.require (node_modules/expo/src/winter/fetch/index.ts:1:1)
+      at require (node_modules/expo/src/winter/runtime.native.ts:48:26)
+      at getValue (node_modules/expo/src/winter/installGlobal.ts:102:21)
+      at Object.get [as fetch] (node_modules/expo/src/winter/installGlobal.ts:44:16)
+          at Array.forEach (<anonymous>)
+
+PASS src/framework/vkg/semantic/__tests__/builder.test.ts
+PASS src/framework/core/docs/__tests__/parser.test.ts
+PASS src/framework/ui/haptics/__tests__/IntelligentHaptics.test.ts
+PASS src/lib/vkg/__tests__/rdf.test.ts
+PASS src/lib/truex/hook-otp/__tests__/behavior.test.ts
+PASS src/components/__tests__/useColorScheme.test.ts
+PASS src/framework/sync/crdt/__tests__/register.test.ts
+PASS src/framework/sync/replay/__tests__/manager.test.ts
+PASS src/lib/truex/evidence/__tests__/evidence.test.ts
+PASS src/lib/actor/__tests__/replay-diff.test.ts
+PASS src/framework/vkg/__tests__/cache.test.ts
+PASS src/framework/data/fetching/__tests__/useSuspenseQuery.test.ts
+PASS src/framework/vkg/__tests__/rdf.test.ts
+PASS src/framework/sync/p2p/__tests__/adapter.test.ts
+PASS src/lib/truex/contracts/__tests__/contracts.test.ts
+PASS src/framework/data/forms/__tests__/utils.test.ts
+PASS src/lib/truex/server/__tests__/authority.test.ts
+PASS src/framework/core/docs/__tests__/DocRegistry.test.ts
+PASS src/framework/vkg/__tests__/query.test.ts
+PASS src/framework/state/__tests__/proxyStore.test.ts
+PASS src/framework/compositions/blueprints/__tests__/blueprints.test.ts
+PASS src/lib/db/__tests__/db.test.ts
+PASS src/framework/compositions/semantic-crud/__tests__/SemanticCrudManager.test.tsx

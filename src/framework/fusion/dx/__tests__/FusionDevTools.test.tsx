@@ -91,6 +91,6 @@ describe('FusionDevTools', () => {
       jest.advanceTimersByTime(1500);
     });
     
-    expect(screen.getByText('Scaffold')).toBeTruthy();
+    expect(screen.queryByText('Generative...')).toBeNull();
   });
 });

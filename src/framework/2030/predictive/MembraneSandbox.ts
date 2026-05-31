@@ -10,7 +10,7 @@ export class MembraneSandbox {
     this.context = new MembraneContext({
       mode: 'strict',
       tenantId: 'predictive-sandbox',
-      authorityRole: 'observer'
+      authorityRole: 'volunteer'
     });
   }
 

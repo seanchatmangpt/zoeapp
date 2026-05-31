@@ -113,7 +113,7 @@ export class AgentNativeInterface {
   /**
    * Internal dispatcher for semantic actions.
    */
-  private async executeSemanticAction(action: string, params: Record<string, any>): Promise<any> {
+  protected async executeSemanticAction(action: string, params: Record<string, any>): Promise<any> {
     // INNOVATION: This is where we bridge semantic intent to runtime execution.
     // In the Zoe 2030 vision, this is driven by the ontology.
     

@@ -14,6 +14,8 @@ The Zoe Framework SDK implements a multi-layered defense-in-depth strategy to en
 
 The **Operational Membrane** acts as a cryptographic and semantic barrier between the application logic and the underlying state. It ensures that every mutation is valid, audited, and reversible.
 
+> **Deep Dive:** For a comprehensive theoretical and mathematical breakdown, see [The Mathematics of the Operational Membrane](./diataxis/explanation/MEMBRANE_MATH.md).
+
 ### Governance & Approval Flows
 Managed by the `ApprovalFlowManager`, governance allows for multi-step verification of sensitive operations.
 - **Tension-Based Interception:** Operations that meet specific "tension" criteria (e.g., high-value transfers, configuration changes) trigger an approval flow.

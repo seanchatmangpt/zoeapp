@@ -4,7 +4,7 @@ The Zoe Framework is a "batteries-included," highly resilient SDK designed to po
 
 ## 1. High-Level Architecture
 
-The framework is built around the **Operational Membrane**, a secure proxy layer that ensures every state mutation is validated, receipted, and auditable. This foundation enables the framework to provide "Zero-Config" setup and "Self-Healing" capabilities.
+The framework is built around the **Operational Membrane**, a secure proxy layer that ensures every state mutation is validated, receipted, and auditable. This foundation enables the framework to provide "Zero-Config" setup and "Self-Healing" capabilities. For the formal theory behind this system, see [The Mathematics of the Operational Membrane](./diataxis/explanation/MEMBRANE_MATH.md).
 
 ### Layered Design: The Path to 2030
 

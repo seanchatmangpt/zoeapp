@@ -231,6 +231,8 @@ const mockSupabaseClient = {
     from: jest.fn(() => mockSupabaseChain),
     auth: {
       signOut: mockSignOut,
+      getSession: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      onAuthStateChange: jest.fn().mockReturnValue({ data: { subscription: { unsubscribe: jest.fn() } } }),
     },
   },
 };

@@ -33,7 +33,9 @@ export interface AutoInclusiveOptions {
   accessibilityLabel?: string;
 }
 
-export interface WithAutoInclusiveProps extends AutoInclusiveOptions {}
+export interface WithAutoInclusiveProps extends AutoInclusiveOptions {
+  children?: ReactNode;
+}
 
 /**
  * Recursively traverses children and translates any string values found.
@@ -43,9 +45,9 @@ function translateChildren(children: ReactNode, t: (key: string) => string): Rea
     if (typeof child === 'string') {
       return t(child);
     }
-    if (isValidElement(child) && child.props.children) {
+    if (isValidElement(child) && (child.props as any)?.children) {
       return cloneElement(child, {
-        children: translateChildren(child.props.children, t),
+        children: translateChildren((child.props as any).children, t),
       } as any);
     }
     return child;

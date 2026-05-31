@@ -39,6 +39,8 @@ Zoe leverages state-based CRDTs to ensure that all peers eventually converge on 
 
 The `useCrdtState` hook (and its specialized variants like `useLWWRegister`, `usePNCounter`, and `useLWWMap`) provides a seamless way to integrate CRDTs into React components.
 
+**How-to Guide:** [Creating Zero-Latency Collaborative State with CRDTs](./diataxis/how-to/COLLABORATIVE_STATE.md)
+
 ```typescript
 import { useLWWMap, usePNCounter } from '@/src/framework/sync/crdt/hooks';
 
