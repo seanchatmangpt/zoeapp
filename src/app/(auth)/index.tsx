@@ -23,6 +23,8 @@ import { Feather } from '@expo/vector-icons';
 import { supabase } from '../../../lib/supabase';
 import { Stack } from '@/src/components/AvatarRelativeProjection';
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 /**
  * Authentication component with sign in and sign up functionality
  * Provides a professional card-based layout with form validation
@@ -203,6 +205,16 @@ export default function Auth() {
       return;
     }
 
+    if (!hasNumber) {
+      setBanner({ type: 'error', message: 'Password must contain at least one number' });
+      return;
+    }
+
+    if (!hasSpecialOrUpper) {
+      setBanner({ type: 'error', message: 'Password must contain an uppercase or special character' });
+      return;
+    }
+
     setLoading(true);
     setBanner(null);
     try {
@@ -231,8 +243,10 @@ export default function Auth() {
 
   return (
     <KeyboardAvoidingView
+      testID="keyboard-avoiding-view"
       className="flex-1 bg-gray-50"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
       <ScrollView
         className="flex-1"
@@ -307,7 +321,11 @@ export default function Auth() {
                   </Text>
                 </View>
                 <View style={{ width: 8 }} />
-                <TouchableOpacity onPress={() => setBanner(null)} className="p-0.5">
+                <TouchableOpacity
+                  testID="close-banner-button"
+                  onPress={() => setBanner(null)}
+                  className="p-0.5"
+                >
                   <Feather
                     name="x"
                     size={16}
@@ -321,6 +339,7 @@ export default function Auth() {
             <View className="mb-4">
               <Text className="text-sm font-semibold text-gray-700 mb-2">Email Address</Text>
               <View
+                testID="email-input-container"
                 className={`flex-row items-center border rounded-xl px-4 py-3 bg-gray-50/50 ${
                   emailFocused
                     ? 'border-indigo-600 bg-white ring-2 ring-indigo-50 shadow-sm'
@@ -357,6 +376,7 @@ export default function Auth() {
             <View className="mb-4">
               <Text className="text-sm font-semibold text-gray-700 mb-2">Password</Text>
               <View
+                testID="password-input-container"
                 className={`flex-row items-center border rounded-xl px-4 py-3 bg-gray-50/50 ${
                   passwordFocused
                     ? 'border-indigo-600 bg-white ring-2 ring-indigo-50 shadow-sm'
@@ -381,7 +401,10 @@ export default function Auth() {
                   onBlur={() => setPasswordFocused(false)}
                 />
                 {password.length > 0 && (
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <TouchableOpacity
+                    testID="password-visibility-toggle"
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
                     <Feather
                       name={showPassword ? 'eye-off' : 'eye'}
                       size={18}
@@ -473,7 +496,7 @@ export default function Auth() {
             <View style={{ height: 8 }} />
 
             {/* Submit Button */}
-            <Pressable
+            <AnimatedPressable
               onPress={isSignUp ? signUpWithEmail : signInWithEmail}
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}
@@ -511,7 +534,7 @@ export default function Auth() {
                   ? 'Initialize Registration'
                   : 'Establish Secure Session'}
               </Text>
-            </Pressable>
+            </AnimatedPressable>
 
             {/* Toggle Auth Mode */}
             <TouchableOpacity

@@ -566,7 +566,7 @@ export default function ActorLab() {
                   key={role}
                   style={[styles.btnQuarter, active && styles.btnActiveBlue]}
                   onPress={() => handleRoleChange(role)}
-                  testID="principal-role-picker"
+                  testID={`principal-role-picker-${role}`}
                 >
                   <Text style={[styles.roleText, active && styles.roleTextActive]}>{role}</Text>
                 </TouchableOpacity>
@@ -674,6 +674,7 @@ export default function ActorLab() {
                       active && { backgroundColor: activeBgMap[lvl], borderColor: colorMap[lvl] },
                     ]}
                     onPress={() => setLevelFilter(lvl)}
+                    testID={`filter-level-${lvl}`}
                   >
                     <Text style={[styles.filterBadgeText, { color: active ? colorMap[lvl] : '#64748B' }]}>{lvl}</Text>
                   </TouchableOpacity>
@@ -709,6 +710,7 @@ export default function ActorLab() {
                       active && { backgroundColor: activeBgMap[cat], borderColor: colorMap[cat] },
                     ]}
                     onPress={() => setCategoryFilter(cat)}
+                    testID={`filter-category-${cat}`}
                   >
                     <Text style={[styles.filterBadgeText, { color: active ? colorMap[cat] : '#64748B' }]}>{cat}</Text>
                   </TouchableOpacity>
@@ -749,7 +751,7 @@ export default function ActorLab() {
             </ScrollView>
           </View>
 
-          <TouchableOpacity style={styles.clearLogsBtn} onPress={() => setLogs([])}>
+          <TouchableOpacity style={styles.clearLogsBtn} onPress={() => setLogs([])} testID="clear-logs">
             <FontAwesome name="trash" size={12} color="#94A3B8" style={{ marginRight: 6 }} />
             <Text style={styles.clearLogsText}>Clear Terminal Logs</Text>
           </TouchableOpacity>

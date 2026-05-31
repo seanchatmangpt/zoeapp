@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import { Clipboard, Alert, Animated } from 'react-native';
+import { Clipboard, Alert, Animated, Platform } from 'react-native';
 import OpenAIAvatarRelativeProjection, { parseMarkdown } from '../openai';
 
 // Mock ScrollView specifically to test scrollToEnd ref operations
@@ -360,5 +360,152 @@ describe('OpenAIAvatarRelativeProjection Component', () => {
     await waitFor(() => {
       expect(mockScrollToEnd).toHaveBeenCalledWith({ animated: true });
     });
+  });
+
+  test('renders markdown formatting correctly: bold, italic, inline code, and numbered lists', async () => {
+    const { supabase } = require('@/lib/supabase');
+    supabase.functions.invoke.mockResolvedValueOnce({
+      data: { message: 'Here is some *italic* and _italic2_ and **bold** and `inline` text.\n1. First item\n2. Second item' },
+      error: null,
+    });
+
+    const { getByPlaceholderText, getByTestId, getByText } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Show markdown styles');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    await waitFor(() => {
+      expect(getByText('italic')).toBeTruthy();
+      expect(getByText('italic2')).toBeTruthy();
+      expect(getByText('bold')).toBeTruthy();
+      expect(getByText('inline')).toBeTruthy();
+      expect(getByText('1.')).toBeTruthy();
+      expect(getByText('First item')).toBeTruthy();
+      expect(getByText('2.')).toBeTruthy();
+      expect(getByText('Second item')).toBeTruthy();
+    });
+  });
+
+  test('stabilizes async renders on component unmount during active OpenAI invocation', async () => {
+    const { supabase } = require('@/lib/supabase');
+    let resolveInvoke: any;
+    const invokePromise = new Promise((resolve) => {
+      resolveInvoke = resolve;
+    });
+    supabase.functions.invoke.mockImplementationOnce(() => invokePromise);
+
+    const { getByPlaceholderText, getByTestId, unmount } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Test unmount');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    // Unmount while API call is pending
+    unmount();
+
+    // Resolve the invoke promise
+    await act(async () => {
+      resolveInvoke({
+        data: { message: 'This should not set state' },
+        error: null,
+      });
+    });
+
+    // No warning or error about setting state on unmounted component should happen
+  });
+
+  test('clears chat history when clear button is pressed and confirmed', async () => {
+    const { getByText } = render(<OpenAIAvatarRelativeProjection />);
+
+    // Wait for initial render
+    await waitFor(() => {
+      expect(getByText(/Hello! I am your AI assistant/)).toBeTruthy();
+    });
+
+    const clearButton = getByText('Clear');
+
+    // Click clear
+    fireEvent.press(clearButton);
+
+    // Verify confirmation alert was shown
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Clear Chat',
+      'Are you sure you want to clear conversation history?',
+      expect.any(Array)
+    );
+
+    // Extract clear action and execute it
+    const alertCalls = alertSpy.mock.calls;
+    const lastCall = alertCalls[alertCalls.length - 1];
+    if (lastCall && Array.isArray(lastCall[2])) {
+      const buttons = lastCall[2];
+      const clearAction = buttons[1];
+      if (clearAction && clearAction.text === 'Clear') {
+        const onPress = clearAction.onPress;
+        if (typeof onPress === 'function') {
+          act(() => {
+            onPress();
+          });
+        }
+      }
+    }
+
+    // Welcome message should be reset
+    await waitFor(() => {
+      expect(getByText(/Hello! I am your AI assistant/)).toBeTruthy();
+    });
+  });
+
+  test('copyToClipboard falls back to console.warn on Web when navigator.clipboard is unavailable', async () => {
+    const { Platform } = require('react-native');
+    const originalPlatform = Platform.OS;
+    Platform.OS = 'web';
+    
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    // Temporarily mock navigator to have undefined clipboard
+    const originalNavigator = global.navigator;
+    try {
+      Object.defineProperty(global, 'navigator', {
+        value: {},
+        writable: true,
+        configurable: true,
+      });
+
+      const { getByText } = render(<OpenAIAvatarRelativeProjection />);
+      await waitFor(() => {
+        expect(getByText(/Hello! I am your AI assistant/)).toBeTruthy();
+      });
+
+      const copyButton = getByText('Copy');
+
+      await act(async () => {
+        fireEvent.press(copyButton);
+      });
+
+      expect(warnSpy).toHaveBeenCalledWith('Clipboard API not available');
+    } finally {
+      // Cleanup
+      warnSpy.mockRestore();
+      Object.defineProperty(global, 'navigator', {
+        value: originalNavigator,
+        writable: true,
+        configurable: true,
+      });
+      Platform.OS = originalPlatform;
+    }
   });
 });

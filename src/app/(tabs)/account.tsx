@@ -274,6 +274,7 @@ export default function Account() {
           <View className="relative">
             {renderAvatar()}
             <Pressable
+              testID="camera-toggle"
               onPress={() => setShowPicker(!showPicker)}
               className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full border-2 border-white shadow active:bg-blue-700">
               <Ionicons name="camera-outline" size={16} color="white" />
@@ -299,6 +300,7 @@ export default function Account() {
               {AVATAR_PRESETS.map((preset) => (
                 <Pressable
                   key={preset.id}
+                  testID={`preset-avatar-${preset.id}`}
                   onPress={() => {
                     setAvatarUrl(preset.url);
                     setImageError(false);
@@ -316,6 +318,7 @@ export default function Account() {
                 Custom Avatar Image URL
               </Text>
               <TextInput
+                testID="custom-avatar-input"
                 className="border border-gray-300 rounded-lg p-2 text-sm text-gray-900 bg-white"
                 placeholder="https://example.com/avatar.jpg"
                 value={avatarUrl}
@@ -341,6 +344,7 @@ export default function Account() {
           <View className="p-4 border-b border-gray-100">
             <Text className="text-xs font-medium text-gray-400 uppercase">Username</Text>
             <TextInput
+              testID="username-input"
               className="text-base text-gray-800 font-medium py-1"
               value={username}
               onChangeText={setUsername}
@@ -351,6 +355,7 @@ export default function Account() {
           <View className="p-4">
             <Text className="text-xs font-medium text-gray-400 uppercase">Website</Text>
             <TextInput
+              testID="website-input"
               className="text-base text-gray-800 font-medium py-1"
               value={website}
               onChangeText={setWebsite}
@@ -364,6 +369,7 @@ export default function Account() {
 
         {/* Update Trigger Button */}
         <TouchableOpacity
+          testID="save-profile-button"
           onPress={handleUpdateProfile}
           disabled={updating}
           className={`rounded-xl py-3.5 px-6 flex-row justify-center items-center shadow-sm mb-6 ${
@@ -387,6 +393,7 @@ export default function Account() {
               <Text className="text-xs text-gray-500 mt-0.5">Disconnect from synchronization drivers</Text>
             </View>
             <Pressable
+              testID="toggle-offline"
               onPress={() => setNetworkOnline(!networkOnline)}
               className={`w-12 h-7 rounded-full p-1 ${!networkOnline ? 'bg-yellow-500' : 'bg-gray-200'}`}>
               <View
@@ -404,6 +411,7 @@ export default function Account() {
               <Text className="text-xs text-gray-500 mt-0.5">Force sync engine to reject local events</Text>
             </View>
             <Pressable
+              testID="toggle-rejections"
               onPress={() => setRemoteRejectActive(!remoteRejectActive)}
               className={`w-12 h-7 rounded-full p-1 ${remoteRejectActive ? 'bg-red-500' : 'bg-gray-200'}`}>
               <View
@@ -421,6 +429,7 @@ export default function Account() {
               <Text className="text-xs text-gray-500 mt-0.5">Simulate client dark mode container layouts</Text>
             </View>
             <Pressable
+              testID="toggle-dark-mode"
               onPress={() => handleToggleDarkMode(!darkMode)}
               className={`w-12 h-7 rounded-full p-1 ${darkMode ? 'bg-blue-600' : 'bg-gray-200'}`}>
               <View
@@ -438,6 +447,7 @@ export default function Account() {
               <Text className="text-xs text-gray-500 mt-0.5">Persist event logs to disk caches</Text>
             </View>
             <Pressable
+              testID="toggle-save-logs"
               onPress={() => handleToggleSaveLogs(!saveLogs)}
               className={`w-12 h-7 rounded-full p-1 ${saveLogs ? 'bg-blue-600' : 'bg-gray-200'}`}>
               <View
@@ -462,6 +472,7 @@ export default function Account() {
           </View>
           
           <Pressable
+            testID="clear-mmkv-button"
             onPress={handleClearMMKV}
             className="p-4 border-b border-gray-100 flex-row items-center active:bg-gray-50">
             <Ionicons name="trash-bin-outline" size={18} color="#EF4444" style={{ marginRight: 12 }} />
@@ -473,6 +484,7 @@ export default function Account() {
           </Pressable>
 
           <Pressable
+            testID="reset-zustand-button"
             onPress={handleResetZustand}
             className="p-4 border-b border-gray-100 flex-row items-center active:bg-gray-50">
             <Ionicons name="refresh-outline" size={18} color="#2563EB" style={{ marginRight: 12 }} />
@@ -484,6 +496,7 @@ export default function Account() {
           </Pressable>
 
           <Pressable
+            testID="clear-async-storage-button"
             onPress={handleClearAsyncStorage}
             className="p-4 flex-row items-center active:bg-gray-50">
             <Ionicons name="cloud-offline-outline" size={18} color="#D97706" style={{ marginRight: 12 }} />

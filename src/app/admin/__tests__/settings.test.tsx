@@ -13,17 +13,19 @@ jest.mock('@expo/vector-icons/FontAwesome', () => {
   return (props: any) => ReactMock.createElement(View, { ...props, testID: props.name });
 });
 
+const mockSession: { session: any } = {
+  session: {
+    user: {
+      email: 'admin@zoeapp.com',
+      id: 'admin-uuid-12345',
+      email_confirmed_at: '2026-05-30T16:00:00Z',
+    },
+  },
+};
+
 // Mock SessionProvider context hook
 jest.mock('../../../../context/SessionProvider', () => ({
-  useSession: () => ({
-    session: {
-      user: {
-        email: 'admin@zoeapp.com',
-        id: 'admin-uuid-12345',
-        email_confirmed_at: '2026-05-30T16:00:00Z',
-      },
-    },
-  }),
+  useSession: () => mockSession,
 }));
 
 // Mock MMKV storage instance in a self-contained factory
@@ -83,6 +85,14 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    mockSession.session = {
+      user: {
+        email: 'admin@zoeapp.com',
+        id: 'admin-uuid-12345',
+        email_confirmed_at: '2026-05-30T16:00:00Z',
+      },
+    };
     
     // Spy on Alert.alert to simulate confirmation presses automatically
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
@@ -230,5 +240,116 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     
     // Verify success alert is triggered
     expect(alertSpy).toHaveBeenCalledWith('Success', 'Sandbox parameters seeded into MMKV store.');
+  });
+
+  test('toggles network online and remote rejection states in Zustand store', async () => {
+    const { getByText } = render(<AdminSettings />);
+    
+    // Toggle Network Simulator
+    const networkToggle = getByText('Network Simulator');
+    await act(async () => {
+      fireEvent.press(networkToggle);
+    });
+    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
+    expect(mockSetNetworkOnline).toHaveBeenCalledWith(true);
+
+    // Toggle Remote Rejections
+    const remoteToggle = getByText('Remote Rejections');
+    await act(async () => {
+      fireEvent.press(remoteToggle);
+    });
+    const mockSetRemoteRejectActive = useActorOpsStore((state: any) => state.setRemoteRejectActive);
+    expect(mockSetRemoteRejectActive).toHaveBeenCalledWith(false);
+  });
+
+  test('renders fallback labels when user context is null or empty', () => {
+    // Override session context mock value
+    mockSession.session = null;
+    
+    const { getByText, queryAllByText } = render(<AdminSettings />);
+    
+    // Principal User fallback 'N/A'
+    expect(getByText('Principal User')).toBeTruthy();
+    expect(getByText('User UUID')).toBeTruthy();
+    
+    // Auth Confirmed fallback should show 'No'
+    expect(getByText('No')).toBeTruthy();
+    
+    // There should be 'N/A' texts (for Principal User and User UUID)
+    const naElements = queryAllByText('N/A');
+    expect(naElements.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('handles MMKV cache wipe errors gracefully', async () => {
+    const testError = new Error('MMKV wipe failed database locked');
+    (mmkvInstance.clearAll as jest.Mock).mockImplementationOnce(() => {
+      throw testError;
+    });
+
+    const { getByText } = render(<AdminSettings />);
+    
+    const wipeMmkvButton = getByText('Wipe MMKV Cache Storage');
+    await act(async () => {
+      fireEvent.press(wipeMmkvButton);
+    });
+
+    // Verify MMKV.clearAll was called
+    expect(mmkvInstance.clearAll).toHaveBeenCalledTimes(1);
+
+    // Verify error alert was shown
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'MMKV wipe failed database locked');
+  });
+
+  test('handles AsyncStorage clear errors gracefully', async () => {
+    const testError = new Error('AsyncStorage clear failed disk full');
+    jest.spyOn(AsyncStorage, 'clear').mockRejectedValueOnce(testError);
+
+    const { getByText } = render(<AdminSettings />);
+    
+    const wipeAsyncButton = getByText('Wipe AsyncStorage Cache');
+    await act(async () => {
+      fireEvent.press(wipeAsyncButton);
+    });
+
+    // Verify AsyncStorage.clear was called
+    expect(AsyncStorage.clear).toHaveBeenCalledTimes(1);
+
+    // Verify error alert was shown
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'AsyncStorage clear failed disk full');
+  });
+
+  test('handles Zustand store reset errors gracefully', async () => {
+    const testError = new Error('Zustand store reset failed');
+    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
+    (mockSetNetworkOnline as jest.Mock).mockImplementationOnce(() => {
+      throw testError;
+    });
+
+    const { getByText } = render(<AdminSettings />);
+    
+    const resetStoresButton = getByText('Reset Local Zustand Stores');
+    await act(async () => {
+      fireEvent.press(resetStoresButton);
+    });
+
+    // Verify error alert was shown
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'Zustand store reset failed');
+  });
+
+  test('handles sandbox parameters seeding errors gracefully', async () => {
+    const testError = new Error('Sandbox seeding failed write permission denied');
+    (mmkvInstance.set as jest.Mock).mockImplementationOnce(() => {
+      throw testError;
+    });
+
+    const { getByText } = render(<AdminSettings />);
+    
+    const seedButton = getByText('Seed Sandbox Parameters');
+    await act(async () => {
+      fireEvent.press(seedButton);
+    });
+
+    // Verify error alert was shown
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'Sandbox seeding failed write permission denied');
   });
 });

@@ -3,6 +3,7 @@ import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import AdminConsequenceSupervision from '../consequence-supervision';
 import { Alert } from 'react-native';
 import { create } from 'zustand';
+import { generateReceiptHash } from '../../../lib/crypto/receipts';
 
 // Store mock Drizzle records
 const mockStore = {
@@ -387,5 +388,150 @@ describe('Admin Consequence Supervision console tests', () => {
     await waitFor(() => {
       expect(mockStore.quarantine.length).toBe(0);
     });
+  });
+
+  it('displays VERIFIED in Receipt Integrity when receipt chain is valid', async () => {
+    mockStore.receipts.push({
+      id: 'rec-1',
+      commandId: 'cmd-1',
+      actorRef: JSON.stringify({ id: 'actor-1' }),
+      status: 'applied_local',
+      eventIds: JSON.stringify(['evt-1']),
+      createdAt: new Date(2026, 5, 30, 10, 0, 0),
+    });
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('VERIFIED')).toBeTruthy();
+    });
+  });
+
+  it('displays TAMPERED in Receipt Integrity when receipt chain has mismatched hashes', async () => {
+    mockStore.receipts.push({
+      id: 'rec-1',
+      commandId: 'cmd-1',
+      actorRef: JSON.stringify({ id: 'actor-1' }),
+      status: 'applied_local',
+      deltaHash: 'mismatched-hash-value-12345',
+      eventIds: JSON.stringify(['evt-1']),
+      createdAt: new Date(2026, 5, 30, 10, 0, 0),
+    });
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('TAMPERED')).toBeTruthy();
+    });
+  });
+
+  it('displays VERIFIED when receipt chain has valid matching hashes', async () => {
+    const data1 = {
+      commandId: 'cmd-1',
+      status: 'applied_local',
+      error: undefined,
+    };
+    const hash1 = generateReceiptHash('', data1);
+
+    mockStore.receipts.push({
+      id: 'rec-1',
+      commandId: 'cmd-1',
+      actorRef: JSON.stringify({ id: 'actor-1' }),
+      status: 'applied_local',
+      deltaHash: hash1,
+      eventIds: JSON.stringify(['evt-1']),
+      createdAt: new Date(2026, 5, 30, 10, 0, 0),
+    });
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('VERIFIED')).toBeTruthy();
+    });
+  });
+
+  it('calculates and displays metrics distribution percentages correctly', async () => {
+    mockStore.receipts.push(
+      {
+        id: 'rec-1',
+        commandId: 'cmd-1',
+        actorRef: JSON.stringify({ id: 'actor-1' }),
+        status: 'applied_local',
+        eventIds: JSON.stringify(['evt-1']),
+        createdAt: new Date(2026, 5, 30, 10, 0, 0),
+      },
+      {
+        id: 'rec-2',
+        commandId: 'cmd-2',
+        actorRef: JSON.stringify({ id: 'actor-1' }),
+        status: 'applied_local',
+        eventIds: JSON.stringify(['evt-2']),
+        createdAt: new Date(2026, 5, 30, 10, 1, 0),
+      },
+      {
+        id: 'rec-3',
+        commandId: 'cmd-3',
+        actorRef: JSON.stringify({ id: 'actor-1' }),
+        status: 'rejected_local',
+        eventIds: JSON.stringify([]),
+        createdAt: new Date(2026, 5, 30, 10, 2, 0),
+      },
+      {
+        id: 'rec-4',
+        commandId: 'cmd-4',
+        actorRef: JSON.stringify({ id: 'actor-1' }),
+        status: 'quarantined',
+        eventIds: JSON.stringify([]),
+        createdAt: new Date(2026, 5, 30, 10, 3, 0),
+      }
+    );
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('Applied: 2 (50%)')).toBeTruthy();
+      expect(getByText('Rejected: 1 (25%)')).toBeTruthy();
+      expect(getByText('Quarantined: 1 (25%)')).toBeTruthy();
+    });
+  });
+
+  it('displays latest refusal details if present', async () => {
+    mockStore.receipts.push({
+      id: 'rec-refusal',
+      commandId: 'cmd-refusal-long-id-string-12345',
+      actorRef: JSON.stringify({ id: 'actor-1' }),
+      status: 'rejected_local',
+      eventIds: JSON.stringify([]),
+      error: 'Authority validation failed',
+      createdAt: new Date(2026, 5, 30, 10, 5, 0),
+    });
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('rejected_local')).toBeTruthy();
+      expect(getByText('cmd-refusal-lon...')).toBeTruthy();
+    });
+  });
+
+  it('displays latest process receipt details when present in store state', async () => {
+    mockUseActorOpsStore.setState({
+      latestReceipt: {
+        id: 'rec-latest',
+        commandId: 'cmd-latest-process-1234',
+        status: 'applied_remote',
+        error: 'No error',
+      },
+    });
+
+    const { getByText, queryByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('cmd-latest-process-1234')).toBeTruthy();
+      expect(getByText('applied_remote')).toBeTruthy();
+      expect(getByText('No error')).toBeTruthy();
+    });
+
+    expect(queryByText('No commands executed in this session yet.')).toBeNull();
   });
 });

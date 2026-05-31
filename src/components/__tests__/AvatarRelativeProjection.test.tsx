@@ -228,4 +228,53 @@ describe('AvatarRelativeProjectionMatrixView', () => {
 
     expect(getByText('• State Hash: vkg_genesis_new_hash')).toBeTruthy();
   });
+
+  test('interactive open slots slider updates slots value, shortage ratio, and pastor risk level dynamically', () => {
+    const { getByTestId, getByText } = render(<AvatarRelativeProjectionMatrixView initialData={{ openSlots: 4 }} />);
+
+    // Initial state: openSlots: 4, shortageRatio: 0.5, riskLevel: Medium
+    expect(getByText('Open Slots: 4')).toBeTruthy();
+    expect(getByText('• Risk Level: Medium')).toBeTruthy();
+
+    // Click slider step 2
+    const step2 = getByTestId('slider-step-2');
+    fireEvent.press(step2);
+
+    expect(getByText('Open Slots: 2')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.25')).toBeTruthy();
+    expect(getByText('• Risk Level: Low')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.25')).toBeTruthy();
+
+    // Click slider step 6
+    const step6 = getByTestId('slider-step-6');
+    fireEvent.press(step6);
+
+    expect(getByText('Open Slots: 6')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.75')).toBeTruthy();
+    expect(getByText('• Risk Level: High')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.75')).toBeTruthy();
+  });
+
+  test('pastor risk level ranges map correctly to shortage ratios (Low, Medium, High)', () => {
+    const { getByTestId, getByText } = render(<AvatarRelativeProjectionMatrixView initialData={{ openSlots: 0 }} />);
+
+    // openSlots = 0 (ratio 0.0) -> Low
+    expect(getByText('Shortage Ratio: 0')).toBeTruthy();
+    expect(getByText('• Risk Level: Low')).toBeTruthy();
+
+    // openSlots = 2 (ratio 0.25) -> Low
+    fireEvent.press(getByTestId('slider-step-2'));
+    expect(getByText('Shortage Ratio: 0.25')).toBeTruthy();
+    expect(getByText('• Risk Level: Low')).toBeTruthy();
+
+    // openSlots = 3 (ratio 0.38) -> Medium
+    fireEvent.press(getByTestId('slider-step-3'));
+    expect(getByText('Shortage Ratio: 0.38')).toBeTruthy();
+    expect(getByText('• Risk Level: Medium')).toBeTruthy();
+
+    // openSlots = 5 (ratio 0.63) -> High
+    fireEvent.press(getByTestId('slider-step-5'));
+    expect(getByText('Shortage Ratio: 0.63')).toBeTruthy();
+    expect(getByText('• Risk Level: High')).toBeTruthy();
+  });
 });

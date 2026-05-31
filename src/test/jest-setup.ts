@@ -69,8 +69,11 @@ jest.mock('react-native-reanimated', () => {
 // Mock @expo/vector-icons
 jest.mock('@expo/vector-icons', () => {
   const React = require('react');
+  const MockIcon = (props: any) => React.createElement('View', props);
   return {
-    Ionicons: (props: any) => React.createElement('View', props),
+    Ionicons: MockIcon,
+    Feather: MockIcon,
+    FontAwesome: MockIcon,
   };
 });
 

@@ -91,7 +91,7 @@ export function parseMarkdown(text: string): Segment[] {
  * Formats inline code and bold styling
  */
 function FormattedText({ text, textColorClass }: { text: string; textColorClass: string }) {
-  const regex = /(`[^`]+`|\*\*[^*]+\*\*)/g;
+  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_)/g;
   const parts = text.split(regex);
 
   return (
@@ -111,6 +111,16 @@ function FormattedText({ text, textColorClass }: { text: string; textColorClass:
           return (
             <Text key={i} className="font-bold">
               {boldVal}
+            </Text>
+          );
+        } else if (
+          (part.startsWith('*') && part.endsWith('*')) ||
+          (part.startsWith('_') && part.endsWith('_'))
+        ) {
+          const italicVal = part.slice(1, -1);
+          return (
+            <Text key={i} className="italic">
+              {italicVal}
             </Text>
           );
         }
@@ -173,11 +183,15 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
     tokens.push({ text: trimmedCode.substring(lastIndex), type: 'plain' });
   }
 
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     try {
       if (Platform.OS === 'web') {
-        navigator.clipboard.writeText(trimmedCode);
-        Alert.alert('Copied', 'Code copied to clipboard!');
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(trimmedCode);
+          Alert.alert('Copied', 'Code copied to clipboard!');
+        } else {
+          console.warn('Clipboard API not available');
+        }
         return;
       }
       Clipboard.setString(trimmedCode);
@@ -252,12 +266,12 @@ function MarkdownRenderer({ content, isUser }: { content: string; isUser: boolea
   return (
     <View>
       {segments.map((segment, index) => {
-        if (segment.type === 'code' && segment.code && segment.language) {
+        if (segment.type === 'code') {
           return (
             <CodeBlock
               key={index}
-              language={segment.language}
-              code={segment.code}
+              language={segment.language || 'plaintext'}
+              code={segment.code || ''}
             />
           );
         } else {
@@ -267,13 +281,27 @@ function MarkdownRenderer({ content, isUser }: { content: string; isUser: boolea
             <View key={index} className="space-y-1">
               {lines.map((line, lineIdx) => {
                 const trimmed = line.trim();
-                const isBullet = trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*');
+                const isBullet = /^[•\-*]\s+/.test(trimmed);
+                const numberedMatch = trimmed.match(/^(\d+)\.\s+/);
 
                 if (isBullet) {
-                  const bulletText = trimmed.replace(/^[•\-*]\s*/, '');
+                  const bulletText = trimmed.replace(/^[•\-*]\s+/, '');
                   return (
                     <View key={lineIdx} className="flex-row items-start pl-2 py-0.5">
                       <Text className={`mr-2 text-base ${textColorClass}`}>•</Text>
+                      <View className="flex-1">
+                        <FormattedText text={bulletText} textColorClass={textColorClass} />
+                      </View>
+                    </View>
+                  );
+                }
+
+                if (numberedMatch) {
+                  const num = numberedMatch[1];
+                  const bulletText = trimmed.substring(numberedMatch[0].length);
+                  return (
+                    <View key={lineIdx} className="flex-row items-start pl-2 py-0.5">
+                      <Text className={`mr-1 text-base ${textColorClass}`}>{num}.</Text>
                       <View className="flex-1">
                         <FormattedText text={bulletText} textColorClass={textColorClass} />
                       </View>
@@ -405,8 +433,20 @@ export default function OpenAIAvatarRelativeProjection() {
     initials: 'AI',
   });
 
+  const isMountedRef = useRef(true);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Initialize welcome message once on mount
   useEffect(() => {
@@ -431,6 +471,8 @@ export default function OpenAIAvatarRelativeProjection() {
           .eq('id', session.user.id)
           .single();
 
+        if (!isMountedRef.current) return;
+
         if (error) {
           console.warn('Error fetching avatar profile details:', error.message);
         }
@@ -445,10 +487,12 @@ export default function OpenAIAvatarRelativeProjection() {
           initials = email.substring(0, 2).toUpperCase();
         }
 
-        setUserProfile({
-          avatarUrl: data?.avatar_url || '',
-          initials,
-        });
+        if (isMountedRef.current) {
+          setUserProfile({
+            avatarUrl: data?.avatar_url || '',
+            initials,
+          });
+        }
       } catch (err) {
         console.warn('Could not fetch user avatar profile details:', err);
       }
@@ -460,8 +504,13 @@ export default function OpenAIAvatarRelativeProjection() {
   }, [session?.user?.id]);
 
   const scrollToBottom = () => {
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }
     }, 100);
   };
 
@@ -502,6 +551,8 @@ export default function OpenAIAvatarRelativeProjection() {
         body: { message: currentPrompt },
       });
 
+      if (!isMountedRef.current) return;
+
       if (error) {
         Alert.alert('Error', error.message || 'Failed to get AI response');
         // Add error notification message in chat
@@ -522,10 +573,13 @@ export default function OpenAIAvatarRelativeProjection() {
         setMessages((prev) => [...prev, aiMsg]);
       }
     } catch (err: any) {
+      if (!isMountedRef.current) return;
       Alert.alert('Error', err.message || 'A network error occurred');
     } finally {
-      setLoading(false);
-      scrollToBottom();
+      if (isMountedRef.current) {
+        setLoading(false);
+        scrollToBottom();
+      }
     }
   };
 
@@ -536,14 +590,16 @@ export default function OpenAIAvatarRelativeProjection() {
         text: 'Clear',
         style: 'destructive',
         onPress: () => {
-          setMessages([
-            {
-              id: 'welcome',
-              role: 'assistant',
-              content: "Hello! I am your AI assistant. How can I help you today? \n\nTry asking me a question or paste code here! **Example:**\n```typescript\nconst greet = () => {\n  console.log('Hello truex app!');\n};\n```",
-              createdAt: new Date(),
-            },
-          ]);
+          if (isMountedRef.current) {
+            setMessages([
+              {
+                id: 'welcome',
+                role: 'assistant',
+                content: "Hello! I am your AI assistant. How can I help you today? \n\nTry asking me a question or paste code here! **Example:**\n```typescript\nconst greet = () => {\n  console.log('Hello truex app!');\n};\n```",
+                createdAt: new Date(),
+              },
+            ]);
+          }
         },
       },
     ]);
@@ -606,6 +662,7 @@ export default function OpenAIAvatarRelativeProjection() {
             onPress={scrollToBottom}
             className="absolute bottom-4 right-4 bg-indigo-600 w-10 h-10 rounded-full items-center justify-center shadow-lg border border-indigo-500"
             activeOpacity={0.8}
+            style={{ zIndex: 10 }}
           >
             <Ionicons name="arrow-down" size={20} color="#FFFFFF" />
           </TouchableOpacity>

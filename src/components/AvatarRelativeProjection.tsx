@@ -186,6 +186,37 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
 
         <View style={matrixStyles.divider} />
 
+        {/* Interactive Slider Section */}
+        <View style={matrixStyles.sliderSection}>
+          <Text style={matrixStyles.controlLabel}>Interactive Open Slots Slider</Text>
+          <View style={matrixStyles.sliderWrapper}>
+            <View style={matrixStyles.sliderTrack} testID="slider-track">
+              <View style={[matrixStyles.sliderFill, { width: `${(openSlots / 8) * 100}%` }]} />
+              <View style={matrixStyles.sliderStepsContainer}>
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((val) => (
+                  <TouchableOpacity
+                    key={val}
+                    testID={`slider-step-${val}`}
+                    style={[
+                      matrixStyles.sliderStepPoint,
+                      openSlots === val && matrixStyles.sliderStepPointActive
+                    ]}
+                    onPress={() => setOpenSlots(val)}
+                    accessibilityLabel={`Set open slots to ${val}`}
+                  >
+                    <Text style={[
+                      matrixStyles.sliderStepText,
+                      openSlots === val && matrixStyles.sliderStepTextActive
+                    ]}>{val}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={matrixStyles.divider} />
+
         <View style={matrixStyles.candidatesSection}>
           <View style={matrixStyles.candidatesHeader}>
             <Text style={matrixStyles.controlLabel}>Candidates ({candidates.length})</Text>
@@ -578,5 +609,60 @@ const matrixStyles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'monospace',
     lineHeight: 15,
+  },
+  sliderSection: {
+    marginBottom: 12,
+  },
+  sliderWrapper: {
+    height: 36,
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
+  sliderTrack: {
+    height: 8,
+    backgroundColor: '#0F172A',
+    borderRadius: 4,
+    position: 'relative',
+    width: '100%',
+  },
+  sliderFill: {
+    height: '100%',
+    backgroundColor: '#3B82F6',
+    borderRadius: 4,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+  },
+  sliderStepsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    position: 'absolute',
+    top: -14,
+    left: 0,
+    right: 0,
+    height: 36,
+  },
+  sliderStepPoint: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#1E293B',
+    borderWidth: 1,
+    borderColor: '#334155',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sliderStepPointActive: {
+    backgroundColor: '#3B82F6',
+    borderColor: '#60A5FA',
+  },
+  sliderStepText: {
+    color: '#94A3B8',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  sliderStepTextActive: {
+    color: '#FFFFFF',
   },
 });

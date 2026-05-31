@@ -1,17 +1,68 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AdminShell } from '../../components/admin/AdminShell';
-import { AdminMetric } from '../../components/admin/AdminMetric';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { ReceiptBadge } from '../../components/admin/ReceiptBadge';
 import { JsonInspector } from '../../components/admin/JsonInspector';
 import { useActorOpsStore } from '../../lib/actor/actorOps';
 import { db } from '../../lib/db/db';
-import { actorOutbox, actorQuarantine, actorReceipts, quads } from '../../lib/db/schema';
+import { actorOutbox, actorQuarantine, actorReceipts, quads, ActorReceiptRecord, ActorQuarantineRecord } from '../../lib/db/schema';
 import { count, eq, desc, or } from 'drizzle-orm';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { generateReceiptHash } from '../../lib/crypto/receipts';
+
+// Consequence Supervisors Info
+const supervisorsList = [
+  {
+    id: 'default-hook-supervisor',
+    name: 'Default Hook Supervisor',
+    maxRetries: 3,
+    backoffMs: 10,
+    patterns: ['quarantine', 'fatal', 'divergence', 'validation'],
+    status: 'Active',
+    description: 'System fault boundary for standard hook actors. Resolves optimistic state mutations and coordinates local rollbacks.',
+    color: '#3B82F6',
+  },
+  {
+    id: 'volunteer-flood-supervisor',
+    name: 'Volunteer Flood Supervisor',
+    maxRetries: 3,
+    backoffMs: 10,
+    patterns: ['quarantine', 'fatal', 'divergence', 'validation'],
+    status: 'Active',
+    description: 'Supervises critical volunteer capacity events. Safeguards ledger consensus and throttles batch command overflows.',
+    color: '#10B981',
+  },
+];
+
+const adminModules = [
+  { name: 'Consequence Supervision', route: '/admin/consequence-supervision', icon: 'dashboard', color: '#3B82F6' },
+  { name: 'Church Profile', route: '/admin/church', icon: 'institution', color: '#10B981' },
+  { name: 'Content', route: '/admin/content', icon: 'file-text-o', color: '#8B5CF6' },
+  { name: 'Sermons', route: '/admin/sermons', icon: 'microphone', color: '#F59E0B' },
+  { name: 'Events', route: '/admin/events', icon: 'calendar', color: '#EC4899' },
+  { name: 'Groups', route: '/admin/groups', icon: 'users', color: '#06B6D4' },
+  { name: 'People', route: '/admin/people', icon: 'vcard-o', color: '#14B8A6' },
+  { name: 'Prayer', route: '/admin/prayer', icon: 'heart', color: '#F43F5E' },
+  { name: 'Volunteers', route: '/admin/volunteers', icon: 'hand-paper-o', color: '#84CC16' },
+  { name: 'Actor Lab', route: '/admin/actor-lab', icon: 'flask', color: '#A855F7' },
+  { name: 'Receipts', route: '/admin/receipts', icon: 'ticket', color: '#E2E8F0' },
+  { name: 'Outbox Queue', route: '/admin/outbox', icon: 'send-o', color: '#E11D48' },
+  { name: 'Realtime Monitor', route: '/admin/realtime', icon: 'flash', color: '#EAB308' },
+  { name: 'Process Intel', route: '/admin/intelligence', icon: 'cogs', color: '#6366F1' },
+  { name: 'Settings', route: '/admin/settings', icon: 'gears', color: '#64748B' },
+];
+
+const throughputData = [
+  { label: 'T-30m', value: 35, rate: '12 ops' },
+  { label: 'T-25m', value: 55, rate: '18 ops' },
+  { label: 'T-20m', value: 80, rate: '27 ops' },
+  { label: 'T-15m', value: 45, rate: '15 ops' },
+  { label: 'T-10m', value: 95, rate: '32 ops' },
+  { label: 'T-5m', value: 65, rate: '22 ops' },
+  { label: 'Now', value: 85, rate: '29 ops' },
+];
 
 export default function AdminConsequenceSupervision() {
   const router = useRouter();
@@ -19,12 +70,12 @@ export default function AdminConsequenceSupervision() {
   
   const [uptime, setUptime] = useState('00:00:00');
   const [receiptChainValid, setReceiptChainValid] = useState(true);
-  const [latestRefusal, setLatestRefusal] = useState<any>(null);
+  const [latestRefusal, setLatestRefusal] = useState<ActorReceiptRecord | null>(null);
   const [totalQuads, setTotalQuads] = useState(0);
   const [reconciliationLag, setReconciliationLag] = useState('0ms');
 
   // New Audit States
-  const [quarantinedItems, setQuarantinedItems] = useState<any[]>([]);
+  const [quarantinedItems, setQuarantinedItems] = useState<ActorQuarantineRecord[]>([]);
   const [operatingId, setOperatingId] = useState<string | null>(null);
   const [receiptCounts, setReceiptCounts] = useState<Record<string, number>>({
     accepted_pending: 0,
@@ -34,30 +85,6 @@ export default function AdminConsequenceSupervision() {
     rejected_remote: 0,
     quarantined: 0,
   });
-
-  // Consequence Supervisors Info
-  const supervisorsList = [
-    {
-      id: 'default-hook-supervisor',
-      name: 'Default Hook Supervisor',
-      maxRetries: 3,
-      backoffMs: 10,
-      patterns: ['quarantine', 'fatal', 'divergence', 'validation'],
-      status: 'Active',
-      description: 'System fault boundary for standard hook actors. Resolves optimistic state mutations and coordinates local rollbacks.',
-      color: '#3B82F6',
-    },
-    {
-      id: 'volunteer-flood-supervisor',
-      name: 'Volunteer Flood Supervisor',
-      maxRetries: 3,
-      backoffMs: 10,
-      patterns: ['quarantine', 'fatal', 'divergence', 'validation'],
-      status: 'Active',
-      description: 'Supervises critical volunteer capacity events. Safeguards ledger consensus and throttles batch command overflows.',
-      color: '#10B981',
-    },
-  ];
 
   // Uptime timer
   useEffect(() => {
@@ -174,7 +201,7 @@ export default function AdminConsequenceSupervision() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleReplay = async (item: any) => {
+  const handleReplay = async (item: ActorQuarantineRecord) => {
     setOperatingId(item.id);
     try {
       // Check if outbox entry already exists
@@ -238,29 +265,11 @@ export default function AdminConsequenceSupervision() {
     );
   };
 
-  const formatTime = (dateInput: any) => {
+  const formatTime = (dateInput: Date | string | number | null | undefined) => {
     if (!dateInput) return 'unknown';
     const d = new Date(dateInput);
     return isNaN(d.getTime()) ? String(dateInput) : d.toLocaleTimeString();
   };
-
-  const adminModules = [
-    { name: 'Consequence Supervision', route: '/admin/consequence-supervision', icon: 'dashboard', color: '#3B82F6' },
-    { name: 'Church Profile', route: '/admin/church', icon: 'institution', color: '#10B981' },
-    { name: 'Content', route: '/admin/content', icon: 'file-text-o', color: '#8B5CF6' },
-    { name: 'Sermons', route: '/admin/sermons', icon: 'microphone', color: '#F59E0B' },
-    { name: 'Events', route: '/admin/events', icon: 'calendar', color: '#EC4899' },
-    { name: 'Groups', route: '/admin/groups', icon: 'users', color: '#06B6D4' },
-    { name: 'People', route: '/admin/people', icon: 'vcard-o', color: '#14B8A6' },
-    { name: 'Prayer', route: '/admin/prayer', icon: 'heart', color: '#F43F5E' },
-    { name: 'Volunteers', route: '/admin/volunteers', icon: 'hand-paper-o', color: '#84CC16' },
-    { name: 'Actor Lab', route: '/admin/actor-lab', icon: 'flask', color: '#A855F7' },
-    { name: 'Receipts', route: '/admin/receipts', icon: 'ticket', color: '#E2E8F0' },
-    { name: 'Outbox Queue', route: '/admin/outbox', icon: 'send-o', color: '#E11D48' },
-    { name: 'Realtime Monitor', route: '/admin/realtime', icon: 'flash', color: '#EAB308' },
-    { name: 'Process Intel', route: '/admin/intelligence', icon: 'cogs', color: '#6366F1' },
-    { name: 'Settings', route: '/admin/settings', icon: 'gears', color: '#64748B' },
-  ];
 
   // Calculate Metrics for Graph
   const totalReceipts = Object.values(receiptCounts).reduce((a, b) => a + b, 0);
@@ -271,16 +280,6 @@ export default function AdminConsequenceSupervision() {
   const successPercent = totalReceipts > 0 ? (successCount / totalReceipts) * 100 : 0;
   const rejectionPercent = totalReceipts > 0 ? (rejectionCount / totalReceipts) * 100 : 0;
   const quarantinedPercent = totalReceipts > 0 ? (quarantinedCount / totalReceipts) * 100 : 0;
-
-  const throughputData = [
-    { label: 'T-30m', value: 35, rate: '12 ops' },
-    { label: 'T-25m', value: 55, rate: '18 ops' },
-    { label: 'T-20m', value: 80, rate: '27 ops' },
-    { label: 'T-15m', value: 45, rate: '15 ops' },
-    { label: 'T-10m', value: 95, rate: '32 ops' },
-    { label: 'T-5m', value: 65, rate: '22 ops' },
-    { label: 'Now', value: 85, rate: '29 ops' },
-  ];
 
   return (
     <AdminShell title="ActorOps Console" subtitle="Authoritative Command Engine Admin Consequence Supervision" scrollable={true}>
@@ -553,7 +552,7 @@ export default function AdminConsequenceSupervision() {
                   </View>
 
                   <View style={styles.quarantineDetailGrid}>
-                    <View style={(styles as any).detailRow}>
+                    <View style={styles.detailRow}>
                       <Text style={styles.detailLabel}>Command ID:</Text>
                       <Text style={styles.detailValueMono} numberOfLines={1}>{item.commandId}</Text>
                     </View>
@@ -666,7 +665,7 @@ export default function AdminConsequenceSupervision() {
   );
 }
 
-const styles: any = StyleSheet.create({
+const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 13,
     fontWeight: 'bold',

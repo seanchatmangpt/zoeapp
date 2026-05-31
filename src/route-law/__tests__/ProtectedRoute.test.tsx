@@ -14,12 +14,18 @@ jest.mock('@/context/SessionProvider', () => ({
 
 jest.mock('expo-router', () => {
   const ReactMock = require('react');
+  const MockStack = ({ children }: any) => ReactMock.createElement('View', null, children);
+  MockStack.Screen = ({ children }: any) => ReactMock.createElement('View', null, children);
+  const MockTabs = ({ children }: any) => ReactMock.createElement('View', null, children);
+  MockTabs.Screen = ({ children }: any) => ReactMock.createElement('View', null, children);
   return {
     Redirect: ({ href }: { href: string }) =>
       ReactMock.createElement('Text', { testID: 'redirect-mock' }, `Redirect: ${href}`),
     useRouter: () => ({
       replace: mockReplace,
     }),
+    Stack: MockStack,
+    Tabs: MockTabs,
   };
 });
 
@@ -435,6 +441,192 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
         })
       );
     });
+
+    test('renders refusal overlay and then renders children after retry succeeds', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      // Start with empty records so it fails
+      mockDbRecords = [];
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-retry-test',
+        requiredReceiptDeltaHash: 'hash-success',
+      };
+
+      const { getByText, queryByText } = render(
+        <ProtectedRoute route={route}>
+          <Text>Children Rendered After Retry</Text>
+        </ProtectedRoute>
+      );
+
+      // Wait for the asynchronous database checks and initial render to complete
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(queryByText('Children Rendered After Retry')).toBeNull();
+
+      // Now set mock records to succeed
+      mockDbRecords = [{
+        commandId: 'cmd-retry-test',
+        deltaHash: 'hash-success',
+      }];
+
+      // Click the retry button
+      const retryBtn = getByText('Retry Verification');
+      await act(async () => {
+        fireEvent.press(retryBtn);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      // Now children should be rendered!
+      expect(getByText('Children Rendered After Retry')).toBeTruthy();
+      expect(queryByText('Admission Refused')).toBeNull();
+    });
+
+    test('renders Refusal page with RECEIPT_VERIFICATION_ERROR when SQLite query throws error', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      const { db } = require('../../lib/db/db');
+      db.select.mockImplementationOnce(() => {
+        throw new Error('Database connection failed');
+      });
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-db-error',
+      };
+
+      const { getByText } = render(
+        <ProtectedRoute route={route}>
+          <Text>Protected Content</Text>
+        </ProtectedRoute>
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(getByText('Refusal Reason (RECEIPT_VERIFICATION_ERROR)')).toBeTruthy();
+      expect(getByText(/Database connection failed/)).toBeTruthy();
+      expect(getByText('Unverified ❌')).toBeTruthy();
+    });
+
+    test('renders Refusal page with RECEIPT_HASH_MISMATCH when hash in database does not match requiredReceiptDeltaHash', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      mockDbRecords = [{
+        commandId: 'cmd-hash-mismatch',
+        deltaHash: 'actual-wrong-hash',
+      }];
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-hash-mismatch',
+        requiredReceiptDeltaHash: 'expected-correct-hash',
+      };
+
+      const { getByText, queryByText } = render(
+        <ProtectedRoute route={route}>
+          <Text>Protected Content</Text>
+        </ProtectedRoute>
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(getByText('Refusal Reason (RECEIPT_HASH_MISMATCH)')).toBeTruthy();
+      expect(getByText(/delta hash mismatch/)).toBeTruthy();
+      expect(queryByText('Protected Content')).toBeNull();
+    });
+
+    test('renders Refusal page with RECEIPT_HASH_MISMATCH when hash in MMKV does not match requiredReceiptDeltaHash', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      const { mmkvInstance } = require('../../lib/store/mmkvStorage');
+      const mmkvSpy = jest.spyOn(mmkvInstance, 'getString').mockImplementation((key: any) => {
+        if (key === 'receipt_cmd-mmkv-mismatch') {
+          return JSON.stringify({ deltaHash: 'actual-wrong-hash' });
+        }
+        return undefined;
+      });
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-mmkv-mismatch',
+        requiredReceiptDeltaHash: 'expected-correct-hash',
+      };
+
+      const { getByText, queryByText } = render(
+        <ProtectedRoute route={route}>
+          <Text>Protected Content</Text>
+        </ProtectedRoute>
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(getByText('Refusal Reason (RECEIPT_HASH_MISMATCH)')).toBeTruthy();
+      expect(getByText(/delta hash mismatch/)).toBeTruthy();
+      expect(queryByText('Protected Content')).toBeNull();
+
+      mmkvSpy.mockRestore();
+    });
+
+    test('renders Refusal page with RECEIPT_HASH_MISMATCH when hash in Zustand does not match requiredReceiptDeltaHash', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = {
+        commandId: 'cmd-zustand-mismatch',
+        deltaHash: 'actual-wrong-hash',
+      };
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-zustand-mismatch',
+        requiredReceiptDeltaHash: 'expected-correct-hash',
+      };
+
+      const { getByText, queryByText } = render(
+        <ProtectedRoute route={route}>
+          <Text>Protected Content</Text>
+        </ProtectedRoute>
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(getByText('Refusal Reason (RECEIPT_HASH_MISMATCH)')).toBeTruthy();
+      expect(getByText(/delta hash mismatch/)).toBeTruthy();
+      expect(queryByText('Protected Content')).toBeNull();
+    });
   });
 
   describe('useRouteAdmission Hook', () => {
@@ -614,6 +806,16 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
       fireEvent.press(redirectBtn);
 
       expect(onRedirectMock).toHaveBeenCalledTimes(1);
+    });
+
+    test('renders verified badge when isChecking is false and refusalReason is not provided', () => {
+      const { getByText, queryByText } = render(
+        <PremiumReceiptBlockingScreen {...defaultProps} isChecking={false} refusalReason={null} />
+      );
+
+      expect(getByText('Verified ✅')).toBeTruthy();
+      expect(queryByText('Unverified ❌')).toBeNull();
+      expect(queryByText('Checking...')).toBeNull();
     });
   });
 });

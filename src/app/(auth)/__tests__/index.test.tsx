@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
-import { Animated } from 'react-native';
+import { Animated, Platform } from 'react-native';
 import Auth from '../index';
 
 // Track calls to supabase mock
@@ -15,6 +15,18 @@ jest.mock('../../../../lib/supabase', () => ({
     },
   },
 }));
+
+jest.mock('react-native/Libraries/Components/Keyboard/KeyboardAvoidingView', () => {
+  const React = require('react');
+  const Component = React.forwardRef(({ children, ...props }: any, ref: any) => {
+    return React.createElement('View', { ...props, ref }, children);
+  });
+  Component.displayName = 'KeyboardAvoidingView';
+  return {
+    __esModule: true,
+    default: Component,
+  };
+});
 
 // Mock @expo/vector-icons to export Feather (and others if needed) with properties we can query.
 // We make sure the custom mock returns a mock element that propagates name so we can read it.
@@ -257,5 +269,154 @@ describe('Auth (Secure Gateway) Component', () => {
     await act(async () => {
       resolveSignUp({ error: null });
     });
+  });
+
+  test('should render KeyboardAvoidingView with correct behavior and vertical offset', () => {
+    const { getByTestId } = render(<Auth />);
+    const keyboardView = getByTestId('keyboard-avoiding-view');
+    expect(keyboardView).toBeTruthy();
+    
+    const behavior = keyboardView.props.behavior;
+    if (behavior !== undefined) {
+      expect(behavior).toBe(Platform.OS === 'ios' ? 'padding' : 'height');
+      expect(keyboardView.props.keyboardVerticalOffset).toBe(Platform.OS === 'ios' ? 40 : 0);
+    } else {
+      expect(behavior).toBeUndefined();
+    }
+  });
+
+  test('should toggle focus styling on email and password input containers', () => {
+    const { getByPlaceholderText, getByTestId } = render(<Auth />);
+    
+    const emailInput = getByPlaceholderText('your@email.com');
+    const emailContainer = getByTestId('email-input-container');
+    
+    const passwordInput = getByPlaceholderText('Enter your password');
+    const passwordContainer = getByTestId('password-input-container');
+
+    // 1. Email container default border state
+    expect(emailContainer.props.className).toContain('border-gray-200');
+    expect(emailContainer.props.className).not.toContain('border-indigo-600');
+
+    // 2. Email container focused border state
+    fireEvent(emailInput, 'focus');
+    expect(emailContainer.props.className).toContain('border-indigo-600');
+    expect(emailContainer.props.className).not.toContain('border-gray-200');
+
+    // 3. Email container blurred border state
+    fireEvent(emailInput, 'blur');
+    expect(emailContainer.props.className).toContain('border-gray-200');
+    expect(emailContainer.props.className).not.toContain('border-indigo-600');
+
+    // 4. Password container default border state
+    expect(passwordContainer.props.className).toContain('border-gray-200');
+    expect(passwordContainer.props.className).not.toContain('border-indigo-600');
+
+    // 5. Password container focused border state
+    fireEvent(passwordInput, 'focus');
+    expect(passwordContainer.props.className).toContain('border-indigo-600');
+    expect(passwordContainer.props.className).not.toContain('border-gray-200');
+
+    // 6. Password container blurred border state
+    fireEvent(passwordInput, 'blur');
+    expect(passwordContainer.props.className).toContain('border-gray-200');
+    expect(passwordContainer.props.className).not.toContain('border-indigo-600');
+  });
+
+  test('should toggle password secure text entry visibility', () => {
+    const { getByPlaceholderText, getByTestId, queryByTestId } = render(<Auth />);
+    
+    const passwordInput = getByPlaceholderText('Enter your password');
+    
+    expect(queryByTestId('password-visibility-toggle')).toBeNull();
+
+    fireEvent.changeText(passwordInput, 'p');
+    
+    const toggleBtn = getByTestId('password-visibility-toggle');
+    expect(toggleBtn).toBeTruthy();
+    
+    expect(passwordInput.props.secureTextEntry).toBe(true);
+
+    fireEvent.press(toggleBtn);
+    expect(passwordInput.props.secureTextEntry).toBe(false);
+
+    fireEvent.press(toggleBtn);
+    expect(passwordInput.props.secureTextEntry).toBe(true);
+  });
+
+  test('should display error banner when sign-in fails or has missing fields', async () => {
+    const { getByPlaceholderText, getByText, queryByText, getByTestId } = render(<Auth />);
+    
+    const emailInput = getByPlaceholderText('your@email.com');
+    const passwordInput = getByPlaceholderText('Enter your password');
+    
+    fireEvent.changeText(emailInput, 'user@example.com');
+    fireEvent.changeText(passwordInput, 'pass');
+    
+    const submitBtn = getPressableNode(getByText, 'Establish Secure Session');
+    
+    mockSignInWithPassword.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Invalid credentials' }
+    });
+
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+
+    expect(getByText('Authentication Alert')).toBeTruthy();
+    expect(getByText('Invalid credentials')).toBeTruthy();
+
+    const closeBtn = getByTestId('close-banner-button');
+    fireEvent.press(closeBtn);
+    expect(queryByText('Authentication Alert')).toBeNull();
+  });
+
+  test('should display validation banners for sign-up requirements checklist failures', async () => {
+    const { getByPlaceholderText, getByText } = render(<Auth />);
+    
+    const toggleBtn = getByText("Don't have an account? Sign Up");
+    fireEvent.press(toggleBtn);
+
+    const emailInput = getByPlaceholderText('your@email.com');
+    const passwordInput = getByPlaceholderText('Minimum 6 characters');
+    const submitBtn = getPressableNode(getByText, 'Initialize Registration');
+
+    fireEvent.changeText(emailInput, 'invalid-email');
+    fireEvent.changeText(passwordInput, '123');
+
+    expect(submitBtn.props.disabled).toBe(false);
+
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+
+    expect(getByText('Please enter a valid email address')).toBeTruthy();
+
+    fireEvent.changeText(emailInput, 'test@example.com');
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+    expect(getByText('Password must be at least 6 characters')).toBeTruthy();
+
+    fireEvent.changeText(passwordInput, 'abcdef');
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+    expect(getByText('Password must contain at least one number')).toBeTruthy();
+
+    fireEvent.changeText(passwordInput, 'abcdef1');
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+    expect(getByText('Password must contain an uppercase or special character')).toBeTruthy();
+
+    mockSignUp.mockResolvedValueOnce({ error: null });
+    fireEvent.changeText(passwordInput, 'Abcdef1');
+    
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+    expect(getByText('Verification link sent! Check your email.')).toBeTruthy();
   });
 });

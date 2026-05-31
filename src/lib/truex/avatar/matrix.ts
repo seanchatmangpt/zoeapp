@@ -43,7 +43,10 @@ export const PROJECTION_MATRIX: Record<string, (data: any, role: AvatarRole) => 
           visible: true,
           surface: 'risk summary',
           allowedActions: ['acknowledge_risk'],
-          payload: { riskLevel: 'High', shortageRatio: data.shortageRatio },
+          payload: { 
+            riskLevel: data.shortageRatio > 0.6 ? 'High' : data.shortageRatio > 0.3 ? 'Medium' : 'Low', 
+            shortageRatio: data.shortageRatio 
+          },
         };
       case 'admin':
         return {
