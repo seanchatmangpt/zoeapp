@@ -1,3 +1,2 @@
-const { render } = require('ejs');
-const template = `<% if (typeof withSubcommands !== "undefined" && String(withSubcommands) === "true") { %>subCommands: {}<% } else { %>async run(ctx) {}<% } %>`;
-console.log(render(template, { withSubcommands: true }));
+const { HookRuntime } = require('./src/lib/truex/hook-otp/runtime');
+console.log(HookRuntime.prototype.send);

@@ -352,4 +352,30 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     // Verify error alert was shown
     expect(alertSpy).toHaveBeenCalledWith('Error', 'Sandbox seeding failed write permission denied');
   });
+
+  test('handles errors during MMKV property load and refresh', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    
+    // Simulate error during initial load
+    (mmkvInstance.getBoolean as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('Initial load failure');
+    });
+
+    const { getByText } = render(<AdminSettings />);
+    expect(warnSpy).toHaveBeenCalledWith('Failed to load MMKV properties:', expect.any(Error));
+
+    // Simulate error during refresh
+    (mmkvInstance.getAllKeys as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('Refresh keys failure');
+    });
+
+    // Trigger a toggle to hit refreshMMKVKeyCount
+    const walToggle = getByText('SQLite WAL Mode');
+    await act(async () => {
+      fireEvent.press(walToggle);
+    });
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.any(Error));
+    warnSpy.mockRestore();
+  });
 });

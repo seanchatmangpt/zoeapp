@@ -1,53 +1,132 @@
 import React from 'react';
-import { render, act, fireEvent, waitFor } from '@testing-library/react-native';
-import { VkgProvider } from '@/src/components/VkgProvider';
+import { render, fireEvent } from '@testing-library/react-native';
 import HooksProjection from '../hooks';
+import * as VkgProviderModule from '@/src/components/VkgProvider';
+
+jest.mock('@/src/components/VkgProvider', () => {
+  const actual = jest.requireActual('@/src/components/VkgProvider');
+  return {
+    ...actual,
+    useVkgEngine: jest.fn(),
+  };
+});
 
 describe('Truex Hooks Projection View', () => {
+  let mockEngine: any;
+
   beforeEach(() => {
-    global.fetch = jest.fn().mockImplementation(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ status: 'settled', receipt: 'hash_abc' }),
-      })
-    ) as jest.Mock;
+    mockEngine = {
+      pendingReceipts: 0,
+      processedReceipts: 0,
+      quarantinedHooks: [],
+      lastReceipt: null,
+      avatar: 'member',
+      setAvatar: jest.fn(),
+      projection: null,
+      triggerHook: jest.fn(),
+      repairLastQuarantine: jest.fn(),
+    };
+    (VkgProviderModule.useVkgEngine as jest.Mock).mockReturnValue(mockEngine);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test('should render cockpit, allow avatar switching, and show projection details', async () => {
-    const { getByText, queryByText } = render(
-      <VkgProvider>
-        <HooksProjection />
-      </VkgProvider>
-    );
+  test('should render cockpit, allow avatar switching, and show hidden state for guest', () => {
+    const { getByText } = render(<HooksProjection />);
 
-    // Initial title
     expect(getByText('Truex Hook Cockpit')).toBeTruthy();
-
-    // Default avatar is member, wait for HELP INVITATION projection to load asynchronously
-    await waitFor(() => {
-      expect(getByText('HELP INVITATION')).toBeTruthy();
-    });
-
-    // Switch to guest avatar
-    const guestBtn = getByText('guest');
-    await act(async () => {
-      fireEvent.press(guestBtn);
-    });
-
-    // Projections for guest are hidden
     expect(getByText('[HIDDEN] No projection visible for guest avatar.')).toBeTruthy();
 
-    // Switch to volunteer avatar
-    const volunteerBtn = getByText('volunteer');
-    await act(async () => {
-      fireEvent.press(volunteerBtn);
-    });
+    const guestBtn = getByText('guest');
+    fireEvent.press(guestBtn);
+    expect(mockEngine.setAvatar).toHaveBeenCalledWith('guest');
+  });
 
-    // Check shift prompt surface
-    expect(getByText('SHIFT PROMPT')).toBeTruthy();
+  test('should show projection details with allowed actions', () => {
+    mockEngine.projection = {
+      visible: true,
+      surface: 'help_invitation',
+      payload: { message: 'Help needed' },
+      allowedActions: ['accept', 'decline'],
+    };
+    const { getByText } = render(<HooksProjection />);
+    
+    expect(getByText('HELP_INVITATION')).toBeTruthy();
+    expect(getByText('Help needed')).toBeTruthy();
+    expect(getByText('accept')).toBeTruthy();
+    expect(getByText('decline')).toBeTruthy();
+  });
+
+  test('should show projection details without payload message and actions', () => {
+    mockEngine.projection = {
+      visible: true,
+      surface: 'info_surface',
+      payload: null,
+      allowedActions: [],
+    };
+    const { getByText } = render(<HooksProjection />);
+    
+    expect(getByText('INFO_SURFACE')).toBeTruthy();
+    expect(getByText('Projection matches active role.')).toBeTruthy();
+    expect(getByText('No actions permitted for this role.')).toBeTruthy();
+  });
+
+  test('should display quarantined state and trigger repair', () => {
+    mockEngine.quarantinedHooks = ['hook_123'];
+    const { getByText } = render(<HooksProjection />);
+    
+    expect(getByText('HOOK QUARANTINED')).toBeTruthy();
+    
+    const repairBtn = getByText('Trigger Repair & Replay');
+    fireEvent.press(repairBtn);
+    expect(mockEngine.repairLastQuarantine).toHaveBeenCalled();
+  });
+
+  test('should show pending receipts state', () => {
+    mockEngine.pendingReceipts = 1;
+    const { getByText } = render(<HooksProjection />);
+    
+    expect(getByText('Processing optimistic sync...')).toBeTruthy();
+  });
+
+  test('should show reconciled state when processed > 0 and pending == 0 and not quarantined', () => {
+    mockEngine.processedReceipts = 1;
+    mockEngine.pendingReceipts = 0;
+    mockEngine.quarantinedHooks = [];
+    const { getByText } = render(<HooksProjection />);
+    
+    expect(getByText('Evidence Reconciled ✅')).toBeTruthy();
+  });
+
+  test('should NOT show reconciled state when quarantined', () => {
+    mockEngine.processedReceipts = 1;
+    mockEngine.pendingReceipts = 0;
+    mockEngine.quarantinedHooks = ['hook_fail'];
+    const { queryByText } = render(<HooksProjection />);
+    
+    expect(queryByText('Evidence Reconciled ✅')).toBeNull();
+  });
+
+  test('should show last receipt', () => {
+    mockEngine.lastReceipt = {
+      receiptHash: 'hash_456',
+      status: 'settled',
+      messageId: 'msg_999',
+    };
+    const { getByText } = render(<HooksProjection />);
+    
+    expect(getByText('Hash: hash_456')).toBeTruthy();
+    expect(getByText('settled')).toBeTruthy();
+    expect(getByText('msg_999')).toBeTruthy();
+  });
+
+  test('should trigger volunteer cancellation command', () => {
+    const { getByText } = render(<HooksProjection />);
+    
+    const triggerBtn = getByText('Trigger Volunteer Cancellation');
+    fireEvent.press(triggerBtn);
+    expect(mockEngine.triggerHook).toHaveBeenCalledWith('volunteer_123', 'volunteer_cancel', 'shift_abc');
   });
 });

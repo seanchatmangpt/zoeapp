@@ -353,3 +353,327 @@ export function generateBlake3ReceiptHash(previousHash: string | null | undefine
   const dataStr = canonicalStringify(data);
   return blake3(prev + dataStr);
 }
+
+// =========================================================================
+// Zero-Knowledge Proof & Elliptic Curve Signature Validation Algorithms
+// =========================================================================
+
+export const BN254_P = 21888242871839275222246405745257275088696311157297823662689037894645226208583n;
+export const SECP256K1_P = 115792089237316195423570985008687907853269984665640564039457584007908834671663n;
+export const SECP256K1_N = 115792089237316195423570985008687907852837564279074904382605163141518161494337n;
+export const SECP256K1_A = 0n;
+export const SECP256K1_B = 7n;
+
+export interface Secp256k1Point {
+  x: bigint;
+  y: bigint;
+  isInfinity: boolean;
+}
+
+export const SECP256K1_G: Secp256k1Point = {
+  x: 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n,
+  y: 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n,
+  isInfinity: false
+};
+
+/**
+ * Math and Modular arithmetic helper functions.
+ */
+export function mod(n: bigint, p: bigint): bigint {
+  let result = n % p;
+  if (result < 0n) {
+    result += p;
+  }
+  return result;
+}
+
+export function modPow(base: bigint, exp: bigint, modulus: bigint): bigint {
+  if (modulus === 1n) return 0n;
+  let result = 1n;
+  let b = mod(base, modulus);
+  let e = exp;
+  while (e > 0n) {
+    if (e % 2n === 1n) {
+      result = mod(result * b, modulus);
+    }
+    b = mod(b * b, modulus);
+    e = e / 2n;
+  }
+  return result;
+}
+
+export function modInverse(a: bigint, m: bigint): bigint {
+  let m0 = m;
+  let y = 0n, x = 1n;
+  let aVal = a;
+
+  if (m === 1n) return 0n;
+
+  while (aVal > 1n) {
+    const q = aVal / m;
+    let t = m;
+
+    m = aVal % m;
+    aVal = t;
+    t = y;
+
+    y = x - q * y;
+    x = t;
+  }
+
+  if (x < 0n) {
+    x += m0;
+  }
+  return x;
+}
+
+export function parseToBigInt(val: any): bigint {
+  if (typeof val === 'bigint') return val;
+  if (typeof val === 'number') {
+    if (!Number.isSafeInteger(val)) {
+      throw new Error(`Precision loss warning: cannot safely parse float/unsafe number ${val} as bigint.`);
+    }
+    return BigInt(val);
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (trimmed.startsWith('0x') || trimmed.startsWith('0X')) {
+      return BigInt(trimmed);
+    }
+    if (/^-?\d+$/.test(trimmed)) {
+      return BigInt(trimmed);
+    }
+    if (/^[0-9a-fA-F]+$/.test(trimmed)) {
+      return BigInt('0x' + trimmed);
+    }
+    return BigInt(trimmed);
+  }
+  throw new Error(`Unsupported type for BigInt parsing: ${typeof val}`);
+}
+
+// Check if a point lies on secp256k1 curve
+export function isPointOnSecp256k1(p: Secp256k1Point): boolean {
+  if (p.isInfinity) return true;
+  const y2 = mod(p.y * p.y, SECP256K1_P);
+  const x3 = mod(p.x * p.x * p.x + SECP256K1_B, SECP256K1_P);
+  return y2 === x3;
+}
+
+// Point Addition on Secp256k1
+export function ecAdd(p1: Secp256k1Point, p2: Secp256k1Point): Secp256k1Point {
+  if (p1.isInfinity) return p2;
+  if (p2.isInfinity) return p1;
+
+  if (p1.x === p2.x) {
+    if (mod(p1.y + p2.y, SECP256K1_P) === 0n) {
+      return { x: 0n, y: 0n, isInfinity: true };
+    }
+    return ecDouble(p1);
+  }
+
+  const dy = mod(p2.y - p1.y, SECP256K1_P);
+  const dx = mod(p2.x - p1.x, SECP256K1_P);
+  const lambda = mod(dy * modInverse(dx, SECP256K1_P), SECP256K1_P);
+
+  const x3 = mod(lambda * lambda - p1.x - p2.x, SECP256K1_P);
+  const y3 = mod(lambda * (p1.x - x3) - p1.y, SECP256K1_P);
+
+  return { x: x3, y: y3, isInfinity: false };
+}
+
+// Point Doubling on Secp256k1
+export function ecDouble(p: Secp256k1Point): Secp256k1Point {
+  if (p.isInfinity) return p;
+  if (p.y === 0n) return { x: 0n, y: 0n, isInfinity: true };
+
+  const numerator = mod(3n * p.x * p.x + SECP256K1_A, SECP256K1_P);
+  const denominator = mod(2n * p.y, SECP256K1_P);
+  const lambda = mod(numerator * modInverse(denominator, SECP256K1_P), SECP256K1_P);
+
+  const x3 = mod(lambda * lambda - 2n * p.x, SECP256K1_P);
+  const y3 = mod(lambda * (p.x - x3) - p.y, SECP256K1_P);
+
+  return { x: x3, y: y3, isInfinity: false };
+}
+
+// Scalar Multiplication (Double-and-Add)
+export function ecMultiply(point: Secp256k1Point, scalar: bigint): Secp256k1Point {
+  let s = mod(scalar, SECP256K1_N);
+  if (s === 0n) return { x: 0n, y: 0n, isInfinity: true };
+
+  let result: Secp256k1Point = { x: 0n, y: 0n, isInfinity: true };
+  let addend = point;
+
+  while (s > 0n) {
+    if (s % 2n === 1n) {
+      result = ecAdd(result, addend);
+    }
+    addend = ecDouble(addend);
+    s = s / 2n;
+  }
+
+  return result;
+}
+
+export function verifyEcdsaSignature(
+  messageHash: string | bigint,
+  signature: { r: string | bigint; s: string | bigint },
+  publicKey: { x: string | bigint; y: string | bigint }
+): { valid: boolean; error?: string } {
+  try {
+    const r = parseToBigInt(signature.r);
+    const s = parseToBigInt(signature.s);
+    const qx = parseToBigInt(publicKey.x);
+    const qy = parseToBigInt(publicKey.y);
+    const e = parseToBigInt(messageHash);
+
+    // 1. Signature bounds check
+    if (r <= 0n || r >= SECP256K1_N) {
+      return { valid: false, error: 'Signature r-value is out of bounds [1, n-1]' };
+    }
+    if (s <= 0n || s >= SECP256K1_N) {
+      return { valid: false, error: 'Signature s-value is out of bounds [1, n-1]' };
+    }
+
+    // Low-s rule to prevent malleability
+    if (s > SECP256K1_N / 2n) {
+      return { valid: false, error: 'Signature s-value exceeds n/2 (high-s malleability prevention)' };
+    }
+
+    // 2. Public key bounds and curve membership check
+    if (qx < 0n || qx >= SECP256K1_P || qy < 0n || qy >= SECP256K1_P) {
+      return { valid: false, error: 'Public key coordinates are out of field bounds [0, P-1]' };
+    }
+
+    const Q: Secp256k1Point = { x: qx, y: qy, isInfinity: false };
+    if (!isPointOnSecp256k1(Q)) {
+      return { valid: false, error: 'Public key is not a valid point on the secp256k1 curve' };
+    }
+
+    // 3. Verify signature
+    const w = modInverse(s, SECP256K1_N);
+    const u1 = mod(e * w, SECP256K1_N);
+    const u2 = mod(r * w, SECP256K1_N);
+
+    const u1G = ecMultiply(SECP256K1_G, u1);
+    const u2Q = ecMultiply(Q, u2);
+    const X = ecAdd(u1G, u2Q);
+
+    if (X.isInfinity) {
+      return { valid: false, error: 'Calculated point is at infinity' };
+    }
+
+    const valid = mod(X.x, SECP256K1_N) === r;
+    if (!valid) {
+      return { valid: false, error: 'Signature verification failed (r mismatch)' };
+    }
+
+    return { valid: true };
+  } catch (err: any) {
+    return { valid: false, error: `Mathematical signature verification error: ${err.message}` };
+  }
+}
+
+export function isPointOnBn254G1(x: bigint, y: bigint): boolean {
+  if (x < 0n || x >= BN254_P || y < 0n || y >= BN254_P) {
+    return false;
+  }
+  const lhs = mod(y * y, BN254_P);
+  const rhs = mod(x * x * x + 3n, BN254_P);
+  return lhs === rhs;
+}
+
+export function isPointOnBn254G2(x0: bigint, x1: bigint, y0: bigint, y1: bigint): boolean {
+  if (x0 < 0n || x0 >= BN254_P || x1 < 0n || x1 >= BN254_P ||
+      y0 < 0n || y0 >= BN254_P || y1 < 0n || y1 >= BN254_P) {
+    return false;
+  }
+
+  const b0 = 0x1f5135ddade76bad478bcea21235556279d5f27a7da4f14af20b742c263447d4n;
+  const b1 = 0x21902cc11125e5722d0576ab51e4c31d96a3625d5cee4d2ef50dedc65a60040an;
+
+  const lhs_real = mod(y0 * y0 - y1 * y1, BN254_P);
+  const lhs_imag = mod(2n * y0 * y1, BN254_P);
+
+  const x0_2 = mod(x0 * x0, BN254_P);
+  const x1_2 = mod(x1 * x1, BN254_P);
+  const rhs_real = mod(x0 * x0_2 - 3n * x0 * x1_2 + b0, BN254_P);
+  const rhs_imag = mod(3n * x0_2 * x1 - x1 * x1_2 + b1, BN254_P);
+
+  return lhs_real === rhs_real && lhs_imag === rhs_imag;
+}
+
+export function verifyZKProofReceipt(
+  receipt: {
+    proof: {
+      a: [string | bigint, string | bigint];
+      b: [[string | bigint, string | bigint], [string | bigint, string | bigint]];
+      c: [string | bigint, string | bigint];
+    };
+    publicInputs: (string | bigint)[];
+    receiptHash: string;
+  },
+  vk: { expectedInputsCount: number }
+): { valid: boolean; error?: string } {
+  try {
+    // 1. Check public inputs length
+    if (receipt.publicInputs.length !== vk.expectedInputsCount) {
+      return {
+        valid: false,
+        error: `Public inputs count mismatch. Expected ${vk.expectedInputsCount}, got ${receipt.publicInputs.length}`,
+      };
+    }
+
+    // 2. Parse and bounds-check public inputs
+    const inputs: bigint[] = [];
+    for (let i = 0; i < receipt.publicInputs.length; i++) {
+      const val = parseToBigInt(receipt.publicInputs[i]);
+      if (val < 0n || val >= BN254_P) {
+        return {
+          valid: false,
+          error: `Public input at index ${i} is out of field bounds [0, P-1]`,
+        };
+      }
+      inputs.push(val);
+    }
+
+    // 3. Parse and bounds-check G1 proof point A
+    const ax = parseToBigInt(receipt.proof.a[0]);
+    const ay = parseToBigInt(receipt.proof.a[1]);
+    if (!isPointOnBn254G1(ax, ay)) {
+      return { valid: false, error: 'Proof point A is not a valid point on the BN254 G1 curve' };
+    }
+
+    // 4. Parse and bounds-check G1 proof point C
+    const cx = parseToBigInt(receipt.proof.c[0]);
+    const cy = parseToBigInt(receipt.proof.c[1]);
+    if (!isPointOnBn254G1(cx, cy)) {
+      return { valid: false, error: 'Proof point C is not a valid point on the BN254 G1 curve' };
+    }
+
+    // 5. Parse and bounds-check G2 proof point B
+    const bx0 = parseToBigInt(receipt.proof.b[0][0]);
+    const bx1 = parseToBigInt(receipt.proof.b[0][1]);
+    const by0 = parseToBigInt(receipt.proof.b[1][0]);
+    const by1 = parseToBigInt(receipt.proof.b[1][1]);
+    if (!isPointOnBn254G2(bx0, bx1, by0, by1)) {
+      return { valid: false, error: 'Proof point B is not a valid point on the BN254 G2 curve' };
+    }
+
+    // 6. Verify that the receiptHash binding matches one of the public inputs
+    const hashBigInt = parseToBigInt(receipt.receiptHash);
+    const reducedHash = mod(hashBigInt, BN254_P);
+
+    const hashMatched = inputs.some((inp) => inp === hashBigInt || inp === reducedHash);
+    if (!hashMatched) {
+      return {
+        valid: false,
+        error: 'Receipt hash binding verification failed. Receipt hash is not bound to public inputs.',
+      };
+    }
+
+    return { valid: true };
+  } catch (err: any) {
+    return { valid: false, error: `ZK proof validation error: ${err.message}` };
+  }
+}

@@ -5,7 +5,6 @@ import { TransitionOverlay } from '../TransitionOverlay';
 import { useSession } from '@/context/SessionProvider';
 import { useColorScheme } from '@/src/components/useColorScheme';
 
-// Mock the context and hook dependencies
 jest.mock('@/context/SessionProvider', () => ({
   useSession: jest.fn(),
 }));
@@ -21,11 +20,25 @@ describe('TransitionOverlay Component', () => {
   let startMock: jest.Mock;
   let stopMock: jest.Mock;
   let timingSpy: jest.SpyInstance;
+  let springSpy: jest.SpyInstance;
+  let parallelSpy: jest.SpyInstance;
 
   beforeEach(() => {
     startMock = jest.fn();
     stopMock = jest.fn();
     timingSpy = jest.spyOn(Animated, 'timing').mockImplementation(() => {
+      return {
+        start: startMock,
+        stop: stopMock,
+      } as any;
+    });
+    springSpy = jest.spyOn(Animated, 'spring').mockImplementation(() => {
+      return {
+        start: startMock,
+        stop: stopMock,
+      } as any;
+    });
+    parallelSpy = jest.spyOn(Animated, 'parallel').mockImplementation(() => {
       return {
         start: startMock,
         stop: stopMock,
@@ -45,6 +58,8 @@ describe('TransitionOverlay Component', () => {
 
   afterEach(() => {
     timingSpy.mockRestore();
+    springSpy.mockRestore();
+    parallelSpy.mockRestore();
     jest.clearAllMocks();
   });
 
@@ -53,7 +68,7 @@ describe('TransitionOverlay Component', () => {
     expect(toJSON()).toBeNull();
   });
 
-  test('should render welcome text and start timing fade-in animation for signin transition in light mode', () => {
+  test('should render welcome text and start parallel animation for signin transition in light mode', () => {
     mockUseSession.mockReturnValue({
       session: null,
       loading: false,
@@ -71,14 +86,24 @@ describe('TransitionOverlay Component', () => {
       expect.any(Animated.Value),
       expect.objectContaining({
         toValue: 1,
-        duration: 250,
+        duration: 300,
         useNativeDriver: true,
       })
     );
+    expect(springSpy).toHaveBeenCalledWith(
+      expect.any(Animated.Value),
+      expect.objectContaining({
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      })
+    );
+    expect(parallelSpy).toHaveBeenCalled();
     expect(startMock).toHaveBeenCalledTimes(1);
   });
 
-  test('should render signing out text and start timing fade-in animation for signout transition in dark mode', () => {
+  test('should render signing out text and start parallel animation for signout transition in dark mode', () => {
     mockUseSession.mockReturnValue({
       session: null,
       loading: false,
@@ -97,15 +122,15 @@ describe('TransitionOverlay Component', () => {
       expect.any(Animated.Value),
       expect.objectContaining({
         toValue: 1,
-        duration: 250,
+        duration: 300,
         useNativeDriver: true,
       })
     );
+    expect(parallelSpy).toHaveBeenCalled();
     expect(startMock).toHaveBeenCalledTimes(1);
   });
 
   test('should trigger fade-out animation and hide overlay when transitioning ceases', async () => {
-    // Start with transitioning active
     mockUseSession.mockReturnValue({
       session: null,
       loading: false,
@@ -118,7 +143,6 @@ describe('TransitionOverlay Component', () => {
     expect(getByText('Welcome back!')).toBeTruthy();
     expect(startMock).toHaveBeenCalledTimes(1);
 
-    // Stop transitioning
     mockUseSession.mockReturnValue({
       session: null,
       loading: false,
@@ -127,10 +151,8 @@ describe('TransitionOverlay Component', () => {
       setIsTransitioning: jest.fn(),
     });
 
-    // Rerender component to trigger useEffect change
     rerender(<TransitionOverlay />);
 
-    // Timing should be called again with toValue 0, duration 350
     expect(timingSpy).toHaveBeenLastCalledWith(
       expect.any(Animated.Value),
       expect.objectContaining({
@@ -141,7 +163,6 @@ describe('TransitionOverlay Component', () => {
     );
     expect(startMock).toHaveBeenCalledTimes(2);
 
-    // Retrieve start callback and trigger completion to verify setVisible(false) unmounts
     const startCallback = startMock.mock.calls[1][0];
     expect(startCallback).toBeInstanceOf(Function);
 
@@ -149,7 +170,6 @@ describe('TransitionOverlay Component', () => {
       startCallback({ finished: true });
     });
 
-    // Component should now return null/be empty
     expect(queryByText('Welcome back!')).toBeNull();
   });
 
@@ -166,6 +186,7 @@ describe('TransitionOverlay Component', () => {
     expect(stopMock).not.toHaveBeenCalled();
 
     unmount();
-    expect(stopMock).toHaveBeenCalledTimes(1);
+    // Timing and Spring stops are called
+    expect(stopMock).toHaveBeenCalledTimes(2);
   });
 });

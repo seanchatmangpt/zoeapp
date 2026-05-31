@@ -267,4 +267,166 @@ describe('Universal Operational Membrane', () => {
     // Invalid target state
     expect(Trajectories.validateTransition('SermonFlow', 'published', 'drafted')).toBe(false);
   });
+
+  it('supports deep proxying of nested objects and guards nested properties', async () => {
+    const context = new MembraneContext({
+      mode: 'strict',
+      tenantId: 'tenant-1',
+      authorityRole: 'admin'
+    });
+
+    const target = {
+      nested: {
+        state: 'idle'
+      }
+    };
+
+    const proxy = ProxyableBridge.wrap(target, context, {
+      flowName: 'SermonFlow'
+    });
+
+    // Access nested object (should be proxied)
+    const nestedProxy = proxy.nested;
+    expect(nestedProxy).toBeDefined();
+
+    // 1. Valid deep mutation: idle -> drafted
+    nestedProxy.state = 'drafted';
+    expect(nestedProxy.state).toBe('drafted');
+
+    // 2. Invalid deep mutation: drafted -> published
+    // Should run async check and roll back
+    const writeResult = await context.run('property-mutator', 'cmd-deep-invalid', {
+      flowName: 'SermonFlow',
+      fromState: 'drafted',
+      toState: 'published'
+    }, async () => {
+      nestedProxy.state = 'published';
+      return true;
+    });
+
+    expect(writeResult.success).toBe(false);
+    // Wait for background validation and rollback
+    await new Promise(resolve => setTimeout(resolve, 15));
+    expect(nestedProxy.state).toBe('drafted'); // Rolled back!
+  });
+
+  it('traps deleteProperty and rolls back on failure', async () => {
+    const context = new MembraneContext({
+      mode: 'strict',
+      tenantId: 'tenant-1',
+      authorityRole: 'admin'
+    });
+
+    const target = {
+      state: 'drafted',
+      removable: 'yes'
+    } as any;
+
+    const proxy = ProxyableBridge.wrap(target, context, {
+      flowName: 'SermonFlow'
+    });
+
+    // Test a delete that fails admissibility checks (e.g. deny delete)
+    const originalInterceptorsEvaluate = Interceptors.evaluate;
+    Interceptors.evaluate = jest.fn().mockResolvedValue('deny');
+
+    delete proxy.removable;
+    
+    // Wait for background context run and rollback
+    await new Promise(resolve => setTimeout(resolve, 15));
+    
+    // The property should still exist (rolled back!)
+    expect(proxy.removable).toBe('yes');
+
+    // Restore interceptors
+    Interceptors.evaluate = originalInterceptorsEvaluate;
+  });
+
+  it('traps defineProperty and rolls back on failure', async () => {
+    const context = new MembraneContext({
+      mode: 'strict',
+      tenantId: 'tenant-1',
+      authorityRole: 'admin'
+    });
+
+    const target = {
+      state: 'drafted'
+    };
+
+    const proxy = ProxyableBridge.wrap(target, context, {
+      flowName: 'SermonFlow'
+    });
+
+    // Mock interceptor to deny defineProperty
+    const originalInterceptorsEvaluate = Interceptors.evaluate;
+    Interceptors.evaluate = jest.fn().mockResolvedValue('deny');
+
+    Object.defineProperty(proxy, 'newProp', {
+      value: 'unauthorized_val',
+      configurable: true,
+      writable: true,
+      enumerable: true
+    });
+
+    // Wait for background context run and rollback
+    await new Promise(resolve => setTimeout(resolve, 15));
+
+    expect((proxy as any).newProp).toBeUndefined();
+
+    // Restore interceptors
+    Interceptors.evaluate = originalInterceptorsEvaluate;
+  });
+
+  it('emits telemetry events for get, set, delete, and rollback operations, and ignores symbols', async () => {
+    const context = new MembraneContext({
+      mode: 'strict',
+      tenantId: 'tenant-1',
+      authorityRole: 'admin'
+    });
+
+    const target = {
+      state: 'idle',
+      meta: 'info'
+    };
+
+    const events: any[] = [];
+    ProxyableBridge.clearTelemetryListeners();
+    ProxyableBridge.registerTelemetryListener((e) => {
+      events.push(e);
+    });
+
+    const proxy = ProxyableBridge.wrap(target, context, {
+      flowName: 'SermonFlow'
+    });
+
+    // 1. Get telemetry
+    const stateVal = proxy.state;
+    expect(stateVal).toBe('idle');
+    expect(events.some(e => e.type === 'get' && e.property === 'state')).toBe(true);
+
+    // 2. Set telemetry
+    proxy.state = 'drafted';
+    expect(events.some(e => e.type === 'set' && e.property === 'state')).toBe(true);
+
+    // 3. Rollback telemetry (illegal transition drafted -> published)
+    proxy.state = 'published';
+    
+    // Wait for background rollback to execute
+    await new Promise(resolve => setTimeout(resolve, 15));
+    expect(events.some(e => e.type === 'rollback' && e.property === 'state')).toBe(true);
+
+    // 4. Ignore symbol properties in telemetry
+    const sym = Symbol('ignored_prop');
+    (proxy as any)[sym] = 'secret';
+    const symVal = (proxy as any)[sym];
+    expect(symVal).toBe('secret');
+
+    // No symbol events should exist in telemetry
+    const symbolEvent = events.find(e => e.property.includes('Symbol('));
+    expect(symbolEvent).toBeUndefined();
+
+    // Cleanup
+    ProxyableBridge.clearTelemetryListeners();
+  });
 });
+

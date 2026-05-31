@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, act, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import AdminOutbox from '../outbox';
+import AdminOutbox, { formatTimestamp, CodePayload } from '../outbox';
 import { globalLocalDispatcher, globalRemoteDispatcher } from '../../../lib/actor/actorOps';
 
 // Mock FontAwesome icon used inside AdminShell
@@ -23,6 +23,7 @@ jest.mock('expo-router', () => ({
 // Mock variables for outbox and quarantine databases
 let mockOutboxData: any[] = [];
 let mockQuarantineData: any[] = [];
+let mockShouldDbThrow = false;
 
 // Mock SQLite db client
 jest.mock('../../../lib/db/db', () => {
@@ -34,6 +35,9 @@ jest.mock('../../../lib/db/db', () => {
         from: jest.fn().mockImplementation((table) => {
           return {
             orderBy: jest.fn().mockImplementation(() => {
+              if (mockShouldDbThrow) {
+                return Promise.reject(new Error('Mock DB Fetch Error'));
+              }
               const getTableName = (t: any): string => {
                 if (!t) return '';
                 if (t.config?.name) return t.config.name;
@@ -129,6 +133,7 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
     jest.clearAllMocks();
     mockOutboxData = [];
     mockQuarantineData = [];
+    mockShouldDbThrow = false;
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   });
 
@@ -320,5 +325,102 @@ describe('AdminOutbox Screen - Pre-Admission Tension Queue Views', () => {
     // Verify error messages display in status text and alert dialog
     expect(getByText(`Sync Failed: ${errorMsg}`)).toBeTruthy();
     expect(alertSpy).toHaveBeenCalledWith('Outbox Sync Error', errorMsg);
+  });
+
+  test('formatTimestamp correctly returns N/A for invalid date', () => {
+    expect(formatTimestamp(null)).toBe('N/A');
+    expect(formatTimestamp(new Date('invalid'))).toBe('N/A');
+    expect(formatTimestamp('2023-01-01' as any)).toBe('N/A'); // Not a Date instance
+  });
+
+  test('CodePayload handles invalid JSON data without crashing', async () => {
+    const invalidJsonString = '{"bad": "json"';
+    const { getByTestId, getByText } = render(<CodePayload data={invalidJsonString} title="Test Title" />);
+    
+    // Press to expand
+    const codeHeader = getByTestId('code-payload').children[0] as any;
+    await act(async () => {
+      fireEvent.press(codeHeader);
+    });
+
+    // It should render the string directly instead of formatted json
+    expect(getByText('{"bad": "json"')).toBeTruthy();
+  });
+
+  test('handles invalid JSON in outbox and quarantine items gracefully', async () => {
+    mockOutboxData = [
+      {
+        id: 'outbox-invalid-1',
+        commandId: 'cmd-outbox-inv',
+        jobType: 'DISPATCH_AUTHORITATIVE',
+        payload: '{"bad": "json"', // invalid json
+        status: 'pending',
+        attempts: 0,
+        createdAt: new Date('2026-05-30T10:00:00.000Z'),
+      }
+    ];
+
+    mockQuarantineData = [
+      {
+        id: 'quarantine-invalid-1',
+        commandId: 'cmd-quar-inv',
+        actorRef: '{"bad": "json"', // invalid json
+        payload: '{"bad": "json"', // invalid json
+        error: 'Some error',
+        createdAt: new Date('2026-05-30T11:00:00.000Z'),
+      }
+    ];
+
+    const { getByText } = render(<AdminOutbox />);
+    await act(async () => {
+      await flushPromises();
+    });
+
+    expect(getByText('Job: outbox-inv...')).toBeTruthy();
+    expect(getByText('Quarantine: quarantine...')).toBeTruthy();
+  });
+
+  test('displays syncing indicators during active synchronization', async () => {
+    let resolveSync: (value?: void | PromiseLike<void>) => void;
+    const syncPromise = new Promise<void>((resolve) => {
+      resolveSync = resolve;
+    });
+    mockLocalDispatcherTyped.syncOutbox.mockReturnValueOnce(syncPromise);
+
+    const { getByTestId, getByText } = render(<AdminOutbox />);
+    await act(async () => {
+      await flushPromises();
+    });
+
+    const flushBtn = getByTestId('flush-outbox');
+    
+    // Trigger sync but do not await full completion yet
+    await act(async () => {
+      fireEvent.press(flushBtn);
+    });
+
+    // Now syncing state should be active
+    expect(getByTestId('flush-outbox')).toBeTruthy();
+    expect(getByText('Syncing...')).toBeTruthy();
+    expect(getByText('Step 1/2: Replaying outbox commands to remote...')).toBeTruthy();
+
+    // Resolve the promise
+    await act(async () => {
+      resolveSync!();
+      await flushPromises();
+    });
+  });
+
+  test('fetchQueueData handles db connection errors gracefully', async () => {
+    mockShouldDbThrow = true;
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<AdminOutbox />);
+    await act(async () => {
+      await flushPromises();
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to load queue data:', expect.any(Error));
+    consoleSpy.mockRestore();
   });
 });

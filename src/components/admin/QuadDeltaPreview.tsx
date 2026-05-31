@@ -6,97 +6,119 @@ interface QuadDeltaPreviewProps {
     add?: any[];
     remove?: any[];
   } | string;
+  testID?: string;
 }
 
-export function QuadDeltaPreview({ delta }: QuadDeltaPreviewProps) {
+export function QuadDeltaPreview({ delta, testID }: QuadDeltaPreviewProps) {
   let parsed: { add?: any[]; remove?: any[] } = {};
 
   try {
     parsed = typeof delta === 'string' ? JSON.parse(delta) : delta;
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('Not an object');
+    }
   } catch (e) {
-    return <Text style={styles.errorText}>Invalid Delta</Text>;
+    return (
+      <View style={[styles.container, styles.errorContainer]} testID={testID}>
+        <Text style={styles.errorText}>Invalid Delta payload</Text>
+      </View>
+    );
   }
 
-  const additions = parsed.add || [];
-  const removals = parsed.remove || [];
+  const additions = Array.isArray(parsed.add) ? parsed.add : [];
+  const removals = Array.isArray(parsed.remove) ? parsed.remove : [];
 
   if (additions.length === 0 && removals.length === 0) {
-    return <Text style={styles.emptyText}>No changes (empty delta)</Text>;
+    return (
+      <View style={[styles.container, styles.emptyContainer]} testID={testID}>
+        <Text style={styles.emptyText}>No changes (empty delta)</Text>
+      </View>
+    );
   }
 
-  const renderQuad = (q: any, type: 'add' | 'remove') => {
-    const color = type === 'add' ? '#34D399' : '#F87171';
+  const renderQuad = (q: any, type: 'add' | 'remove', index: number) => {
+    const color = type === 'add' ? '#34D399' : '#F87171'; // emerald-400 / red-400
     const prefix = type === 'add' ? '+' : '-';
     
-    // Shorten URIs for cleaner display
     const formatNode = (node: any) => {
       if (!node) return 'null';
-      const val = node.value || '';
+      const val = typeof node === 'string' ? node : (node.value || String(node));
       return val.replace('https://schema.org/', 'schema:')
                 .replace('http://www.w3.org/1999/02/22-rdf-syntax-ns#', 'rdf:');
     };
 
     return (
-      <View key={`${type}-${q.subject?.value}-${q.predicate?.value}`} style={styles.quadLine}>
+      <View key={`${type}-${index}`} style={styles.quadLine}>
         <Text style={[styles.prefix, { color }]}>{prefix}</Text>
-        <Text style={styles.codeText}>
-          <Text style={styles.subject}>{formatNode(q.subject)}</Text>{' '}
-          <Text style={styles.predicate}>{formatNode(q.predicate)}</Text>{' '}
-          <Text style={styles.object}>{formatNode(q.object)}</Text>
+        <Text style={styles.codeText} selectable>
+          <Text style={styles.subject}>{formatNode(q?.subject)}</Text>{' '}
+          <Text style={styles.predicate}>{formatNode(q?.predicate)}</Text>{' '}
+          <Text style={styles.object}>{formatNode(q?.object)}</Text>
         </Text>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      {removals.map(q => renderQuad(q, 'remove'))}
-      {additions.map(q => renderQuad(q, 'add'))}
+    <View style={styles.container} testID={testID}>
+      {removals.map((q, i) => renderQuad(q, 'remove', i))}
+      {additions.map((q, i) => renderQuad(q, 'add', i))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#090D16',
+    backgroundColor: '#0F172A', // slate-900
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 8,
-    marginTop: 6,
+    borderColor: '#334155', // slate-700
+    padding: 12,
+    marginTop: 8,
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  emptyContainer: {
+    paddingVertical: 16,
+    alignItems: 'center',
   },
   quadLine: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   prefix: {
     fontFamily: 'SpaceMono',
-    fontSize: 11,
-    marginRight: 6,
-    fontWeight: 'bold',
+    fontSize: 12,
+    marginRight: 8,
+    fontWeight: '700',
+    marginTop: 2,
   },
   codeText: {
     fontFamily: 'SpaceMono',
-    fontSize: 10,
+    fontSize: 11,
+    lineHeight: 18,
     flex: 1,
   },
   subject: {
-    color: '#60A5FA', // blue
+    color: '#60A5FA', // blue-400
   },
   predicate: {
-    color: '#F472B6', // pink
+    color: '#F472B6', // pink-400
   },
   object: {
-    color: '#34D399', // green
+    color: '#10B981', // emerald-500
   },
   errorText: {
-    color: '#EF4444',
-    fontSize: 11,
+    color: '#F87171',
+    fontSize: 12,
+    fontWeight: '600',
   },
   emptyText: {
-    color: '#64748B',
-    fontSize: 11,
+    color: '#64748B', // slate-500
+    fontSize: 12,
     fontStyle: 'italic',
   },
 });

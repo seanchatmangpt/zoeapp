@@ -2,7 +2,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
 import { render, fireEvent } from '@testing-library/react-native';
-import { ProtectedRoute, PremiumReceiptBlockingScreen } from '../ProtectedRoute';
+import { ProtectedRoute, PremiumReceiptBlockingScreen, defaultResolveParticipant } from '../ProtectedRoute';
 import { useRouteAdmission } from '../../hooks/useRouteAdmission';
 
 const mockUseSession = jest.fn();
@@ -627,6 +627,357 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
       expect(getByText(/delta hash mismatch/)).toBeTruthy();
       expect(queryByText('Protected Content')).toBeNull();
     });
+
+    test('renders children if receipt exists in MMKV as hash only', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      const { mmkvInstance } = require('../../lib/store/mmkvStorage');
+      const mmkvSpy = jest.spyOn(mmkvInstance, 'getString').mockImplementation((key: any) => {
+        if (key === 'receipt_hash_cmd-hash-only') {
+          return 'hash-xyz';
+        }
+        return undefined;
+      });
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-hash-only',
+        requiredReceiptDeltaHash: 'hash-xyz',
+      };
+
+      let root: any;
+      await act(async () => {
+        root = renderer.create(
+          <ProtectedRoute route={route}>
+            <Text>Protected MMKV Hash Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(root.toJSON()).toEqual(
+        expect.objectContaining({
+          type: 'Text',
+          children: ['Protected MMKV Hash Content'],
+        })
+      );
+      mmkvSpy.mockRestore();
+    });
+
+    test('renders Refusal page with RECEIPT_HASH_MISMATCH when MMKV hash only mismatch', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      const { mmkvInstance } = require('../../lib/store/mmkvStorage');
+      const mmkvSpy = jest.spyOn(mmkvInstance, 'getString').mockImplementation((key: any) => {
+        if (key === 'receipt_hash_cmd-hash-only-mismatch') {
+          return 'wrong-hash';
+        }
+        return undefined;
+      });
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-hash-only-mismatch',
+        requiredReceiptDeltaHash: 'expected-correct-hash',
+      };
+
+      const { getByText, queryByText } = render(
+        <ProtectedRoute route={route}>
+          <Text>Protected Content</Text>
+        </ProtectedRoute>
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(getByText('Refusal Reason (RECEIPT_HASH_MISMATCH)')).toBeTruthy();
+      expect(queryByText('Protected Content')).toBeNull();
+
+      mmkvSpy.mockRestore();
+    });
+
+    test('renders children if receipt exists in SQLite without required delta hash', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      const { mmkvInstance } = require('../../lib/store/mmkvStorage');
+      const mmkvSpy = jest.spyOn(mmkvInstance, 'getString').mockReturnValue(undefined);
+
+      mockDbRecords = [{
+        commandId: 'cmd-db-nohash',
+        deltaHash: 'hash-abc',
+      }];
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-db-nohash',
+      };
+
+      let root: any;
+      await act(async () => {
+        root = renderer.create(
+          <ProtectedRoute route={route}>
+            <Text>Protected SQLite Content No Hash</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(root.toJSON()).toEqual(
+        expect.objectContaining({
+          type: 'Text',
+          children: ['Protected SQLite Content No Hash'],
+        })
+      );
+      mmkvSpy.mockRestore();
+    });
+
+    test('warns when subscribing to MMKV changes fails', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+
+      const { mmkvInstance } = require('../../lib/store/mmkvStorage');
+      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      
+      const mmkvListenerSpy = jest.spyOn(mmkvInstance, 'addOnValueChangedListener').mockImplementation(() => {
+        throw new Error('MMKV Listener Error');
+      });
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-mmkv-error',
+      };
+
+      await act(async () => {
+        renderer.create(
+          <ProtectedRoute route={route}>
+            <Text>Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Failed to subscribe to MMKV changes in ProtectedRoute:',
+        expect.any(Error)
+      );
+
+      consoleWarnSpy.mockRestore();
+      mmkvListenerSpy.mockRestore();
+    });
+
+    test('renders default loading indicator when loading is true and no loadingComponent is provided', () => {
+      mockUseSession.mockReturnValue({
+        session: null,
+        loading: true,
+      });
+
+      const route = { requiredIdentityBoundary: 'authenticated' };
+      let root: any;
+      act(() => {
+        root = renderer.create(
+          <ProtectedRoute route={route}>
+            <Text>Protected Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(JSON.stringify(root.toJSON())).toContain('ActivityIndicator');
+    });
+
+    test('renders fallback function output when receipt verification fails and fallback is function', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+      mockDbRecords = [];
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-receipt-fail',
+      };
+
+      const fallbackFn = (refusal: any) => (
+        <Text>Receipt Failed: {refusal.code}</Text>
+      );
+
+      let root: any;
+      await act(async () => {
+        root = renderer.create(
+          <ProtectedRoute route={route} fallback={fallbackFn}>
+            <Text>Protected Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(root.toJSON()).toEqual(
+        expect.objectContaining({
+          type: 'Text',
+          children: ['Receipt Failed: ', 'RECEIPT_NOT_FOUND'],
+        })
+      );
+    });
+
+    test('renders fallback component when receipt verification fails and fallback is node', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+      mockDbRecords = [];
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-receipt-fail',
+      };
+
+      let root: any;
+      await act(async () => {
+        root = renderer.create(
+          <ProtectedRoute route={route} fallback={<Text>Receipt Node Fallback</Text>}>
+            <Text>Protected Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(root.toJSON()).toEqual(
+        expect.objectContaining({
+          type: 'Text',
+          children: ['Receipt Node Fallback'],
+        })
+      );
+    });
+
+    test('triggers router redirect when Redirect button is pressed on receipt block screen', async () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+      mockLatestReceipt = null;
+      mockDbRecords = [];
+
+      const route = {
+        requiredIdentityBoundary: 'authenticated',
+        requiredReceiptCommandId: 'cmd-receipt-fail-redirect',
+      };
+
+      const { getByText } = render(
+        <ProtectedRoute route={route} redirectPath="/custom-cancel">
+          <Text>Protected Content</Text>
+        </ProtectedRoute>
+      );
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      const redirectBtn = getByText('Go to /custom-cancel');
+      fireEvent.press(redirectBtn);
+
+      expect(mockReplace).toHaveBeenCalledWith('/custom-cancel');
+    });
+
+    test('renders loadingComponent when checkingReceipt is true', () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+
+      const route = { requiredIdentityBoundary: 'authenticated', requiredReceiptCommandId: 'cmd-check' };
+      let root: any;
+      act(() => {
+        root = renderer.create(
+          <ProtectedRoute route={route} loadingComponent={<Text>Checking Receipt...</Text>}>
+            <Text>Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      expect(JSON.stringify(root.toJSON())).toContain('Checking Receipt...');
+    });
+
+    test('invokes verifyReceipt when onRetry is called on PremiumReceiptBlockingScreen during isChecking', () => {
+      mockUseSession.mockReturnValue({
+        session: { user: { id: '123' } },
+        loading: false,
+      });
+
+      const route = { requiredIdentityBoundary: 'authenticated', requiredReceiptCommandId: 'cmd-check-retry' };
+      let root: any;
+      act(() => {
+        root = renderer.create(
+          <ProtectedRoute route={route}>
+            <Text>Content</Text>
+          </ProtectedRoute>
+        );
+      });
+
+      const blockingScreen = root.root.findByType(PremiumReceiptBlockingScreen);
+      act(() => {
+        blockingScreen.props.onRetry();
+      });
+      expect(blockingScreen).toBeDefined();
+    });
+  });
+
+  describe('defaultResolveParticipant', () => {
+    test('handles unauthenticated session', () => {
+      expect(defaultResolveParticipant(null)).toEqual({
+        identityBoundary: 'anonymous',
+        disclosures: [],
+      });
+    });
+
+    test('extracts disclosures and identity boundaries correctly', () => {
+      const session = {
+        user: {
+          email_confirmed_at: '2023-01-01',
+          phone_confirmed_at: '2023-01-01',
+          factors: [{ id: 'factor1' }],
+          user_metadata: {
+            disclosures: ['age_over_18'],
+            accepted_terms: true,
+            identity_boundary: 'custom_boundary',
+          },
+        },
+      };
+      
+      const result = defaultResolveParticipant(session);
+      expect(result.identityBoundary).toBe('custom_boundary');
+      expect(result.disclosures).toContain('email_verified');
+      expect(result.disclosures).toContain('phone_verified');
+      expect(result.disclosures).toContain('age_over_18');
+      expect(result.disclosures).toContain('terms_accepted');
+    });
+
+    test('handles alternative metadata fields', () => {
+      const session = {
+        user: {
+          user_metadata: {
+            acceptedTerms: true,
+            identityBoundary: 'another_boundary',
+          },
+        },
+      };
+      
+      const result = defaultResolveParticipant(session);
+      expect(result.identityBoundary).toBe('another_boundary');
+      expect(result.disclosures).toContain('terms_accepted');
+    });
   });
 
   describe('useRouteAdmission Hook', () => {
@@ -816,6 +1167,52 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
       expect(getByText('Verified ✅')).toBeTruthy();
       expect(queryByText('Unverified ❌')).toBeNull();
       expect(queryByText('Checking...')).toBeNull();
+    });
+  });
+
+  describe('defaultResolveParticipant', () => {
+    test('handles unauthenticated session', () => {
+      expect(defaultResolveParticipant(null)).toEqual({
+        identityBoundary: 'anonymous',
+        disclosures: [],
+      });
+    });
+
+    test('extracts disclosures and identity boundaries correctly', () => {
+      const session = {
+        user: {
+          email_confirmed_at: '2023-01-01',
+          phone_confirmed_at: '2023-01-01',
+          factors: [{ id: 'factor1' }],
+          user_metadata: {
+            disclosures: ['age_over_18'],
+            accepted_terms: true,
+            identity_boundary: 'custom_boundary',
+          },
+        },
+      };
+      
+      const result = defaultResolveParticipant(session);
+      expect(result.identityBoundary).toBe('custom_boundary');
+      expect(result.disclosures).toContain('email_verified');
+      expect(result.disclosures).toContain('phone_verified');
+      expect(result.disclosures).toContain('age_over_18');
+      expect(result.disclosures).toContain('terms_accepted');
+    });
+
+    test('handles alternative metadata fields', () => {
+      const session = {
+        user: {
+          user_metadata: {
+            acceptedTerms: true,
+            identityBoundary: 'another_boundary',
+          },
+        },
+      };
+      
+      const result = defaultResolveParticipant(session);
+      expect(result.identityBoundary).toBe('another_boundary');
+      expect(result.disclosures).toContain('terms_accepted');
     });
   });
 });

@@ -295,32 +295,27 @@ describe('Auth (Secure Gateway) Component', () => {
     const passwordContainer = getByTestId('password-input-container');
 
     // 1. Email container default border state
-    expect(emailContainer.props.className).toContain('border-gray-200');
+    expect(emailContainer.props.className).toContain('border-slate-200');
     expect(emailContainer.props.className).not.toContain('border-indigo-600');
+// 2. Email container focused border state
+fireEvent(emailInput, 'focus');
+expect(emailContainer.props.className).toContain('border-indigo-500');
+expect(emailContainer.props.className).not.toContain('border-slate-200');
 
-    // 2. Email container focused border state
-    fireEvent(emailInput, 'focus');
-    expect(emailContainer.props.className).toContain('border-indigo-600');
-    expect(emailContainer.props.className).not.toContain('border-gray-200');
+// 3. Email container blurred border state
+fireEvent(emailInput, 'blur');
+expect(emailContainer.props.className).toContain('border-slate-200');
+expect(emailContainer.props.className).not.toContain('border-indigo-500');
 
-    // 3. Email container blurred border state
-    fireEvent(emailInput, 'blur');
-    expect(emailContainer.props.className).toContain('border-gray-200');
-    expect(emailContainer.props.className).not.toContain('border-indigo-600');
+// 4. Password container focused border state
+fireEvent(passwordInput, 'focus');
+expect(passwordContainer.props.className).toContain('border-indigo-500');
+expect(passwordContainer.props.className).not.toContain('border-slate-200');
 
-    // 4. Password container default border state
-    expect(passwordContainer.props.className).toContain('border-gray-200');
-    expect(passwordContainer.props.className).not.toContain('border-indigo-600');
-
-    // 5. Password container focused border state
-    fireEvent(passwordInput, 'focus');
-    expect(passwordContainer.props.className).toContain('border-indigo-600');
-    expect(passwordContainer.props.className).not.toContain('border-gray-200');
-
-    // 6. Password container blurred border state
+    // 5. Password container blurred border state
     fireEvent(passwordInput, 'blur');
-    expect(passwordContainer.props.className).toContain('border-gray-200');
-    expect(passwordContainer.props.className).not.toContain('border-indigo-600');
+    expect(passwordContainer.props.className).toContain('border-slate-200');
+    expect(passwordContainer.props.className).not.toContain('border-indigo-500');
   });
 
   test('should toggle password secure text entry visibility', () => {
@@ -418,5 +413,81 @@ describe('Auth (Secure Gateway) Component', () => {
       fireEvent.press(submitBtn);
     });
     expect(getByText('Verification link sent! Check your email.')).toBeTruthy();
+  });
+
+  test('should handle missing fields directly and unexpected errors in sign-in', async () => {
+    const { getByText } = render(<Auth />);
+    const submitBtn = getPressableNode(getByText, 'Establish Secure Session');
+    
+    // forcefully call onPress to simulate missing fields bypassing disabled state
+    await act(async () => {
+      submitBtn.props.onPress();
+    });
+    expect(getByText('Please fill in all fields')).toBeTruthy();
+
+    // Now test unexpected exception
+    const { getByPlaceholderText: getByPlaceholderText2, getByText: getByText2 } = render(<Auth />);
+    const emailInput = getByPlaceholderText2('your@email.com');
+    const passwordInput = getByPlaceholderText2('Enter your password');
+    
+    fireEvent.changeText(emailInput, 'user@example.com');
+    fireEvent.changeText(passwordInput, 'pass');
+    
+    mockSignInWithPassword.mockRejectedValueOnce(new Error('Network failure'));
+    
+    const submitBtn2 = getPressableNode(getByText2, 'Establish Secure Session');
+    await act(async () => {
+      fireEvent.press(submitBtn2);
+    });
+    expect(getByText2('Network failure')).toBeTruthy();
+  });
+
+  test('should handle missing fields directly, auth error, and unexpected errors in sign-up', async () => {
+    const { getByText, getByPlaceholderText } = render(<Auth />);
+    const toggleBtn = getByText("Don't have an account? Sign Up");
+    fireEvent.press(toggleBtn);
+
+    const submitBtn = getPressableNode(getByText, 'Initialize Registration');
+    
+    // forcefully call onPress for missing fields
+    await act(async () => {
+      submitBtn.props.onPress();
+    });
+    expect(getByText('Please fill in all fields')).toBeTruthy();
+
+    // Now test returned auth error
+    const emailInput = getByPlaceholderText('your@email.com');
+    const passwordInput = getByPlaceholderText('Minimum 6 characters');
+    fireEvent.changeText(emailInput, 'dev@truex.io');
+    fireEvent.changeText(passwordInput, 'Abcdef1!');
+
+    mockSignUp.mockResolvedValueOnce({ error: { message: 'Email already in use' } });
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+    expect(getByText('Email already in use')).toBeTruthy();
+
+    // Now test unexpected exception
+    mockSignUp.mockRejectedValueOnce(new Error('Sign up exploded'));
+    await act(async () => {
+      fireEvent.press(submitBtn);
+    });
+    expect(getByText('Sign up exploded')).toBeTruthy();
+  });
+
+  test('should clear email input when clear button is pressed', () => {
+    const { getByPlaceholderText, getByTestId, queryByTestId } = render(<Auth />);
+    const emailInput = getByPlaceholderText('your@email.com');
+    
+    expect(queryByTestId('clear-email-button')).toBeNull();
+
+    fireEvent.changeText(emailInput, 'test@example.com');
+    expect(emailInput.props.value).toBe('test@example.com');
+    
+    const clearBtn = getByTestId('clear-email-button');
+    expect(clearBtn).toBeTruthy();
+
+    fireEvent.press(clearBtn);
+    expect(emailInput.props.value).toBe('');
   });
 });

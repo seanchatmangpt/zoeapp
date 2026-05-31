@@ -1,47 +1,63 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useActorOpsStore } from '../../lib/actor/actorOps';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 interface PermissionGateProps {
   allowedRoles: string[];
   children: React.ReactNode;
   fallback?: React.ReactNode;
+  testID?: string;
 }
 
-export function PermissionGate({ allowedRoles, children, fallback }: PermissionGateProps) {
+export function PermissionGate({ allowedRoles, children, fallback, testID }: PermissionGateProps) {
   const { currentPrincipal } = useActorOpsStore();
 
   const isAllowed = allowedRoles.includes(currentPrincipal.role);
 
   if (!isAllowed) {
     if (fallback !== undefined) {
-      return <>{fallback}</>;
+      return <View testID={testID}>{fallback}</View>;
     }
     return (
-      <View style={styles.container}>
+      <View style={styles.container} testID={testID}>
+        <FontAwesome name="lock" size={24} color="#F87171" style={styles.icon} />
+        <Text style={styles.errorTitle}>Access Restricted</Text>
         <Text style={styles.errorText}>
-          Permission Denied: Requires role in [{allowedRoles.join(', ')}]. Active role is '{currentPrincipal.role}'.
+          Requires one of: [{allowedRoles.join(', ')}]{'\n'}
+          Current role: {currentPrincipal.role}
         </Text>
       </View>
     );
   }
 
-  return <>{children}</>;
+  return <View testID={testID}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'rgba(239, 68, 68, 0.08)',
-    borderRadius: 8,
+    backgroundColor: '#451A1A', // red-900 / darker
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.2)',
-    padding: 12,
+    borderColor: '#7F1D1D', // red-800
+    padding: 16,
     marginVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    marginBottom: 8,
+  },
+  errorTitle: {
+    color: '#FCA5A5', // red-300
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   errorText: {
-    color: '#F87171',
+    color: '#FECACA', // red-200
     fontSize: 12,
-    fontWeight: 'bold',
     textAlign: 'center',
+    lineHeight: 18,
   },
 });

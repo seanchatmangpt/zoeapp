@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Pressable, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
@@ -7,6 +7,11 @@ import { useSession } from '../../../context/SessionProvider';
 import { useActorOpsStore } from '../../lib/actor/actorOps';
 import { mmkvInstance } from '../../lib/store/mmkvStorage';
 import { Ionicons } from '@expo/vector-icons';
+const Switch = ({ active, colorClass }: { active: boolean; colorClass: string }) => (
+  <View className={`w-12 h-7 rounded-full p-1 justify-center ${active ? colorClass : 'bg-slate-700/80 border border-slate-600/50'}`}>
+    <View className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-transform duration-200 ${active ? 'translate-x-5' : 'translate-x-0'}`} />
+  </View>
+);
 
 export default function AdminSettings() {
   const { session } = useSession();
@@ -136,7 +141,6 @@ export default function AdminSettings() {
 
   const handleSeedSandboxData = () => {
     try {
-      // Seeds some mock debug parameters into MMKV to test state persistence
       mmkvInstance.set('sandbox_seeded_at', new Date().toISOString());
       mmkvInstance.set('sandbox_tenant_ref', 'tenant-test-override-999');
       mmkvInstance.set('sandbox_sync_facade', 'Supabase Realtime CDC Facade');
@@ -147,84 +151,75 @@ export default function AdminSettings() {
     }
   };
 
+
+
   return (
     <AdminShell title="System Settings" subtitle="Admin panel parameters and configurations">
       
       {/* SECTION 1: Authentication Context */}
       <AdminCard title="Authentication Context" subtitle="Active session properties">
-        <View className="mb-4">
-          <View style={styles.row} className="border-b border-slate-700/50 py-2">
-            <Text style={styles.label}>Principal User</Text>
-            <Text style={styles.val}>{session?.user?.email || 'N/A'}</Text>
+        <View className="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden">
+          <View className="flex-row justify-between items-center p-3.5 border-b border-slate-700/50">
+            <Text className="text-slate-400 text-sm font-medium">Principal User</Text>
+            <Text className="text-slate-200 text-sm font-semibold">{session?.user?.email || 'N/A'}</Text>
           </View>
-          <View style={styles.row} className="border-b border-slate-700/50 py-2">
-            <Text style={styles.label}>User UUID</Text>
-            <Text style={styles.valMono}>{session?.user?.id || 'N/A'}</Text>
+          <View className="flex-row justify-between items-center p-3.5 border-b border-slate-700/50">
+            <Text className="text-slate-400 text-sm font-medium">User UUID</Text>
+            <Text className="text-slate-300 text-xs font-mono">{session?.user?.id || 'N/A'}</Text>
           </View>
-          <View style={styles.row} className="py-2">
-            <Text style={styles.label}>Auth Confirmed</Text>
-            <Text style={styles.val}>{session?.user?.email_confirmed_at ? 'Yes' : 'No'}</Text>
+          <View className="flex-row justify-between items-center p-3.5">
+            <Text className="text-slate-400 text-sm font-medium">Auth Confirmed</Text>
+            <View className={`px-2.5 py-1 rounded-md ${session?.user?.email_confirmed_at ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-rose-500/10 border border-rose-500/20'}`}>
+              <Text className={`text-xs font-bold ${session?.user?.email_confirmed_at ? 'text-emerald-500' : 'text-rose-500'}`}>
+                {session?.user?.email_confirmed_at ? 'Yes' : 'No'}
+              </Text>
+            </View>
           </View>
         </View>
       </AdminCard>
 
       {/* SECTION 2: Local Storage & Sync Engine */}
       <AdminCard title="Engine Configurations" subtitle="Zoe Multi-tenant Boundaries & Sync Settings">
-        <View className="mb-2">
+        <View className="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden">
           
-          {/* Custom Switch: SQLite WAL Mode */}
-          <Pressable onPress={toggleWalMode} className="flex-row justify-between items-center py-3 border-b border-slate-700/50">
+          <Pressable onPress={toggleWalMode} className="flex-row justify-between items-center p-4 border-b border-slate-700/50 active:bg-slate-700/30">
             <View className="flex-1 pr-4">
               <Text className="text-slate-200 font-semibold text-sm">SQLite WAL Mode</Text>
-              <Text className="text-slate-400 text-xs mt-0.5">Enable write-ahead logging database speedups</Text>
+              <Text className="text-slate-400 text-xs mt-1">Enable write-ahead logging database speedups</Text>
             </View>
-            <View className={`w-11 h-6 rounded-full p-0.5 ${walMode ? 'bg-blue-500' : 'bg-slate-600'}`}>
-              <View className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${walMode ? 'translate-x-5' : 'translate-x-0'}`} />
-            </View>
+            <Switch active={walMode} colorClass="bg-blue-500" />
           </Pressable>
 
-          {/* Custom Switch: Network Online Simulation */}
-          <Pressable onPress={() => setNetworkOnline(!networkOnline)} className="flex-row justify-between items-center py-3 border-b border-slate-700/50">
+          <Pressable onPress={() => setNetworkOnline(!networkOnline)} className="flex-row justify-between items-center p-4 border-b border-slate-700/50 active:bg-slate-700/30">
             <View className="flex-1 pr-4">
               <Text className="text-slate-200 font-semibold text-sm">Network Simulator</Text>
-              <Text className="text-slate-400 text-xs mt-0.5">Simulate offline state for testing synchronization outbox</Text>
+              <Text className="text-slate-400 text-xs mt-1">Simulate offline state for testing synchronization outbox</Text>
             </View>
-            <View className={`w-11 h-6 rounded-full p-0.5 ${networkOnline ? 'bg-blue-500' : 'bg-slate-600'}`}>
-              <View className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${networkOnline ? 'translate-x-5' : 'translate-x-0'}`} />
-            </View>
+            <Switch active={networkOnline} colorClass="bg-emerald-500" />
           </Pressable>
 
-          {/* Custom Switch: Remote Reject Simulation */}
-          <Pressable onPress={() => setRemoteRejectActive(!remoteRejectActive)} className="flex-row justify-between items-center py-3 border-b border-slate-700/50">
+          <Pressable onPress={() => setRemoteRejectActive(!remoteRejectActive)} className="flex-row justify-between items-center p-4 border-b border-slate-700/50 active:bg-slate-700/30">
             <View className="flex-1 pr-4">
               <Text className="text-slate-200 font-semibold text-sm">Remote Rejections</Text>
-              <Text className="text-slate-400 text-xs mt-0.5">Simulate conflicts by rejecting incoming server actions</Text>
+              <Text className="text-slate-400 text-xs mt-1">Simulate conflicts by rejecting incoming server actions</Text>
             </View>
-            <View className={`w-11 h-6 rounded-full p-0.5 ${remoteRejectActive ? 'bg-red-500' : 'bg-slate-600'}`}>
-              <View className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${remoteRejectActive ? 'translate-x-5' : 'translate-x-0'}`} />
-            </View>
+            <Switch active={remoteRejectActive} colorClass="bg-rose-500" />
           </Pressable>
 
-          {/* Custom Switch: Verbose logging */}
-          <Pressable onPress={toggleVerboseLogs} className="flex-row justify-between items-center py-3 border-b border-slate-700/50">
+          <Pressable onPress={toggleVerboseLogs} className="flex-row justify-between items-center p-4 border-b border-slate-700/50 active:bg-slate-700/30">
             <View className="flex-1 pr-4">
               <Text className="text-slate-200 font-semibold text-sm">Verbose Sync Logging</Text>
-              <Text className="text-slate-400 text-xs mt-0.5">Output sync logs to serial terminal</Text>
+              <Text className="text-slate-400 text-xs mt-1">Output sync logs to serial terminal</Text>
             </View>
-            <View className={`w-11 h-6 rounded-full p-0.5 ${verboseLogs ? 'bg-blue-500' : 'bg-slate-600'}`}>
-              <View className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${verboseLogs ? 'translate-x-5' : 'translate-x-0'}`} />
-            </View>
+            <Switch active={verboseLogs} colorClass="bg-purple-500" />
           </Pressable>
 
-          {/* Custom Switch: Supervision Restart */}
-          <Pressable onPress={toggleSupervisionRestart} className="flex-row justify-between items-center py-3">
+          <Pressable onPress={toggleSupervisionRestart} className="flex-row justify-between items-center p-4 active:bg-slate-700/30">
             <View className="flex-1 pr-4">
               <Text className="text-slate-200 font-semibold text-sm">Supervision Auto-Restart</Text>
-              <Text className="text-slate-400 text-xs mt-0.5">Restart syncing threads on driver crash events</Text>
+              <Text className="text-slate-400 text-xs mt-1">Restart syncing threads on driver crash events</Text>
             </View>
-            <View className={`w-11 h-6 rounded-full p-0.5 ${supervisionRestart ? 'bg-blue-500' : 'bg-slate-600'}`}>
-              <View className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${supervisionRestart ? 'translate-x-5' : 'translate-x-0'}`} />
-            </View>
+            <Switch active={supervisionRestart} colorClass="bg-blue-500" />
           </Pressable>
 
         </View>
@@ -232,79 +227,77 @@ export default function AdminSettings() {
 
       {/* SECTION 3: Diagnostic Reset Actions */}
       <AdminCard title="Diagnostics Console & Resets" subtitle="Direct memory modifications & debug tools">
-        <View className="mb-2 flex-row justify-between items-center border-b border-slate-700/50 pb-3">
-          <Text className="text-slate-300 text-sm font-semibold">MMKV Storage Keys</Text>
-          <View className="bg-slate-800 rounded px-2.5 py-0.5">
+        
+        <View className="flex-row justify-between items-center bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/50 mb-4">
+          <View className="flex-row items-center space-x-2">
+            <Ionicons name="server-outline" size={16} color="#94A3B8" />
+            <Text className="text-slate-300 text-sm font-semibold">MMKV Storage Keys</Text>
+          </View>
+          <View className="bg-blue-500/20 px-3 py-1 rounded-md border border-blue-500/30">
             <Text className="text-xs font-bold text-blue-400">{mmkvKeysCount}</Text>
           </View>
         </View>
 
-        <View className="space-y-3 mt-4">
+        <View className="space-y-3">
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={handleSeedSandboxData}
-            className="w-full bg-blue-600/20 active:bg-blue-600/30 border border-blue-500/40 rounded-xl py-3 px-4 flex-row items-center justify-between mb-3">
-            <View className="flex-row items-center">
-              <Ionicons name="flask-outline" size={18} color="#60A5FA" style={{ marginRight: 10 }} />
-              <Text className="text-blue-200 font-semibold text-sm">Seed Sandbox Parameters</Text>
+            className="w-full bg-slate-800/80 active:bg-slate-700/80 border border-slate-700 rounded-xl py-3.5 px-4 flex-row items-center justify-between"
+          >
+            <View className="flex-row items-center space-x-3">
+              <View className="w-8 h-8 rounded-full bg-blue-500/10 items-center justify-center">
+                <Ionicons name="flask-outline" size={16} color="#60A5FA" />
+              </View>
+              <Text className="text-slate-200 font-semibold text-sm">Seed Sandbox Parameters</Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#60A5FA" />
+            <Ionicons name="chevron-forward" size={16} color="#64748B" />
           </TouchableOpacity>
 
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={handleResetZustand}
-            className="w-full bg-blue-600/20 active:bg-blue-600/30 border border-blue-500/40 rounded-xl py-3 px-4 flex-row items-center justify-between mb-3">
-            <View className="flex-row items-center">
-              <Ionicons name="refresh-outline" size={18} color="#60A5FA" style={{ marginRight: 10 }} />
-              <Text className="text-blue-200 font-semibold text-sm">Reset Local Zustand Stores</Text>
+            className="w-full bg-slate-800/80 active:bg-slate-700/80 border border-slate-700 rounded-xl py-3.5 px-4 flex-row items-center justify-between"
+          >
+            <View className="flex-row items-center space-x-3">
+              <View className="w-8 h-8 rounded-full bg-purple-500/10 items-center justify-center">
+                <Ionicons name="refresh-outline" size={16} color="#A78BFA" />
+              </View>
+              <Text className="text-slate-200 font-semibold text-sm">Reset Local Zustand Stores</Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#60A5FA" />
+            <Ionicons name="chevron-forward" size={16} color="#64748B" />
           </TouchableOpacity>
 
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={handleClearAsyncStorage}
-            className="w-full bg-red-500/10 active:bg-red-500/25 border border-red-500/30 rounded-xl py-3 px-4 flex-row items-center justify-between mb-3">
-            <View className="flex-row items-center">
-              <Ionicons name="trash-bin-outline" size={18} color="#EF4444" style={{ marginRight: 10 }} />
-              <Text className="text-red-300 font-semibold text-sm">Wipe AsyncStorage Cache</Text>
+            className="w-full bg-slate-800/80 active:bg-slate-700/80 border border-slate-700 rounded-xl py-3.5 px-4 flex-row items-center justify-between"
+          >
+            <View className="flex-row items-center space-x-3">
+              <View className="w-8 h-8 rounded-full bg-orange-500/10 items-center justify-center">
+                <Ionicons name="trash-bin-outline" size={16} color="#FB923C" />
+              </View>
+              <Text className="text-slate-200 font-semibold text-sm">Wipe AsyncStorage Cache</Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#EF4444" />
+            <Ionicons name="chevron-forward" size={16} color="#64748B" />
           </TouchableOpacity>
 
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={handleClearMMKV}
-            className="w-full bg-red-500/10 active:bg-red-500/25 border border-red-500/30 rounded-xl py-3 px-4 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <Ionicons name="trash-bin-outline" size={18} color="#EF4444" style={{ marginRight: 10 }} />
-              <Text className="text-red-300 font-semibold text-sm">Wipe MMKV Cache Storage</Text>
+            className="w-full bg-rose-500/10 active:bg-rose-500/20 border border-rose-500/30 rounded-xl py-3.5 px-4 flex-row items-center justify-between"
+          >
+            <View className="flex-row items-center space-x-3">
+              <View className="w-8 h-8 rounded-full bg-rose-500/20 items-center justify-center">
+                <Ionicons name="warning-outline" size={16} color="#F43F5E" />
+              </View>
+              <Text className="text-rose-400 font-bold text-sm">Wipe MMKV Cache Storage</Text>
             </View>
-            <Ionicons name="chevron-forward" size={16} color="#EF4444" />
+            <Ionicons name="chevron-forward" size={16} color="#F43F5E" />
           </TouchableOpacity>
         </View>
+
       </AdminCard>
 
     </AdminShell>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  label: {
-    color: '#94A3B8',
-    fontSize: 13,
-  },
-  val: {
-    color: '#F8FAFC',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  valMono: {
-    color: '#F8FAFC',
-    fontSize: 11,
-    fontFamily: 'SpaceMono',
-  },
-});
-

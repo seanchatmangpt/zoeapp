@@ -19,16 +19,22 @@ jest.mock('@/src/components/AvatarRelativeProjection', () => {
 });
 
 // Mock SessionProvider
-jest.mock('@/context/SessionProvider', () => ({
-  useSession: () => ({
+jest.mock('@/context/SessionProvider', () => {
+  const mockFn = jest.fn().mockReturnValue({
     session: {
       user: {
         id: 'test-user-uuid',
         email: 'test@example.com',
       },
     },
-  }),
-}));
+  });
+  return {
+    useSession: mockFn,
+  };
+});
+
+import { useSession } from '@/context/SessionProvider';
+const mockUseSession = useSession as any;
 
 // Mock Supabase client
 jest.mock('@/lib/supabase', () => {
@@ -50,9 +56,14 @@ jest.mock('@/lib/supabase', () => {
     return {};
   });
 
+  const mockSignOut = jest.fn();
+
   return {
     supabase: {
       from: mockFrom,
+      auth: {
+        signOut: mockSignOut,
+      },
     },
   };
 });
@@ -130,11 +141,20 @@ describe('Account Tab Dashboard Unit Tests', () => {
       status: 200,
     });
     mockUpsertSpy.mockResolvedValue({ error: null });
+    mockUseSession.mockReturnValue({
+      session: {
+        user: {
+          id: 'test-user-uuid',
+          email: 'test@example.com',
+        },
+      },
+      loading: false,
+    });
 
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
       if (buttons && buttons.length > 0) {
         const confirmButton = buttons.find(
-          (btn) => btn.text === 'Clear All' || btn.text === 'Reset Store State' || btn.text === 'Clear'
+          (btn) => btn.text === 'Clear All' || btn.text === 'Reset Store State' || btn.text === 'Clear' || btn.text === 'Sign Out'
         );
         if (confirmButton && confirmButton.onPress) {
           confirmButton.onPress();
@@ -361,5 +381,151 @@ describe('Account Tab Dashboard Unit Tests', () => {
     });
 
     clearSpy.mockRestore();
+  });
+
+  test('should handle profile load errors (status != 406) and alert', async () => {
+    mockSingleSpy.mockResolvedValueOnce({
+      data: null,
+      error: new Error('Database connection failed'),
+      status: 500,
+    });
+    
+    render(<Account />);
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Error loading profile', 'Database connection failed');
+    });
+  });
+
+  test('should handle refreshMMKVKeyCount error', async () => {
+    const { getByTestId } = render(<Account />);
+    await waitFor(() => {
+      expect(getByTestId('toggle-dark-mode')).toBeTruthy();
+    });
+
+    (mmkvInstance.getAllKeys as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('MMKV read failed');
+    });
+
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    fireEvent.press(getByTestId('toggle-dark-mode'));
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.any(Error));
+    warnSpy.mockRestore();
+  });
+
+  test('should handle update profile error when session user is missing', async () => {
+    mockUseSession.mockReturnValue({ session: { user: null }, loading: false });
+    
+    const { getByTestId } = render(<Account />);
+    await waitFor(() => {
+      expect(getByTestId('save-profile-button')).toBeTruthy();
+    });
+    
+    await act(async () => {
+      fireEvent.press(getByTestId('save-profile-button'));
+    });
+    
+    expect(alertSpy).toHaveBeenCalledWith('Error updating profile', 'No user on the session!');
+  });
+
+  test('should handle update profile error from supabase', async () => {
+    mockUpsertSpy.mockResolvedValueOnce({ error: new Error('Upsert failed') });
+    
+    const { getByTestId } = render(<Account />);
+    await waitFor(() => {
+      expect(getByTestId('save-profile-button')).toBeTruthy();
+    });
+    
+    await act(async () => {
+      fireEvent.press(getByTestId('save-profile-button'));
+    });
+    
+    expect(alertSpy).toHaveBeenCalledWith('Error updating profile', 'Upsert failed');
+  });
+
+  test('should handle getInitials falling back to email or ??', async () => {
+    mockSingleSpy.mockResolvedValueOnce({
+      data: { username: '', website: '', avatar_url: '' },
+      error: null,
+      status: 200,
+    });
+    
+    const { getByText, rerender } = render(<Account />);
+    
+    await waitFor(() => {
+      expect(getByText('TE')).toBeTruthy();
+    });
+
+    mockUseSession.mockReturnValue({ session: { user: { id: 'test-user-uuid', email: '' } }, loading: false });
+    
+    mockSingleSpy.mockResolvedValueOnce({
+      data: { username: '', website: '', avatar_url: '' },
+      error: null,
+      status: 200,
+    });
+    
+    rerender(<Account />);
+    
+    await waitFor(() => {
+      expect(getByText('??')).toBeTruthy();
+    });
+  });
+
+  test('should handle developer tool errors', async () => {
+    const { getByTestId } = render(<Account />);
+    await waitFor(() => {
+      expect(getByTestId('clear-mmkv-button')).toBeTruthy();
+    });
+
+    (mmkvInstance.clearAll as any).mockImplementationOnce(() => {
+      throw new Error('clearAll failed');
+    });
+    fireEvent.press(getByTestId('clear-mmkv-button'));
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'clearAll failed');
+
+    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
+    mockSetNetworkOnline.mockImplementationOnce(() => {
+      throw new Error('reset failed');
+    });
+    fireEvent.press(getByTestId('reset-zustand-button'));
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'reset failed');
+
+    const clearSpy = jest.spyOn(AsyncStorage, 'clear').mockRejectedValueOnce(new Error('async clear failed'));
+    fireEvent.press(getByTestId('clear-async-storage-button'));
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Error', 'async clear failed');
+    });
+    clearSpy.mockRestore();
+  });
+
+  test('should handle image fallback on error', async () => {
+    const { getByTestId, getByText } = render(<Account />);
+    await waitFor(() => {
+      expect(getByTestId('avatar-image')).toBeTruthy();
+    });
+    
+    fireEvent(getByTestId('avatar-image'), 'onError');
+    
+    await waitFor(() => {
+      expect(getByText('IN')).toBeTruthy();
+    });
+  });
+
+  test('should handle Sign Out', async () => {
+    const { getByText } = render(<Account />);
+    await waitFor(() => {
+      expect(getByText('Sign Out')).toBeTruthy();
+    });
+
+    fireEvent.press(getByText('Sign Out'));
+
+    const mockSignOut = supabase.auth.signOut;
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      expect.any(Array)
+    );
+    expect(mockSignOut).toHaveBeenCalled();
   });
 });

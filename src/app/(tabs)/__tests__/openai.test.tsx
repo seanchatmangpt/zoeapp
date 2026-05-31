@@ -508,4 +508,245 @@ describe('OpenAIAvatarRelativeProjection Component', () => {
       Platform.OS = originalPlatform;
     }
   });
+
+  test('CodeBlock renders comments and values correctly', async () => {
+    const { supabase } = require('@/lib/supabase');
+    supabase.functions.invoke.mockResolvedValueOnce({
+      data: { message: '```javascript\n// This is a comment\nconst val = 42;\nconst b = true;\n```' },
+      error: null,
+    });
+
+    const { getByPlaceholderText, getByTestId, getByText } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Show code');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    await waitFor(() => {
+      expect(getByText('// This is a comment')).toBeTruthy();
+      expect(getByText('42')).toBeTruthy();
+      expect(getByText('true')).toBeTruthy();
+    });
+  });
+
+  test('copyToClipboard succeeds on Web when navigator.clipboard is available', async () => {
+    const { Platform } = require('react-native');
+    const originalPlatform = Platform.OS;
+    Platform.OS = 'web';
+    
+    const originalNavigator = global.navigator;
+    try {
+      const mockWriteText = jest.fn().mockResolvedValue(undefined);
+      Object.defineProperty(global, 'navigator', {
+        value: { clipboard: { writeText: mockWriteText } },
+        writable: true,
+        configurable: true,
+      });
+
+      const { getByText } = render(<OpenAIAvatarRelativeProjection />);
+      await waitFor(() => {
+        expect(getByText(/Hello! I am your AI assistant/)).toBeTruthy();
+      });
+
+      const copyButton = getByText('Copy');
+
+      await act(async () => {
+        fireEvent.press(copyButton);
+      });
+
+      expect(mockWriteText).toHaveBeenCalled();
+      expect(alertSpy).toHaveBeenCalledWith('Copied', 'Code copied to clipboard!');
+    } finally {
+      Object.defineProperty(global, 'navigator', {
+        value: originalNavigator,
+        writable: true,
+        configurable: true,
+      });
+      Platform.OS = originalPlatform;
+    }
+  });
+
+  test('copyToClipboard catches error when setString fails', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    clipboardSpy.mockImplementationOnce(() => { throw new Error('Clipboard failed'); });
+
+    const { getByText } = render(<OpenAIAvatarRelativeProjection />);
+    await waitFor(() => {
+      expect(getByText(/Hello! I am your AI assistant/)).toBeTruthy();
+    });
+
+    const copyButton = getByText('Copy');
+
+    await act(async () => {
+      fireEvent.press(copyButton);
+    });
+
+    expect(errorSpy).toHaveBeenCalledWith('Failed to copy to clipboard', expect.any(Error));
+    errorSpy.mockRestore();
+  });
+
+  test('MarkdownRenderer renders bullet points correctly', async () => {
+    const { supabase } = require('@/lib/supabase');
+    supabase.functions.invoke.mockResolvedValueOnce({
+      data: { message: '- First bullet\n* Second bullet\n• Third bullet' },
+      error: null,
+    });
+
+    const { getByPlaceholderText, getByTestId, getByText } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Show bullets');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    await waitFor(() => {
+      expect(getByText('First bullet')).toBeTruthy();
+      expect(getByText('Second bullet')).toBeTruthy();
+      expect(getByText('Third bullet')).toBeTruthy();
+    });
+  });
+
+  test('loadUserProfile handles supabase error', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const { supabase } = require('@/lib/supabase');
+    supabase.from().select().eq().single.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'profile error' },
+    });
+
+    render(<OpenAIAvatarRelativeProjection />);
+    
+    await waitFor(() => {
+      expect(warnSpy).toHaveBeenCalledWith('Error fetching avatar profile details:', 'profile error');
+    });
+    warnSpy.mockRestore();
+  });
+
+  test('loadUserProfile uses email initials if username is empty', async () => {
+    const { supabase } = require('@/lib/supabase');
+    supabase.from().select().eq().single.mockResolvedValueOnce({
+      data: { username: '' },
+      error: null,
+    });
+
+    const { getByPlaceholderText, getByTestId, getByText } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Hello');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    await waitFor(() => {
+      expect(getByText('TE')).toBeTruthy();
+    });
+  });
+
+  test('loadUserProfile catches exceptions during fetch', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const { supabase } = require('@/lib/supabase');
+    supabase.from().select().eq().single.mockRejectedValueOnce(new Error('Network failure'));
+
+    render(<OpenAIAvatarRelativeProjection />);
+
+    await waitFor(() => {
+      expect(warnSpy).toHaveBeenCalledWith('Could not fetch user avatar profile details:', expect.any(Error));
+    });
+    warnSpy.mockRestore();
+  });
+
+  test('callOpenAIFunction shows alert for empty prompt', async () => {
+    const { getByPlaceholderText, getByTestId } = render(<OpenAIAvatarRelativeProjection />);
+    
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+    
+    // Set a value so disabled is false
+    fireEvent.changeText(input, 'valid prompt');
+
+    const originalTrim = String.prototype.trim;
+    let mockTrimActive = false;
+    String.prototype.trim = function(this: string) {
+      if (mockTrimActive && this.toString() === 'valid prompt') {
+        return '';
+      }
+      return originalTrim.apply(this);
+    };
+
+    try {
+      mockTrimActive = true;
+      await act(async () => {
+        fireEvent.press(sendButton);
+      });
+
+      expect(alertSpy).toHaveBeenCalledWith('Please enter a prompt');
+    } finally {
+      String.prototype.trim = originalTrim;
+    }
+  });
+
+  test('callOpenAIFunction handles invoke exception', async () => {
+    const { supabase } = require('@/lib/supabase');
+    supabase.functions.invoke.mockRejectedValueOnce(new Error('Network timeout'));
+
+    const { getByPlaceholderText, getByTestId } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Trigger error');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Error', 'Network timeout');
+    });
+  });
+
+  test('callOpenAIFunction avoids setting state if unmounted during exception', async () => {
+    const { supabase } = require('@/lib/supabase');
+    let rejectInvoke: any;
+    const invokePromise = new Promise((_, reject) => {
+      rejectInvoke = reject;
+    });
+    supabase.functions.invoke.mockImplementationOnce(() => invokePromise);
+
+    const { getByPlaceholderText, getByTestId, unmount } = render(
+      <OpenAIAvatarRelativeProjection />
+    );
+
+    const input = getByPlaceholderText('Ask AI anything...');
+    const sendButton = getByTestId('send-button');
+
+    fireEvent.changeText(input, 'Test unmount exception');
+    await act(async () => {
+      fireEvent.press(sendButton);
+    });
+
+    unmount();
+
+    await act(async () => {
+      rejectInvoke(new Error('Rejected late'));
+    });
+
+    expect(alertSpy).not.toHaveBeenCalledWith('Error', 'Rejected late');
+  });
 });

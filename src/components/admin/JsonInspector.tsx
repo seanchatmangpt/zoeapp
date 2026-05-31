@@ -4,9 +4,10 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 interface JsonInspectorProps {
   data: any;
   title?: string;
+  testID?: string;
 }
 
-export function JsonInspector({ data, title }: JsonInspectorProps) {
+export function JsonInspector({ data, title, testID }: JsonInspectorProps) {
   const [collapsed, setCollapsed] = useState(true);
 
   let formatted = '';
@@ -18,18 +19,21 @@ export function JsonInspector({ data, title }: JsonInspectorProps) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID={testID}>
       <TouchableOpacity 
         style={styles.header} 
         onPress={() => setCollapsed(!collapsed)}
         activeOpacity={0.7}
+        testID={`${testID}-toggle`}
       >
         <Text style={styles.title}>{title || 'View Payload'}</Text>
-        <Text style={styles.arrow}>{collapsed ? '▶' : '▼'}</Text>
+        <View style={styles.iconContainer}>
+          <Text style={styles.arrow}>{collapsed ? '▶' : '▼'}</Text>
+        </View>
       </TouchableOpacity>
       {!collapsed && (
-        <View style={styles.body}>
-          <Text style={styles.jsonText}>{formatted}</Text>
+        <View style={styles.body} testID={`${testID}-body`}>
+          <Text style={styles.jsonText} selectable>{formatted}</Text>
         </View>
       )}
     </View>
@@ -38,35 +42,43 @@ export function JsonInspector({ data, title }: JsonInspectorProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#090D16', // Dark background for code
+    backgroundColor: '#0F172A', // slate-900 (code background)
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: '#334155', // slate-700
     marginTop: 8,
     overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: '#1E293B', // slate-800
   },
   title: {
     fontSize: 12,
-    color: '#94A3B8',
-    fontWeight: 'bold',
+    color: '#E2E8F0', // slate-200
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  iconContainer: {
+    width: 20,
+    alignItems: 'flex-end',
   },
   arrow: {
     fontSize: 10,
-    color: '#64748B',
+    color: '#94A3B8', // slate-400
   },
   body: {
-    padding: 10,
-    maxHeight: 250,
+    padding: 12,
+    maxHeight: 300, // Slightly taller
   },
   jsonText: {
     fontFamily: 'SpaceMono',
-    fontSize: 10,
-    color: '#10B981', // green text for code
+    fontSize: 11, // Better readability
+    lineHeight: 16,
+    color: '#34D399', // emerald-400 for code
   },
 });

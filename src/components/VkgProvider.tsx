@@ -95,12 +95,17 @@ export function VkgProvider({ children }: { children: ReactNode }) {
     return () => runtime.unregisterTelemetry(handleTelemetry);
   }, []);
 
+  /**
+   * Triggers a hook mutation optimistically.
+   * Updates local state immediately, then asynchronously pushes the delta to the Supabase Edge function.
+   * If the Edge function is unreachable or fails, state gracefully falls back to local tracking.
+   */
   const triggerHook = useCallback(async (subject: string, predicate: string, object: string) => {
     // 1. Optimistic pending UI updates
     setPendingReceipts((prev) => prev + 1);
 
     const msg: HookMessage = {
-      id: 'msg_' + Math.random().toString(36).substr(2, 9),
+      id: 'msg_' + Math.random().toString(36).substring(2, 11),
       type: 'graph_delta',
       payload: { action: 'cancel', subject, predicate, object },
       actorRef,
@@ -111,7 +116,8 @@ export function VkgProvider({ children }: { children: ReactNode }) {
     try {
       runtime.send(actorRef, msg);
     } catch (err) {
-      console.error('Local evaluation error:', err);
+      // In a production app, we would route this to a structured error tracking service (e.g. Sentry)
+      console.error('Local evaluation error:', err instanceof Error ? err.message : err);
     }
 
     // 2. Simulate Outbox Sync to Supabase Edge function

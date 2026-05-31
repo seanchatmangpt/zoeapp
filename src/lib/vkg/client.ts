@@ -16,6 +16,8 @@ import { SyncEngine } from '../sync/syncEngine';
  * Synchronizes assertions (quad inserts and deletes) to Supabase.
  */
 export class VKGRdfSyncEngine extends SyncEngine {
+  protected override supportedJobTypes = ['RDF_ADD_QUAD', 'RDF_REMOVE_QUAD'];
+
   protected async dispatchJob(job: { jobType: string; payload: string; entityId: string | null }): Promise<void> {
     const rawQuad = JSON.parse(job.payload);
 
@@ -83,15 +85,18 @@ export class VirtualKnowledgeGraphClient {
 
     if (subject) {
       conditions.push(eq(quads.subject, subject.value));
+      conditions.push(eq(quads.subjectTermType, subject.termType));
     }
     if (predicate) {
       conditions.push(eq(quads.predicate, predicate.value));
     }
     if (object) {
       conditions.push(eq(quads.objectValue, object.value));
+      conditions.push(eq(quads.objectTermType, object.termType));
     }
     if (graph) {
       conditions.push(eq(quads.graph, graph.value));
+      conditions.push(eq(quads.graphTermType, graph.termType));
     }
 
     let query = db.select().from(quads);
@@ -213,8 +218,17 @@ export class VirtualKnowledgeGraphClient {
     const typeVal = doc['@type'];
     if (typeVal) {
       const typePredicate = DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
-      const typeUri = typeVal.startsWith('http') ? typeVal : `https://schema.org/${typeVal}`;
-      quadsList.push(DataFactory.quad(subject, typePredicate, DataFactory.namedNode(typeUri), defaultGraph));
+      const processType = (t: any) => {
+        if (typeof t === 'string') {
+          const typeUri = t.startsWith('http') ? t : `https://schema.org/${t}`;
+          quadsList.push(DataFactory.quad(subject, typePredicate, DataFactory.namedNode(typeUri), defaultGraph));
+        }
+      };
+      if (Array.isArray(typeVal)) {
+        typeVal.forEach(processType);
+      } else {
+        processType(typeVal);
+      }
     }
 
     // 3. Loop through other keys
@@ -253,7 +267,7 @@ export class VirtualKnowledgeGraphClient {
             const isRef =
               item.startsWith('http://') ||
               item.startsWith('https://') ||
-              /^[a-zA-Z0-9_-]+:[a-zA-Z0-9_-]+/.test(item);
+              /^[a-zA-Z0-9_-]+:[a-zA-Z0-9_./:#-]+$/.test(item);
 
             objTerm = isRef ? DataFactory.namedNode(item) : DataFactory.literal(item);
           } else if (typeof item === 'boolean') {
@@ -305,7 +319,15 @@ export class VirtualKnowledgeGraphClient {
 
       // Check if standard type predicate
       if (pred === typePredicate) {
-        nodeObj['@type'] = quad.object.value;
+        if (nodeObj['@type']) {
+          if (Array.isArray(nodeObj['@type'])) {
+            nodeObj['@type'].push(quad.object.value);
+          } else {
+            nodeObj['@type'] = [nodeObj['@type'], quad.object.value];
+          }
+        } else {
+          nodeObj['@type'] = quad.object.value;
+        }
         continue;
       }
 

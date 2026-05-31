@@ -36,17 +36,17 @@ function Connector({ status, label }: ConnectorProps) {
   let lineColor = 'rgba(255, 255, 255, 0.2)';
   let lineStyle: 'solid' | 'dashed' = 'solid';
   if (status === 'active') {
-    lineColor = '#10B981'; // Green
+    lineColor = '#34D399'; // Emerald 400
   } else if (status === 'error') {
-    lineColor = '#EF4444'; // Red
+    lineColor = '#F87171'; // Red 400
     lineStyle = 'dashed';
   } else if (status === 'syncing') {
-    lineColor = '#3B82F6'; // Blue
+    lineColor = '#60A5FA'; // Blue 400
   }
 
   return (
     <View style={styles.connectorContainer}>
-      <View style={[styles.connectorLine, { borderColor: lineColor, borderStyle: lineStyle }]} />
+      <View style={[styles.connectorLine, { borderColor: lineColor, borderStyle: lineStyle }]} testID={`connector-${status}`} />
       {label && (
         <View
           style={[
@@ -54,10 +54,10 @@ function Connector({ status, label }: ConnectorProps) {
             {
               backgroundColor:
                 status === 'error'
-                  ? 'rgba(239, 68, 68, 0.15)'
+                  ? 'rgba(239, 68, 68, 0.2)'
                   : status === 'syncing'
-                  ? 'rgba(59, 130, 246, 0.15)'
-                  : 'rgba(16, 185, 129, 0.15)',
+                  ? 'rgba(59, 130, 246, 0.2)'
+                  : 'rgba(16, 185, 129, 0.2)',
             },
           ]}
         >
@@ -89,9 +89,9 @@ function SimulationNode({
   badgeText,
 }: SimulationNodeProps) {
   return (
-    <View style={[styles.nodeCard, { borderColor: statusColor + '33' }]}>
-      <View style={[styles.nodeIconBg, { backgroundColor: statusColor + '15' }]}>
-        <FontAwesome name={icon as any} size={16} color={statusColor} />
+    <View style={[styles.nodeCard, { borderColor: statusColor + '50' }]}>
+      <View style={[styles.nodeIconBg, { backgroundColor: statusColor + '20' }]}>
+        <FontAwesome name={icon as any} size={18} color={statusColor} />
       </View>
       <View style={styles.nodeInfo}>
         <Text style={styles.nodeTitle}>{title}</Text>
@@ -99,7 +99,7 @@ function SimulationNode({
       </View>
       <View style={styles.nodeStatusContainer}>
         {badgeText && (
-          <View style={[styles.nodeBadge, { backgroundColor: statusColor + '1F', borderColor: statusColor + '40' }]}>
+          <View style={[styles.nodeBadge, { backgroundColor: statusColor + '25', borderColor: statusColor + '50' }]}>
             <Text style={[styles.nodeBadgeText, { color: statusColor }]}>{badgeText}</Text>
           </View>
         )}
@@ -437,7 +437,7 @@ export default function ActorLab() {
           subtitle="Manage background virtual twin traffic & replication loops"
         >
           <View style={styles.simStatusContainer}>
-            <Text style={styles.simStatusLabel}>Status:</Text>
+            <Text style={styles.simStatusLabel}>Daemon Status:</Text>
             <View
               style={[
                 styles.simStatusBadge,
@@ -467,10 +467,11 @@ export default function ActorLab() {
             <TouchableOpacity
               style={[styles.btnThird, simState === 'running' && styles.btnActiveGreen]}
               onPress={startSimulation}
+              activeOpacity={0.7}
             >
               <FontAwesome
                 name="play"
-                size={12}
+                size={14}
                 color={simState === 'running' ? '#F8FAFC' : '#94A3B8'}
                 style={styles.btnIcon}
               />
@@ -480,18 +481,19 @@ export default function ActorLab() {
             <TouchableOpacity
               style={[styles.btnThird, simState === 'paused' && styles.btnActiveYellow]}
               onPress={pauseSimulation}
+              activeOpacity={0.7}
             >
               <FontAwesome
                 name="pause"
-                size={12}
+                size={14}
                 color={simState === 'paused' ? '#F8FAFC' : '#94A3B8'}
                 style={styles.btnIcon}
               />
               <Text style={[styles.btnText, simState === 'paused' && styles.btnTextActive]}>PAUSE</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btnThird} onPress={restartSimulation}>
-              <FontAwesome name="refresh" size={12} color="#94A3B8" style={styles.btnIcon} />
+            <TouchableOpacity style={styles.btnThird} onPress={restartSimulation} activeOpacity={0.7}>
+              <FontAwesome name="refresh" size={14} color="#94A3B8" style={styles.btnIcon} />
               <Text style={styles.btnText}>RESTART</Text>
             </TouchableOpacity>
           </View>
@@ -504,8 +506,9 @@ export default function ActorLab() {
               style={[styles.btnHalf, networkOnline && styles.btnActiveGreen]}
               onPress={() => toggleNetwork(true)}
               testID="mock-network-on"
+              activeOpacity={0.7}
             >
-              <FontAwesome name="wifi" size={14} color={networkOnline ? '#F8FAFC' : '#94A3B8'} style={styles.btnIcon} />
+              <FontAwesome name="wifi" size={16} color={networkOnline ? '#F8FAFC' : '#94A3B8'} style={styles.btnIcon} />
               <Text style={[styles.btnText, networkOnline && styles.btnTextActive]}>ONLINE</Text>
             </TouchableOpacity>
 
@@ -513,8 +516,9 @@ export default function ActorLab() {
               style={[styles.btnHalf, !networkOnline && styles.btnActiveRed]}
               onPress={() => toggleNetwork(false)}
               testID="mock-network-off"
+              activeOpacity={0.7}
             >
-              <FontAwesome name="ban" size={14} color={!networkOnline ? '#F8FAFC' : '#94A3B8'} style={styles.btnIcon} />
+              <FontAwesome name="ban" size={16} color={!networkOnline ? '#F8FAFC' : '#94A3B8'} style={styles.btnIcon} />
               <Text style={[styles.btnText, !networkOnline && styles.btnTextActive]}>OFFLINE</Text>
             </TouchableOpacity>
           </View>
@@ -527,10 +531,11 @@ export default function ActorLab() {
               style={[styles.btnHalf, remoteRejectActive && styles.btnActiveRed]}
               onPress={() => toggleRemoteRejection(true)}
               testID="mock-remote-reject-on"
+              activeOpacity={0.7}
             >
               <FontAwesome
                 name="times"
-                size={14}
+                size={16}
                 color={remoteRejectActive ? '#F8FAFC' : '#94A3B8'}
                 style={styles.btnIcon}
               />
@@ -541,10 +546,11 @@ export default function ActorLab() {
               style={[styles.btnHalf, !remoteRejectActive && styles.btnActiveGreen]}
               onPress={() => toggleRemoteRejection(false)}
               testID="mock-remote-reject-off"
+              activeOpacity={0.7}
             >
               <FontAwesome
                 name="check"
-                size={14}
+                size={16}
                 color={!remoteRejectActive ? '#F8FAFC' : '#94A3B8'}
                 style={styles.btnIcon}
               />
@@ -567,6 +573,7 @@ export default function ActorLab() {
                   style={[styles.btnQuarter, active && styles.btnActiveBlue]}
                   onPress={() => handleRoleChange(role)}
                   testID={`principal-role-picker-${role}`}
+                  activeOpacity={0.7}
                 >
                   <Text style={[styles.roleText, active && styles.roleTextActive]}>{role}</Text>
                 </TouchableOpacity>
@@ -591,54 +598,58 @@ export default function ActorLab() {
 
         {/* 7. Metrics & Status Outputs */}
         <AdminCard title="Runtime Metric Monitor" subtitle="Reactive execution logs state">
-          <View style={styles.metricRow}>
-            <Text style={styles.metricLabel}>Local Outbox Size:</Text>
-            <Text style={styles.metricValMono} testID="outbox-count">
-              {outboxCount}
-            </Text>
-          </View>
+          <View style={styles.metricCardBox}>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Local Outbox Size</Text>
+              <Text style={styles.metricValMono} testID="outbox-count">
+                {outboxCount}
+              </Text>
+            </View>
 
-          <View style={styles.metricRow}>
-            <Text style={styles.metricLabel}>Quarantined Count:</Text>
-            <Text style={styles.metricValMono} testID="quarantine-count">
-              {quarantineCount}
-            </Text>
-          </View>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Quarantined Count</Text>
+              <Text style={styles.metricValMono} testID="quarantine-count">
+                {quarantineCount}
+              </Text>
+            </View>
 
-          <View style={styles.metricRow}>
-            <Text style={styles.metricLabel}>Latest Receipt:</Text>
-            <ReceiptBadge status={latestReceipt?.status || 'accepted_pending'} testID="receipt-status" />
-          </View>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Latest Receipt</Text>
+              <ReceiptBadge status={latestReceipt?.status || 'accepted_pending'} testID="receipt-status" />
+            </View>
 
-          <View style={styles.metricRow}>
-            <Text style={styles.metricLabel}>Latest Event Emitted:</Text>
-            <Text style={styles.metricVal} testID="latest-event-type">
-              {latestEvent || 'None'}
-            </Text>
-          </View>
+            <View style={styles.metricRow}>
+              <Text style={styles.metricLabel}>Latest Event Emitted</Text>
+              <Text style={styles.metricVal} testID="latest-event-type">
+                {latestEvent || 'None'}
+              </Text>
+            </View>
 
-          <View style={styles.metricRow}>
-            <Text style={styles.metricLabel}>Error Code Label:</Text>
-            <Text style={[styles.metricVal, styles.errorText]} testID="latest-error-code">
-              {getErrorCode()}
-            </Text>
+            <View style={[styles.metricRow, { borderBottomWidth: 0, marginBottom: 0, paddingBottom: 0 }]}>
+              <Text style={styles.metricLabel}>Error Code Label</Text>
+              <Text style={[styles.metricVal, styles.errorText]} testID="latest-error-code">
+                {getErrorCode()}
+              </Text>
+            </View>
           </View>
         </AdminCard>
 
         {/* 8. Virtual Knowledge Graph Projection View */}
         <AdminCard title="VKG Semantic Sermon Projection" subtitle="Rendered schema:name properties present in standard triple store">
-          {sermonTitles.length > 0 ? (
-            sermonTitles.map((titleStr, idx) => (
-              <View key={`${titleStr}-${idx}`} style={styles.sermonRow}>
-                <FontAwesome name="check-circle" size={14} color="#10B981" style={styles.checkIcon} />
-                <Text style={styles.sermonTitleText} testID="sermon-title-rendered">
-                  {titleStr}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.emptyProjectionText}>Virtual Knowledge Graph contains 0 sermon name quads.</Text>
-          )}
+          <View style={styles.metricCardBox}>
+            {sermonTitles.length > 0 ? (
+              sermonTitles.map((titleStr, idx) => (
+                <View key={`${titleStr}-${idx}`} style={styles.sermonRow}>
+                  <FontAwesome name="check-circle" size={16} color="#34D399" style={styles.checkIcon} />
+                  <Text style={styles.sermonTitleText} testID="sermon-title-rendered">
+                    {titleStr}
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyProjectionText}>Virtual Knowledge Graph contains 0 sermon name quads.</Text>
+            )}
+          </View>
         </AdminCard>
 
         {/* 9. Interactive Log Terminal */}
@@ -654,17 +665,17 @@ export default function ActorLab() {
                 const active = levelFilter === lvl;
                 const colorMap = {
                   ALL: '#94A3B8',
-                  INFO: '#3B82F6',
-                  SUCCESS: '#10B981',
-                  WARNING: '#F59E0B',
-                  ERROR: '#EF4444',
+                  INFO: '#60A5FA',
+                  SUCCESS: '#34D399',
+                  WARNING: '#FBBF24',
+                  ERROR: '#F87171',
                 };
                 const activeBgMap = {
-                  ALL: 'rgba(148, 163, 184, 0.2)',
-                  INFO: 'rgba(59, 130, 246, 0.2)',
-                  SUCCESS: 'rgba(16, 185, 129, 0.2)',
-                  WARNING: 'rgba(245, 158, 11, 0.2)',
-                  ERROR: 'rgba(239, 68, 68, 0.2)',
+                  ALL: 'rgba(148, 163, 184, 0.15)',
+                  INFO: 'rgba(59, 130, 246, 0.15)',
+                  SUCCESS: 'rgba(16, 185, 129, 0.15)',
+                  WARNING: 'rgba(245, 158, 11, 0.15)',
+                  ERROR: 'rgba(239, 68, 68, 0.15)',
                 };
                 return (
                   <TouchableOpacity
@@ -675,6 +686,7 @@ export default function ActorLab() {
                     ]}
                     onPress={() => setLevelFilter(lvl)}
                     testID={`filter-level-${lvl}`}
+                    activeOpacity={0.7}
                   >
                     <Text style={[styles.filterBadgeText, { color: active ? colorMap[lvl] : '#64748B' }]}>{lvl}</Text>
                   </TouchableOpacity>
@@ -690,17 +702,17 @@ export default function ActorLab() {
                 const active = categoryFilter === cat;
                 const colorMap = {
                   ALL: '#94A3B8',
-                  SYSTEM: '#A78BFA',
+                  SYSTEM: '#C084FC',
                   TRANSACTION: '#818CF8',
                   SYNC: '#22D3EE',
                   NETWORK: '#FB923C',
                 };
                 const activeBgMap = {
-                  ALL: 'rgba(148, 163, 184, 0.2)',
-                  SYSTEM: 'rgba(167, 139, 250, 0.2)',
-                  TRANSACTION: 'rgba(129, 140, 248, 0.2)',
-                  SYNC: 'rgba(34, 211, 238, 0.2)',
-                  NETWORK: 'rgba(251, 146, 60, 0.2)',
+                  ALL: 'rgba(148, 163, 184, 0.15)',
+                  SYSTEM: 'rgba(167, 139, 250, 0.15)',
+                  TRANSACTION: 'rgba(129, 140, 248, 0.15)',
+                  SYNC: 'rgba(34, 211, 238, 0.15)',
+                  NETWORK: 'rgba(251, 146, 60, 0.15)',
                 };
                 return (
                   <TouchableOpacity
@@ -711,6 +723,7 @@ export default function ActorLab() {
                     ]}
                     onPress={() => setCategoryFilter(cat)}
                     testID={`filter-category-${cat}`}
+                    activeOpacity={0.7}
                   >
                     <Text style={[styles.filterBadgeText, { color: active ? colorMap[cat] : '#64748B' }]}>{cat}</Text>
                   </TouchableOpacity>
@@ -725,13 +738,13 @@ export default function ActorLab() {
               {filteredLogs.length > 0 ? (
                 filteredLogs.map((log) => {
                   let lvlColor = '#94A3B8';
-                  if (log.level === 'INFO') lvlColor = '#3B82F6';
-                  else if (log.level === 'SUCCESS') lvlColor = '#10B981';
-                  else if (log.level === 'WARNING') lvlColor = '#F59E0B';
-                  else if (log.level === 'ERROR') lvlColor = '#EF4444';
+                  if (log.level === 'INFO') lvlColor = '#60A5FA';
+                  else if (log.level === 'SUCCESS') lvlColor = '#34D399';
+                  else if (log.level === 'WARNING') lvlColor = '#FBBF24';
+                  else if (log.level === 'ERROR') lvlColor = '#F87171';
 
-                  let catColor = '#A78BFA';
-                  if (log.category === 'SYSTEM') catColor = '#A78BFA';
+                  let catColor = '#C084FC';
+                  if (log.category === 'SYSTEM') catColor = '#C084FC';
                   else if (log.category === 'TRANSACTION') catColor = '#818CF8';
                   else if (log.category === 'SYNC') catColor = '#22D3EE';
                   else if (log.category === 'NETWORK') catColor = '#FB923C';
@@ -751,8 +764,8 @@ export default function ActorLab() {
             </ScrollView>
           </View>
 
-          <TouchableOpacity style={styles.clearLogsBtn} onPress={() => setLogs([])} testID="clear-logs">
-            <FontAwesome name="trash" size={12} color="#94A3B8" style={{ marginRight: 6 }} />
+          <TouchableOpacity style={styles.clearLogsBtn} onPress={() => setLogs([])} testID="clear-logs" activeOpacity={0.7}>
+            <FontAwesome name="trash" size={14} color="#94A3B8" style={{ marginRight: 6 }} />
             <Text style={styles.clearLogsText}>Clear Terminal Logs</Text>
           </TouchableOpacity>
         </AdminCard>
@@ -765,23 +778,29 @@ const styles = StyleSheet.create({
   statusBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(16, 185, 129, 0.2)',
+    borderBottomColor: 'rgba(16, 185, 129, 0.25)',
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
   dotGreen: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
-    marginRight: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#34D399',
+    marginRight: 10,
+    shadowColor: '#34D399',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 3,
   },
   statusText: {
     color: '#34D399',
-    fontSize: 11,
-    fontWeight: 'bold',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   scrollContainer: {
@@ -791,24 +810,67 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: -4,
+    marginHorizontal: -6,
   },
   btnHalf: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 10,
-    paddingVertical: 10,
-    marginHorizontal: 4,
+    borderRadius: 12,
+    paddingVertical: 12,
+    marginHorizontal: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
   btnThird: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 12,
+    paddingVertical: 12,
+    marginHorizontal: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnActiveGreen: {
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+  },
+  btnActiveRed: {
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    borderColor: 'rgba(239, 68, 68, 0.4)',
+  },
+  btnActiveBlue: {
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderColor: 'rgba(59, 130, 246, 0.4)',
+  },
+  btnActiveYellow: {
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderColor: 'rgba(245, 158, 11, 0.4)',
+  },
+  btnIcon: {
+    marginRight: 8,
+  },
+  btnText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#94A3B8',
+    letterSpacing: 0.5,
+  },
+  btnTextActive: {
+    color: '#F8FAFC',
+  },
+  btnGroupRow: {
+    flexDirection: 'row',
+    marginHorizontal: -4,
+  },
+  btnQuarter: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
@@ -817,50 +879,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  btnActiveGreen: {
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-    borderColor: 'rgba(16, 185, 129, 0.4)',
-  },
-  btnActiveRed: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-    borderColor: 'rgba(239, 68, 68, 0.4)',
-  },
-  btnActiveBlue: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    borderColor: 'rgba(59, 130, 246, 0.4)',
-  },
-  btnActiveYellow: {
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-    borderColor: 'rgba(245, 158, 11, 0.4)',
-  },
-  btnIcon: {
-    marginRight: 6,
-  },
-  btnText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#64748B',
-  },
-  btnTextActive: {
-    color: '#F8FAFC',
-  },
-  btnGroupRow: {
-    flexDirection: 'row',
-    marginHorizontal: -3,
-  },
-  btnQuarter: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 8,
-    paddingVertical: 8,
-    marginHorizontal: 3,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   roleText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: '#94A3B8',
     textTransform: 'capitalize',
@@ -871,119 +891,145 @@ const styles = StyleSheet.create({
   },
   syncBtn: {
     backgroundColor: '#3B82F6',
+    borderRadius: 12,
+    height: 48,
+  },
+  metricCardBox: {
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    padding: 14,
   },
   metricRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.03)',
-    paddingBottom: 8,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    paddingBottom: 10,
   },
   metricLabel: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   metricVal: {
     color: '#F8FAFC',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 13,
+    fontWeight: '700',
   },
   metricValMono: {
     fontFamily: 'SpaceMono',
-    fontSize: 12,
+    fontSize: 14,
     color: '#F8FAFC',
     fontWeight: 'bold',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    overflow: 'hidden',
   },
   errorText: {
     color: '#F87171',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    overflow: 'hidden',
   },
   sermonRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.1)',
-    borderRadius: 8,
-    padding: 10,
+    borderColor: 'rgba(16, 185, 129, 0.2)',
+    borderRadius: 10,
+    padding: 12,
     marginBottom: 8,
   },
   checkIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   sermonTitleText: {
     color: '#F8FAFC',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
   },
   emptyProjectionText: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: 13,
     fontStyle: 'italic',
     textAlign: 'center',
-    paddingVertical: 12,
+    paddingVertical: 16,
   },
   // New Digital Twin styles
   topologyContainer: {
-    marginVertical: 4,
+    marginVertical: 6,
   },
   nodeCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    backgroundColor: 'rgba(30, 41, 59, 0.5)',
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 10,
+    borderRadius: 16,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   nodeIconBg: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 12,
   },
   nodeInfo: {
     flex: 1,
   },
   nodeTitle: {
     color: '#F8FAFC',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '700',
   },
   nodeSubtitle: {
-    color: '#64748B',
-    fontSize: 10,
-    marginTop: 1,
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 2,
   },
   nodeStatusContainer: {
     alignItems: 'flex-end',
   },
   nodeBadge: {
     borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 5,
-    paddingVertical: 1.5,
-    marginBottom: 2,
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginBottom: 4,
   },
   nodeBadgeText: {
-    fontSize: 8,
-    fontWeight: 'bold',
-  },
-  nodeStatusText: {
     fontSize: 9,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  nodeStatusText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   connectorContainer: {
     alignItems: 'center',
-    marginVertical: 2,
-    height: 24,
+    marginVertical: 4,
+    height: 32,
     justifyContent: 'center',
   },
   connectorLine: {
-    height: 24,
+    height: 32,
     width: 0,
     borderWidth: 1,
     borderStyle: 'solid',
@@ -991,21 +1037,22 @@ const styles = StyleSheet.create({
   },
   connectorLabelBg: {
     position: 'absolute',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     zIndex: 10,
   },
   connectorLabelText: {
-    fontSize: 7,
-    fontWeight: 'bold',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   connectorArrowContainer: {
     position: 'absolute',
-    bottom: -2,
+    bottom: -4,
     zIndex: 5,
   },
   // Simulation control styles
@@ -1013,81 +1060,92 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
-    paddingBottom: 8,
+    marginBottom: 16,
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   simStatusLabel: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   simStatusBadge: {
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   simStatusText: {
-    fontSize: 10,
-    fontWeight: 'bold',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   badgeRunning: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderColor: '#10B981',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderColor: '#34D399',
   },
   badgePaused: {
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    borderColor: '#F59E0B',
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderColor: '#FBBF24',
   },
   badgeStopped: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    borderColor: '#EF4444',
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    borderColor: '#F87171',
   },
   textRunning: {
-    color: '#10B981',
+    color: '#34D399',
   },
   textPaused: {
-    color: '#F59E0B',
+    color: '#FBBF24',
   },
   textStopped: {
-    color: '#EF4444',
+    color: '#F87171',
   },
   // Log terminal styles
   logFiltersContainer: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   filterTitle: {
-    color: '#64748B',
-    fontSize: 10,
-    fontWeight: '600',
-    marginBottom: 3,
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
   filterScroll: {
-    paddingVertical: 1,
+    paddingVertical: 2,
+    paddingHorizontal: 2,
   },
   filterBadge: {
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderRadius: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    marginRight: 6,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
   },
   filterBadgeText: {
-    fontSize: 9,
-    fontWeight: 'bold',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   terminalBox: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#020617', // Slate 950
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 10,
-    height: 180,
-    padding: 8,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    height: 220,
+    padding: 12,
     marginTop: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   terminalScroll: {
     flex: 1,
@@ -1095,51 +1153,58 @@ const styles = StyleSheet.create({
   logRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 4,
+    marginBottom: 6,
+    alignItems: 'flex-start',
   },
   logTime: {
-    color: '#475569',
+    color: '#64748B',
     fontFamily: 'SpaceMono',
-    fontSize: 9,
-    marginRight: 5,
+    fontSize: 10,
+    marginRight: 6,
+    marginTop: 2,
   },
   logLevel: {
     fontFamily: 'SpaceMono',
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
-    marginRight: 5,
+    marginRight: 6,
+    marginTop: 2,
   },
   logCategory: {
     fontFamily: 'SpaceMono',
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: 'bold',
-    marginRight: 5,
+    marginRight: 6,
+    marginTop: 2,
   },
   logMessage: {
-    color: '#CBD5E1',
+    color: '#E2E8F0',
     fontFamily: 'SpaceMono',
-    fontSize: 9,
+    fontSize: 11,
     flex: 1,
-    minWidth: 150,
+    minWidth: 180,
+    lineHeight: 16,
   },
   emptyLogsText: {
     color: '#475569',
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 70,
-    fontSize: 10,
+    marginTop: 80,
+    fontSize: 12,
   },
   clearLogsBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-end',
-    marginTop: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    marginTop: 12,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 8,
   },
   clearLogsText: {
-    color: '#64748B',
-    fontSize: 10,
-    fontWeight: '600',
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });

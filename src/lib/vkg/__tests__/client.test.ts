@@ -177,6 +177,40 @@ describe('VirtualKnowledgeGraphClient (RDF.js Spec)', () => {
       expect(numQuad?.object.value).toBe('350');
       expect((numQuad?.object as any).datatype.value).toBe('http://www.w3.org/2001/XMLSchema#integer');
     });
+
+    it('handles multiple type assertions as an array', () => {
+      const doc = {
+        '@id': 'urn:sermon:1',
+        '@type': ['CreativeWork', 'Sermon'],
+        name: 'The Good Word',
+      };
+
+      const quadsList = client.jsonLdToQuads(doc);
+      
+      const typeQuads = quadsList.filter((q) => q.predicate.value === 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+      expect(typeQuads.length).toBe(2);
+      expect(typeQuads.map(q => q.object.value)).toContain('https://schema.org/CreativeWork');
+      expect(typeQuads.map(q => q.object.value)).toContain('https://schema.org/Sermon');
+    });
+
+    it('correctly treats strings with colons and spaces as Literals, not NamedNodes', () => {
+      const doc = {
+        '@id': 'urn:sermon:2',
+        '@type': 'Sermon',
+        name: 'Title: Redemption',
+        duration: 'Duration: 30 minutes',
+      };
+
+      const quadsList = client.jsonLdToQuads(doc);
+
+      const nameQuad = quadsList.find((q) => q.predicate.value === 'https://schema.org/name');
+      expect(nameQuad?.object.termType).toBe('Literal');
+      expect(nameQuad?.object.value).toBe('Title: Redemption');
+
+      const durationQuad = quadsList.find((q) => q.predicate.value === 'https://schema.org/duration');
+      expect(durationQuad?.object.termType).toBe('Literal');
+      expect(durationQuad?.object.value).toBe('Duration: 30 minutes');
+    });
   });
 
   describe('quadsToJsonLd', () => {
@@ -206,6 +240,29 @@ describe('VirtualKnowledgeGraphClient (RDF.js Spec)', () => {
         '@type': 'https://schema.org/Person',
         name: 'Bob',
       });
+    });
+
+    it('reconstructs multiple types from flat RDF Quads into an array in JSON-LD', () => {
+      const subject = DataFactory.namedNode('urn:sermon:1');
+      const typePred = DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+      const namePred = DataFactory.namedNode('https://schema.org/name');
+
+      const testQuads = [
+        DataFactory.quad(subject, typePred, DataFactory.namedNode('https://schema.org/CreativeWork')),
+        DataFactory.quad(subject, typePred, DataFactory.namedNode('https://schema.org/Sermon')),
+        DataFactory.quad(subject, namePred, DataFactory.literal('The Good Word')),
+      ];
+
+      const jsonLd = client.quadsToJsonLd(testQuads);
+
+      expect(jsonLd.length).toBe(1);
+      const root = jsonLd[0];
+      expect(root['@id']).toBe('urn:sermon:1');
+      expect(root['@type']).toEqual([
+        'https://schema.org/CreativeWork',
+        'https://schema.org/Sermon',
+      ]);
+      expect(root['name']).toBe('The Good Word');
     });
   });
 
@@ -240,6 +297,21 @@ describe('VirtualKnowledgeGraphClient (RDF.js Spec)', () => {
       expect(matched.predicate.value).toBe('https://schema.org/name');
       expect(matched.object.termType).toBe('Literal');
       expect(matched.object.value).toBe('Alice Cooper');
+    });
+
+    it('applies exact termType filters to the SQLite query conditions', async () => {
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([]);
+
+      const subjectFilter = DataFactory.blankNode('_:b1');
+      const predicateFilter = DataFactory.namedNode('https://schema.org/knows');
+      const objectFilter = DataFactory.namedNode('person:bob');
+      const graphFilter = DataFactory.namedNode('https://schema.org/MyGraph');
+
+      await client.match(subjectFilter, predicateFilter, objectFilter, graphFilter);
+
+      expect(mockedDb._mockSelect).toHaveBeenCalled();
+      expect(mockedDb._mockFrom).toHaveBeenCalled();
+      expect(mockedDb._mockWhereSelect).toHaveBeenCalled();
     });
   });
 

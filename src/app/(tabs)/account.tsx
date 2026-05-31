@@ -74,6 +74,8 @@ export default function Account() {
           .eq('id', session.user.id)
           .single();
 
+        console.log("DEBUG GETPROFILE RESULT", { data, error, status });
+
         if (error && status !== 406) {
           throw error;
         }
@@ -251,6 +253,7 @@ export default function Account() {
     if (avatarUrl && !imageError) {
       return (
         <Image
+          testID="avatar-image"
           source={{ uri: avatarUrl }}
           className="w-24 h-24 rounded-full border-4 border-white shadow-md"
           onError={() => setImageError(true)}
@@ -345,7 +348,7 @@ export default function Account() {
             <Text className="text-xs font-medium text-gray-400 uppercase">Username</Text>
             <TextInput
               testID="username-input"
-              className="text-base text-gray-800 font-medium py-1"
+              className="text-base text-gray-800 font-medium py-2 px-3 mt-1 bg-gray-50/50 rounded-lg border border-gray-100"
               value={username}
               onChangeText={setUsername}
               placeholder="Enter username"
@@ -356,7 +359,7 @@ export default function Account() {
             <Text className="text-xs font-medium text-gray-400 uppercase">Website</Text>
             <TextInput
               testID="website-input"
-              className="text-base text-gray-800 font-medium py-1"
+              className="text-base text-gray-800 font-medium py-2 px-3 mt-1 bg-gray-50/50 rounded-lg border border-gray-100"
               value={website}
               onChangeText={setWebsite}
               placeholder="https://yourwebsite.com"

@@ -8,8 +8,9 @@ import { db } from '../../lib/db/db';
 import { actorOutbox, actorQuarantine } from '../../lib/db/schema';
 import { desc } from 'drizzle-orm';
 import { globalLocalDispatcher, globalRemoteDispatcher } from '../../lib/actor/actorOps';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-function formatTimestamp(date: Date): string {
+export function formatTimestamp(date: Date | any): string {
   if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
     return 'N/A';
   }
@@ -28,7 +29,7 @@ interface CodePayloadProps {
   title: string;
 }
 
-function CodePayload({ data, title }: CodePayloadProps) {
+export function CodePayload({ data, title }: CodePayloadProps) {
   const [collapsed, setCollapsed] = useState(true);
   let formattedJson = '';
   try {
@@ -39,7 +40,7 @@ function CodePayload({ data, title }: CodePayloadProps) {
   }
 
   return (
-    <View style={styles.codeContainer}>
+    <View style={styles.codeContainer} testID="code-payload">
       <TouchableOpacity
         style={styles.codeHeader}
         onPress={() => setCollapsed(!collapsed)}
@@ -53,7 +54,7 @@ function CodePayload({ data, title }: CodePayloadProps) {
           <View style={styles.jsonBadge}>
             <Text style={styles.jsonBadgeText}>JSON</Text>
           </View>
-          <Text style={styles.codeArrow}>{collapsed ? '▶' : '▼'}</Text>
+          <FontAwesome name={collapsed ? 'chevron-right' : 'chevron-down'} size={10} color="#94A3B8" />
         </View>
       </TouchableOpacity>
       {!collapsed && (
@@ -128,6 +129,7 @@ export default function AdminOutbox() {
         title={`Job: ${item.id.slice(0, 10)}...`} 
         subtitle={`Created: ${formatTimestamp(item.createdAt)}`}
         headerRight={<OutboxBadge status={item.status} />}
+        style={styles.cardSpacing}
       >
         <View style={styles.details}>
           <View style={styles.detailRow}>
@@ -136,7 +138,9 @@ export default function AdminOutbox() {
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.label}>Attempts:</Text>
-            <Text style={styles.valueText}>{item.attempts} / 3</Text>
+            <View style={styles.badgeWrapper}>
+              <Text style={styles.valueText}>{item.attempts} / 3</Text>
+            </View>
           </View>
           <CodePayload data={payloadData} title="Command Context Data" />
         </View>
@@ -156,7 +160,7 @@ export default function AdminOutbox() {
       <AdminCard 
         title={`Quarantine: ${item.id.slice(0, 10)}...`} 
         subtitle={`Quarantined: ${formatTimestamp(item.createdAt)}`}
-        style={styles.quarantineCard}
+        style={StyleSheet.flatten([styles.quarantineCard, styles.cardSpacing])}
       >
         <View style={styles.details}>
           <View style={styles.detailRow}>
@@ -164,7 +168,10 @@ export default function AdminOutbox() {
             <Text style={styles.valueMono}>{item.commandId}</Text>
           </View>
           <View style={styles.errorBox}>
-            <Text style={styles.errorLabel}>Last Rejection Error:</Text>
+            <View style={styles.errorHeader}>
+              <FontAwesome name="exclamation-circle" size={12} color="#F87171" style={{ marginRight: 6 }} />
+              <Text style={styles.errorLabel}>Last Rejection Error:</Text>
+            </View>
             <Text style={styles.errorText}>{item.error}</Text>
           </View>
           <CodePayload data={{ actor: actorParsed, payload: payloadParsed }} title="Execution Dump Data" />
@@ -193,12 +200,23 @@ export default function AdminOutbox() {
           />
         </View>
         {syncStatusMsg && (
-          <Text style={[
-            styles.statusMessage, 
-            syncStatusMsg.includes('Failed') ? styles.statusFail : syncStatusMsg.includes('Completed') ? styles.statusSuccess : null
+          <View style={[
+            styles.statusMessageContainer,
+            syncStatusMsg.includes('Failed') ? styles.statusContainerFail : syncStatusMsg.includes('Completed') ? styles.statusContainerSuccess : null
           ]}>
-            {syncStatusMsg}
-          </Text>
+            <FontAwesome 
+              name={syncStatusMsg.includes('Failed') ? 'times-circle' : syncStatusMsg.includes('Completed') ? 'check-circle' : 'spinner'} 
+              size={14} 
+              color={syncStatusMsg.includes('Failed') ? '#F87171' : syncStatusMsg.includes('Completed') ? '#34D399' : '#94A3B8'} 
+              style={{ marginRight: 8 }} 
+            />
+            <Text style={[
+              styles.statusMessage, 
+              syncStatusMsg.includes('Failed') ? styles.statusFail : syncStatusMsg.includes('Completed') ? styles.statusSuccess : null
+            ]}>
+              {syncStatusMsg}
+            </Text>
+          </View>
         )}
       </View>
 
@@ -257,6 +275,7 @@ export default function AdminOutbox() {
               scrollEnabled={false}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
+                  <FontAwesome name="shield" size={24} color="#334155" style={{ marginBottom: 8 }} />
                   <Text style={styles.emptyText}>No quarantined commands detected.</Text>
                 </View>
               }
@@ -265,6 +284,7 @@ export default function AdminOutbox() {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
+            <FontAwesome name="check-circle-o" size={24} color="#334155" style={{ marginBottom: 8 }} />
             <Text style={styles.emptyText}>Outbox queue is empty. Ready for offline commands.</Text>
           </View>
         }
@@ -278,7 +298,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.08)',
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    backgroundColor: 'rgba(15, 23, 42, 0.7)',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -287,17 +307,40 @@ const styles = StyleSheet.create({
   flushBtn: {
     flex: 1,
     backgroundColor: '#10B981', // Emerald 500
+    borderRadius: 12,
+    height: 48,
   },
   syncBtn: {
     flex: 1,
     backgroundColor: '#3B82F6', // Blue 500
+    borderRadius: 12,
+    height: 48,
+  },
+  statusMessageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  statusContainerSuccess: {
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    borderColor: 'rgba(16, 185, 129, 0.2)',
+  },
+  statusContainerFail: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderColor: 'rgba(239, 68, 68, 0.2)',
   },
   statusMessage: {
     color: '#94A3B8',
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'SpaceMono',
-    marginTop: 8,
-    textAlign: 'center',
+    fontWeight: '600',
   },
   statusSuccess: {
     color: '#34D399',
@@ -313,71 +356,90 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.5)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(30, 41, 59, 0.6)',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 12,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   metricHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   metricLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: '#94A3B8',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   statusIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   indicatorPending: {
-    backgroundColor: '#F59E0B', // Amber-500
+    backgroundColor: '#FBBF24', // Amber-400
+    shadowColor: '#FBBF24',
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
   },
   indicatorSuccess: {
-    backgroundColor: '#10B981', // Emerald-500
+    backgroundColor: '#34D399', // Emerald-400
+    shadowColor: '#34D399',
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
   },
   indicatorFailed: {
-    backgroundColor: '#EF4444', // Red-500
+    backgroundColor: '#F87171', // Red-400
+    shadowColor: '#F87171',
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 0 },
   },
   metricBody: {
     marginTop: 2,
   },
   metricValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#F8FAFC',
+    letterSpacing: -0.5,
   },
   metricSubtext: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#64748B',
-    marginTop: 2,
+    marginTop: 4,
+    fontWeight: '500',
   },
   listHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 20,
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '800',
     color: '#F8FAFC',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   sectionBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 12,
-    marginLeft: 8,
-    minWidth: 24,
+    marginLeft: 10,
+    minWidth: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -391,25 +453,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#334155', // Slate-700
   },
   sectionBadgeText: {
-    color: '#F8FAFC',
-    fontSize: 11,
+    color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: 'bold',
   },
   listContent: {
     padding: 16,
     paddingBottom: 40,
   },
+  cardSpacing: {
+    marginBottom: 12,
+  },
   details: {
-    marginTop: 4,
+    marginTop: 8,
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   label: {
     color: '#94A3B8',
-    fontSize: 12,
+    fontSize: 13,
     width: 100,
     fontWeight: '600',
   },
@@ -418,6 +483,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#E2E8F0',
     flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  badgeWrapper: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   valueText: {
     fontSize: 12,
@@ -425,51 +501,70 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   quarantineCard: {
-    borderColor: 'rgba(239, 68, 68, 0.2)',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    borderWidth: 1,
   },
   errorBox: {
-    backgroundColor: 'rgba(239, 68, 68, 0.05)',
-    borderRadius: 8,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.1)',
-    padding: 8,
+    borderColor: 'rgba(239, 68, 68, 0.2)',
+    padding: 10,
     marginTop: 8,
   },
+  errorHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   errorLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
+    fontSize: 11,
+    fontWeight: '800',
     color: '#F87171',
+    textTransform: 'uppercase',
   },
   errorText: {
     fontFamily: 'SpaceMono',
-    fontSize: 10,
-    color: '#EF4444',
+    fontSize: 11,
+    color: '#FECACA',
+    lineHeight: 16,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingVertical: 30,
+    backgroundColor: 'rgba(30, 41, 59, 0.3)',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderStyle: 'dashed',
+    marginTop: 8,
   },
   emptyText: {
     color: '#64748B',
-    fontSize: 12,
-    fontStyle: 'italic',
+    fontSize: 13,
+    fontWeight: '500',
   },
   codeContainer: {
-    backgroundColor: '#0F172A',
-    borderRadius: 8,
+    backgroundColor: '#020617', // Slate-950
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    marginTop: 10,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginTop: 12,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   codeHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#1E293B',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: '#0F172A', // Slate-900
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
@@ -479,50 +574,48 @@ const styles = StyleSheet.create({
   },
   codeTagIndicator: {
     fontFamily: 'SpaceMono',
-    fontSize: 11,
+    fontSize: 12,
     color: '#3B82F6',
-    marginRight: 6,
+    marginRight: 8,
     fontWeight: 'bold',
   },
   codeTagIndicatorClose: {
     fontFamily: 'SpaceMono',
-    fontSize: 10,
+    fontSize: 11,
     color: '#3B82F6',
-    marginTop: 6,
+    marginTop: 8,
     fontWeight: 'bold',
   },
   codeTitle: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#E2E8F0',
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   codeHeaderRight: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   jsonBadge: {
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginRight: 8,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginRight: 10,
   },
   jsonBadgeText: {
     fontSize: 9,
-    color: '#60A5FA',
-    fontWeight: 'bold',
-  },
-  codeArrow: {
-    fontSize: 10,
-    color: '#94A3B8',
+    color: '#93C5FD',
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   codeBody: {
-    padding: 12,
-    backgroundColor: '#090D16',
+    padding: 14,
+    backgroundColor: '#020617', // Slate-950
   },
   codeText: {
     fontFamily: 'SpaceMono',
-    fontSize: 10,
-    color: '#10B981',
+    fontSize: 11,
+    color: '#34D399', // Emerald-400
+    lineHeight: 16,
   },
 });

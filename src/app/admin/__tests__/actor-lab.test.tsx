@@ -39,12 +39,17 @@ jest.mock('@/lib/supabase', () => {
 // Mock database to prevent actual SQLite connections/queries
 let mockOutboxCount = 0;
 let mockQuarantineCount = 0;
+let mockShouldDbThrow = false;
 
 jest.mock('../../../lib/db/db', () => {
   return {
     db: {
       select: jest.fn().mockImplementation(() => ({
         from: jest.fn().mockImplementation((table) => {
+          if (mockShouldDbThrow) {
+            return Promise.reject(new Error('Mock DB Error'));
+          }
+
           const getTableName = (t: any): string => {
             if (!t) return '';
             if (t.config?.name) return t.config.name;
@@ -102,6 +107,7 @@ describe('ActorLab Component', () => {
 
     mockOutboxCount = 0;
     mockQuarantineCount = 0;
+    mockShouldDbThrow = false;
 
     // Reset Zustand store to default values
     useActorOpsStore.setState({
@@ -152,6 +158,16 @@ describe('ActorLab Component', () => {
     expect(getByTestId('sermon-title-rendered').props.children).toBe('The Power of Grace');
   });
 
+  test('handles db connection errors gracefully on refreshState', async () => {
+    mockShouldDbThrow = true;
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await renderActorLab();
+
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to load metrics:', expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
   test('starting the simulation daemon transitions state to RUNNING and runs heartbeat tick', async () => {
     mockOutboxCount = 0;
     const { getByText } = await renderActorLab();
@@ -182,7 +198,26 @@ describe('ActorLab Component', () => {
     mockOutboxCount = 2;
     useActorOpsStore.setState({ outboxCount: 2, networkOnline: true });
 
-    const { getByText } = await renderActorLab();
+    let resolveSync: any;
+    syncOutboxSpy.mockImplementationOnce(() => new Promise((resolve) => { resolveSync = resolve; }));
+
+    const { getByText, getByTestId } = await renderActorLab();
+
+    // Connector state sync test (syncing should trigger when triggerSync happens)
+    const syncBtn = getByText('Sync Outbox Now');
+    await act(async () => {
+      fireEvent.press(syncBtn);
+    });
+
+    expect(getByTestId('connector-syncing')).toBeTruthy();
+    
+    await act(async () => {
+      resolveSync();
+      await flushPromises();
+    });
+
+    // Reset spy for daemon loop
+    syncOutboxSpy.mockImplementation(() => Promise.resolve());
 
     // Click START
     const startBtn = getByText('START');
@@ -197,7 +232,8 @@ describe('ActorLab Component', () => {
     });
 
     // syncOutbox should be triggered
-    expect(syncOutboxSpy).toHaveBeenCalledTimes(1);
+    // 1 from manual, 1 from daemon heartbeat
+    expect(syncOutboxSpy).toHaveBeenCalledTimes(2);
     expect(syncOutboxSpy).toHaveBeenCalledWith(globalRemoteDispatcher);
   });
 

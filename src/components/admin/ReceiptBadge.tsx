@@ -13,35 +13,35 @@ export function ReceiptBadge({ status, testID }: ReceiptBadgeProps) {
 
   switch (status) {
     case 'accepted_pending':
-      backgroundColor = 'rgba(217, 119, 6, 0.2)'; // Amber 600
-      textColor = '#F59E0B';
+      backgroundColor = 'rgba(217, 119, 6, 0.2)'; // amber-600/20
+      textColor = '#FBBF24'; // amber-300
       break;
     case 'rejected_local':
-      backgroundColor = 'rgba(239, 68, 68, 0.2)'; // Red 500
-      textColor = '#F87171';
+      backgroundColor = 'rgba(239, 68, 68, 0.2)'; // red-500/20
+      textColor = '#FCA5A5'; // red-300
       break;
     case 'applied_local':
-      backgroundColor = 'rgba(16, 185, 129, 0.2)'; // Emerald 500
-      textColor = '#34D399';
+      backgroundColor = 'rgba(16, 185, 129, 0.2)'; // emerald-500/20
+      textColor = '#6EE7B7'; // emerald-300
       break;
     case 'applied_remote':
-      backgroundColor = 'rgba(59, 130, 246, 0.2)'; // Blue 500
-      textColor = '#60A5FA';
+      backgroundColor = 'rgba(59, 130, 246, 0.2)'; // blue-500/20
+      textColor = '#93C5FD'; // blue-300
       break;
     case 'rejected_remote':
-      backgroundColor = 'rgba(185, 28, 28, 0.3)'; // Red 700
-      textColor = '#EF4444';
+      backgroundColor = 'rgba(153, 27, 27, 0.4)'; // red-800/40
+      textColor = '#F87171'; // red-400
       break;
     case 'quarantined':
-      backgroundColor = 'rgba(139, 92, 246, 0.2)'; // Violet 500
-      textColor = '#A78BFA';
+      backgroundColor = 'rgba(139, 92, 246, 0.2)'; // violet-500/20
+      textColor = '#C4B5FD'; // violet-300
       break;
   }
 
   return (
-    <View style={[styles.badge, { backgroundColor }]}>
-      <Text style={[styles.text, { color: textColor }]} testID={testID}>
-        {status}
+    <View style={[styles.badge, { backgroundColor }]} testID={testID}>
+      <Text style={[styles.text, { color: textColor }]}>
+        {status.replace('_', ' ')}
       </Text>
     </View>
   );
@@ -53,10 +53,13 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 8,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
   },
   text: {
-    fontSize: 11,
-    fontWeight: 'bold',
+    fontSize: 10,
+    fontWeight: '800',
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });

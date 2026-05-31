@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, LayoutAnimation, Platform, UIManager, ScrollView } from 'react-native';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { AvatarRelativeProjectionMatrixView } from '../../components/AvatarRelativeProjection';
@@ -23,60 +23,129 @@ interface MessageItemProps {
 }
 
 function MessageItem({ msg }: MessageItemProps) {
-  const [slideAnim] = React.useState(() => new Animated.Value(-20));
+  const [slideAnim] = React.useState(() => new Animated.Value(-10));
   const [opacityAnim] = React.useState(() => new Animated.Value(0));
 
   React.useEffect(() => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 350,
+        duration: 300,
         useNativeDriver: true,
       }),
       Animated.timing(opacityAnim, {
         toValue: 1,
-        duration: 350,
+        duration: 300,
         useNativeDriver: true,
       }),
     ]).start();
   }, []);
 
-  const getChannelColor = (channel: string) => {
+  const getChannelConfig = (channel: string) => {
     switch (channel) {
-      case 'actor_commands': return '#3B82F6'; // Blue
-      case 'actor_events': return '#8B5CF6'; // Purple
-      case 'actor_receipts': return '#10B981'; // Green
-      case 'rdf_quads_ld': return '#06B6D4'; // Cyan
-      default: return '#64748B'; // Slate
+      case 'actor_commands': return { color: '#3B82F6', icon: 'bolt', bg: 'bg-blue-500/10', border: 'border-blue-500/20' }; // Blue
+      case 'actor_events': return { color: '#8B5CF6', icon: 'rss', bg: 'bg-purple-500/10', border: 'border-purple-500/20' }; // Purple
+      case 'actor_receipts': return { color: '#10B981', icon: 'check-circle', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' }; // Green
+      case 'rdf_quads_ld': return { color: '#06B6D4', icon: 'cube', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' }; // Cyan
+      default: return { color: '#64748B', icon: 'database', bg: 'bg-slate-500/10', border: 'border-slate-500/20' }; // Slate
     }
   };
 
-  const channelColor = getChannelColor(msg.channel);
+  const config = getChannelConfig(msg.channel);
 
   return (
-    <Animated.View style={[
-      styles.msgItem,
-      {
-        opacity: opacityAnim,
-        transform: [{ translateY: slideAnim }],
-        borderLeftColor: channelColor
-      }
-    ]}>
-      <View style={styles.msgHeader}>
-        <View style={[styles.msgChannelBadge, { backgroundColor: channelColor + '15', borderColor: channelColor }]}>
-          <Text style={[styles.msgChannelText, { color: channelColor }]}>{msg.channel}</Text>
+    <Animated.View style={{
+      opacity: opacityAnim,
+      transform: [{ translateY: slideAnim }],
+    }}>
+      <View className={`mb-3 rounded-xl border ${config.border} bg-[#0f172a]/90 overflow-hidden`}>
+        <View className="flex-row items-center justify-between px-3 py-2 bg-black/20 border-b border-white/5">
+          <View className="flex-row items-center space-x-2">
+            <FontAwesome name={config.icon as any} size={12} color={config.color} style={{ marginRight: 6 }} />
+            <Text className="text-xs font-bold uppercase tracking-wider" style={{ color: config.color }}>
+              {msg.channel}
+            </Text>
+          </View>
+          <Text className="text-[10px] text-slate-500 font-medium">{msg.timestamp}</Text>
         </View>
-        <Text style={styles.msgTime}>{msg.timestamp}</Text>
+        <View className="p-3">
+          <Text className="text-[11px] text-slate-300 font-mono leading-relaxed">
+            {JSON.stringify(msg.payload, null, 2)}
+          </Text>
+        </View>
       </View>
-      <Text style={styles.msgJson}>{JSON.stringify(msg.payload, null, 2)}</Text>
     </Animated.View>
   );
 }
+const generateSimulatedPayload = (channel: string): any => {
+  if (channel === 'actor_commands') {
+    const cmds = ['volunteer_signup', 'volunteer_cancel', 'confirm_shift', 'flag_shortage'];
+    const roles = ['member', 'volunteer', 'teamLead', 'pastor'];
+    return {
+      action: 'INSERT',
+      table: 'actor_commands',
+      record: {
+        id: 'cmd_' + Math.random().toString(36).substring(2, 11),
+        command: cmds[Math.floor(Math.random() * cmds.length)],
+        actor_ref: 'volunteer_shortage',
+        principal: { role: roles[Math.floor(Math.random() * roles.length)], id: 'usr_abc' },
+        timestamp: new Date().toISOString()
+      }
+    };
+  } else if (channel === 'actor_events') {
+    const events = ['slot_opened', 'shift_assigned', 'risk_acknowledged'];
+    return {
+      action: 'INSERT',
+      table: 'actor_events',
+      record: {
+        id: 'evt_' + Math.random().toString(36).substring(2, 11),
+        command_id: 'cmd_' + Math.random().toString(36).substring(2, 11),
+        type: events[Math.floor(Math.random() * events.length)],
+        payload: { detail: 'Simulated realtime event logging' },
+        timestamp: new Date().toISOString()
+      }
+    };
+  } else if (channel === 'actor_receipts') {
+    const statuses = ['Confirmed', 'Rejected_Remote', 'accepted_pending'];
+    return {
+      action: 'INSERT',
+      table: 'actor_receipts',
+      record: {
+        id: 'rec_' + Math.random().toString(36).substring(2, 11),
+        command_id: 'cmd_' + Math.random().toString(36).substring(2, 11),
+        status: statuses[Math.floor(Math.random() * statuses.length)],
+        delta_hash: 'hash_' + Math.random().toString(36).substring(2, 7),
+        timestamp: new Date().toISOString()
+      }
+    };
+  } else if (channel === 'rdf_quads_ld') {
+    const subjects = ['volunteer_123', 'shift_abc', 'risk_summary_default'];
+    const predicates = ['has_status', 'allocated_to', 'shortage_ratio'];
+    const objects = ['shortage', 'Sarah Brown', '0.62'];
+    return {
+      action: 'UPSERT',
+      table: 'rdf_quads_ld',
+      record: {
+        subject: subjects[Math.floor(Math.random() * subjects.length)],
+        predicate: predicates[Math.floor(Math.random() * predicates.length)],
+        object: objects[Math.floor(Math.random() * objects.length)],
+        graph: 'default_graph'
+      }
+    };
+  }
+  return {};
+};
 
 export default function AdminRealtime() {
   const [isConnected, setIsConnected] = React.useState(true);
   const [latency, setLatency] = React.useState(42);
   const [messages, setMessages] = React.useState<Message[]>(() => [
+    {
+      id: 'msg-init-0',
+      channel: 'system_status',
+      payload: { status: 'initialized' },
+      timestamp: new Date(Date.now() - 15000).toLocaleTimeString(),
+    },
     {
       id: 'msg-init-1',
       channel: 'rdf_quads_ld',
@@ -91,35 +160,34 @@ export default function AdminRealtime() {
     }
   ]);
 
-  // Connection pulse animation
   const [pulseAnim] = React.useState(() => new Animated.Value(1));
+  
   React.useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
-          toValue: 0.3,
-          duration: isConnected ? 1000 : 350,
+          toValue: 0.4,
+          duration: isConnected ? 1200 : 400,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: isConnected ? 1000 : 350,
+          duration: isConnected ? 1200 : 400,
           useNativeDriver: true,
         }),
       ])
     ).start();
   }, [isConnected]);
 
-  // Latency fluctuation simulation
   React.useEffect(() => {
     const interval = setInterval(() => {
       if (isConnected) {
         setLatency(prev => {
-          const diff = Math.floor(Math.random() * 11) - 5; // -5 to +5
-          return Math.max(10, Math.min(120, prev + diff));
+          const diff = Math.floor(Math.random() * 11) - 5;
+          return Math.max(12, Math.min(150, prev + diff));
         });
       }
-    }, 3000);
+    }, 2500);
     return () => clearInterval(interval);
   }, [isConnected]);
 
@@ -127,7 +195,7 @@ export default function AdminRealtime() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setMessages(prev => [
       {
-        id: 'msg-' + Math.random().toString(36).substr(2, 9),
+        id: 'msg-' + Math.random().toString(36).substring(2, 11),
         channel,
         payload,
         timestamp: new Date().toLocaleTimeString(),
@@ -136,11 +204,9 @@ export default function AdminRealtime() {
     ]);
   }, []);
 
-  // Supabase Realtime Listener Setup
   React.useEffect(() => {
     if (!isConnected) return;
     
-    // Subscribe to CDC updates
     const channel = supabase
       .channel('admin-realtime-cdc')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'actor_commands' }, (payload) => {
@@ -165,63 +231,7 @@ export default function AdminRealtime() {
   }, [isConnected, addMessage]);
 
   const simulateMessage = (channel: string) => {
-    let payload = {};
-    if (channel === 'actor_commands') {
-      const cmds = ['volunteer_signup', 'volunteer_cancel', 'confirm_shift', 'flag_shortage'];
-      const roles = ['member', 'volunteer', 'teamLead', 'pastor'];
-      payload = {
-        action: 'INSERT',
-        table: 'actor_commands',
-        record: {
-          id: 'cmd_' + Math.random().toString(36).substr(2, 9),
-          command: cmds[Math.floor(Math.random() * cmds.length)],
-          actor_ref: 'volunteer_shortage',
-          principal: { role: roles[Math.floor(Math.random() * roles.length)], id: 'usr_abc' },
-          timestamp: new Date().toISOString()
-        }
-      };
-    } else if (channel === 'actor_events') {
-      const events = ['slot_opened', 'shift_assigned', 'risk_acknowledged'];
-      payload = {
-        action: 'INSERT',
-        table: 'actor_events',
-        record: {
-          id: 'evt_' + Math.random().toString(36).substr(2, 9),
-          command_id: 'cmd_' + Math.random().toString(36).substr(2, 9),
-          type: events[Math.floor(Math.random() * events.length)],
-          payload: { detail: 'Simulated realtime event logging' },
-          timestamp: new Date().toISOString()
-        }
-      };
-    } else if (channel === 'actor_receipts') {
-      const statuses = ['Confirmed', 'Rejected_Remote', 'accepted_pending'];
-      payload = {
-        action: 'INSERT',
-        table: 'actor_receipts',
-        record: {
-          id: 'rec_' + Math.random().toString(36).substr(2, 9),
-          command_id: 'cmd_' + Math.random().toString(36).substr(2, 9),
-          status: statuses[Math.floor(Math.random() * statuses.length)],
-          delta_hash: 'hash_' + Math.random().toString(36).substr(2, 5),
-          timestamp: new Date().toISOString()
-        }
-      };
-    } else if (channel === 'rdf_quads_ld') {
-      const subjects = ['volunteer_123', 'shift_abc', 'risk_summary_default'];
-      const predicates = ['has_status', 'allocated_to', 'shortage_ratio'];
-      const objects = ['shortage', 'Sarah Brown', '0.62'];
-      payload = {
-        action: 'UPSERT',
-        table: 'rdf_quads_ld',
-        record: {
-          subject: subjects[Math.floor(Math.random() * subjects.length)],
-          predicate: predicates[Math.floor(Math.random() * predicates.length)],
-          object: objects[Math.floor(Math.random() * objects.length)],
-          graph: 'default_graph'
-        }
-      };
-    }
-    
+    const payload = generateSimulatedPayload(channel);
     addMessage(channel, payload);
   };
 
@@ -239,57 +249,70 @@ export default function AdminRealtime() {
         subtitle="Socket and subscription states"
         headerRight={
           <TouchableOpacity 
-            style={[styles.toggleBtn, { borderColor: isConnected ? '#10B981' : '#EF4444' }]} 
+            activeOpacity={0.7}
+            className={`px-3 py-1.5 rounded-lg border flex-row items-center shadow-sm ${isConnected ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}
             onPress={() => setIsConnected(!isConnected)}
           >
-            <Text style={[styles.toggleBtnText, { color: isConnected ? '#10B981' : '#EF4444' }]}>
+            <FontAwesome name={isConnected ? "wifi" : "warning"} size={12} color={isConnected ? '#10B981' : '#F43F5E'} style={{ marginRight: 6 }} />
+            <Text className={`text-xs font-bold tracking-wide ${isConnected ? 'text-emerald-500' : 'text-rose-500'}`}>
               {isConnected ? 'Disconnect' : 'Connect'}
             </Text>
           </TouchableOpacity>
         }
       >
-        <View style={styles.row}>
-          <Text style={styles.label}>Connection State:</Text>
-          <View style={styles.badgeWrapper}>
-            <Animated.View style={[
-              styles.statusDot, 
-              { 
-                backgroundColor: isConnected ? '#10B981' : '#EF4444',
-                opacity: pulseAnim
-              }
-            ]} />
-            <Text style={[styles.val, isConnected ? styles.greenText : styles.redText]}>
-              {isConnected ? 'Connected' : 'Offline / Error'}
-            </Text>
+        <View className="space-y-3 mt-2">
+          <View className="flex-row justify-between items-center bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+            <View className="flex-row items-center space-x-3">
+              <View className={`w-8 h-8 rounded-full items-center justify-center ${isConnected ? 'bg-emerald-500/20' : 'bg-rose-500/20'}`}>
+                <Animated.View style={{ opacity: pulseAnim }}>
+                  <FontAwesome name="circle" size={12} color={isConnected ? '#10B981' : '#F43F5E'} />
+                </Animated.View>
+              </View>
+              <View>
+                <Text className="text-slate-400 text-xs font-medium mb-0.5">Connection State</Text>
+                <Text className={`text-sm font-bold ${isConnected ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  {isConnected ? 'Connected' : 'Offline / Error'}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Client Mode:</Text>
-          <Text style={styles.val}>Websocket (Realtime v2)</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Latency / Echo Rate:</Text>
-          <Text style={styles.val}>{isConnected ? `${latency}ms` : '—'}</Text>
+          <View className="flex-row space-x-3">
+            <View className="flex-1 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+              <Text className="text-slate-400 text-xs font-medium mb-1">Client Mode</Text>
+              <Text className="text-slate-200 text-sm font-semibold">Realtime v2</Text>
+            </View>
+            <View className="flex-1 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+              <Text className="text-slate-400 text-xs font-medium mb-1">Echo Latency</Text>
+              <Text className="text-slate-200 text-sm font-mono font-bold">
+                {isConnected ? `${latency}ms` : '—'}
+              </Text>
+            </View>
+          </View>
         </View>
       </AdminCard>
 
       {/* Simulator Control Panel */}
       <AdminCard title="Real-Time Event Simulator" subtitle="Simulate database CDC inserts & updates">
-        <View style={styles.simulatorGrid}>
-          <TouchableOpacity style={[styles.simBtn, { borderLeftColor: '#3B82F6' }]} onPress={() => simulateMessage('actor_commands')}>
-            <Text style={styles.simBtnText}>⚡ Command</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.simBtn, { borderLeftColor: '#8B5CF6' }]} onPress={() => simulateMessage('actor_events')}>
-            <Text style={styles.simBtnText}>⚡ Event</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.simBtn, { borderLeftColor: '#10B981' }]} onPress={() => simulateMessage('actor_receipts')}>
-            <Text style={styles.simBtnText}>⚡ Receipt</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.simBtn, { borderLeftColor: '#06B6D4' }]} onPress={() => simulateMessage('rdf_quads_ld')}>
-            <Text style={styles.simBtnText}>⚡ RDF Quad</Text>
-          </TouchableOpacity>
+        <View className="flex-row flex-wrap gap-2 mt-2">
+          {[
+            { channel: 'actor_commands', label: '⚡ Command', color: 'blue' },
+            { channel: 'actor_events', label: '⚡ Event', color: 'purple' },
+            { channel: 'actor_receipts', label: '⚡ Receipt', color: 'emerald' },
+            { channel: 'rdf_quads_ld', label: '⚡ RDF Quad', color: 'cyan' }
+          ].map((item) => (
+            <TouchableOpacity 
+              key={item.channel}
+              activeOpacity={0.7}
+              className={`flex-1 min-w-[45%] bg-slate-800/80 border border-slate-700 rounded-xl p-3 items-center justify-center shadow-sm border-l-4`}
+              style={{
+                borderLeftColor: item.color === 'blue' ? '#3B82F6' : item.color === 'purple' ? '#8B5CF6' : item.color === 'emerald' ? '#10B981' : '#06B6D4'
+              }}
+              onPress={() => simulateMessage(item.channel)}
+            >
+              <Text className="text-slate-200 text-xs font-bold tracking-wide">{item.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </AdminCard>
 
@@ -299,155 +322,42 @@ export default function AdminRealtime() {
         subtitle="WebSocket packet log (latest first)"
         headerRight={
           messages.length > 0 ? (
-            <TouchableOpacity onPress={clearMessages}>
-              <Text style={styles.clearText}>Clear Log</Text>
+            <TouchableOpacity 
+              activeOpacity={0.6}
+              className="bg-rose-500/10 px-3 py-1.5 rounded-lg border border-rose-500/20"
+              onPress={clearMessages}
+            >
+              <Text className="text-rose-400 text-xs font-bold">Clear Log</Text>
             </TouchableOpacity>
           ) : undefined
         }
       >
-        <View style={styles.feedContainer}>
-          {messages.length > 0 ? (
-            messages.map(msg => (
-              <MessageItem key={msg.id} msg={msg} />
-            ))
-          ) : (
-            <View style={styles.emptyFeed}>
-              <FontAwesome name="hourglass-o" size={24} color="#64748B" />
-              <Text style={styles.emptyFeedText}>No real-time messages received yet.</Text>
-            </View>
-          )}
+        <View className="mt-2" style={{ maxHeight: 450 }}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
+            {messages.length > 0 ? (
+              messages.map(msg => (
+                <MessageItem key={msg.id} msg={msg} />
+              ))
+            ) : (
+              <View className="py-12 items-center justify-center">
+                <View className="w-16 h-16 rounded-full bg-slate-800/50 items-center justify-center mb-4 border border-slate-700/50">
+                  <FontAwesome name="hourglass-o" size={24} color="#64748B" />
+                </View>
+                <Text className="text-slate-400 text-sm font-medium">No real-time messages received yet.</Text>
+                <Text className="text-slate-500 text-xs mt-1">Waiting for CDC events...</Text>
+              </View>
+            )}
+          </ScrollView>
         </View>
       </AdminCard>
 
       {/* Projection Matrix */}
       <AdminCard title="Avatar Projection Matrix" subtitle="Authoritative permission filters for the current state">
-        <AvatarRelativeProjectionMatrixView />
+        <View className="mt-2 rounded-xl overflow-hidden border border-slate-700/50">
+          <AvatarRelativeProjectionMatrixView />
+        </View>
       </AdminCard>
 
     </AdminShell>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  label: {
-    color: '#94A3B8',
-    fontSize: 13,
-  },
-  val: {
-    color: '#F8FAFC',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  greenText: {
-    color: '#10B981',
-  },
-  redText: {
-    color: '#EF4444',
-  },
-  badgeWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  toggleBtn: {
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    backgroundColor: 'rgba(255,255,255,0.02)',
-  },
-  toggleBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  simulatorGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  simBtn: {
-    flex: 1,
-    minWidth: '45%',
-    backgroundColor: 'rgba(30, 41, 59, 0.9)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderLeftWidth: 4,
-    borderRadius: 8,
-    padding: 10,
-    alignItems: 'center',
-  },
-  simBtnText: {
-    color: '#F8FAFC',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  feedContainer: {
-    gap: 8,
-    maxHeight: 400,
-  },
-  clearText: {
-    color: '#EF4444',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  emptyFeed: {
-    paddingVertical: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  emptyFeedText: {
-    color: '#64748B',
-    fontSize: 13,
-    fontStyle: 'italic',
-  },
-  msgItem: {
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
-    borderLeftWidth: 4,
-    borderRadius: 8,
-    padding: 10,
-  },
-  msgHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  msgChannelBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderWidth: 1,
-  },
-  msgChannelText: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-  msgTime: {
-    color: '#64748B',
-    fontSize: 10,
-  },
-  msgJson: {
-    color: '#E2E8F0',
-    fontFamily: 'monospace',
-    fontSize: 10,
-    backgroundColor: '#090D16',
-    padding: 8,
-    borderRadius: 6,
-    lineHeight: 14,
-  },
-});

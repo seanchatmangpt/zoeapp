@@ -8,9 +8,10 @@ interface AdminShellProps {
   subtitle?: string;
   children: React.ReactNode;
   scrollable?: boolean;
+  testID?: string;
 }
 
-export function AdminShell({ title, subtitle, children, scrollable = true }: AdminShellProps) {
+export function AdminShell({ title, subtitle, children, scrollable = true, testID }: AdminShellProps) {
   const router = useRouter();
 
   const handleBack = () => {
@@ -31,16 +32,16 @@ export function AdminShell({ title, subtitle, children, scrollable = true }: Adm
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} testID={testID}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton} testID="arrow-left">
+          <TouchableOpacity onPress={handleBack} style={styles.backButton} testID="admin-back-btn" activeOpacity={0.7}>
             <FontAwesome name="arrow-left" size={16} color="#3B82F6" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.title}>{title}</Text>
-            {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+            <Text style={styles.title} numberOfLines={1}>{title}</Text>
+            {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
           </View>
         </View>
 
@@ -58,6 +59,8 @@ export function AdminShell({ title, subtitle, children, scrollable = true }: Adm
                   key={item.name}
                   onPress={() => router.replace(item.route as any)}
                   style={[styles.navButton, isActive && styles.navButtonActive]}
+                  activeOpacity={0.7}
+                  testID={`nav-${item.name.replace(/\s+/g, '-').toLowerCase()}`}
                 >
                   <Text style={[styles.navButtonText, isActive && styles.navButtonTextActive]}>
                     {item.name}
@@ -84,7 +87,7 @@ export function AdminShell({ title, subtitle, children, scrollable = true }: Adm
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#0F172A', // Slate 900 base background
+    backgroundColor: '#0F172A', // slate-900 base background
   },
   container: {
     flex: 1,
@@ -93,56 +96,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
-    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+    borderBottomColor: '#1E293B', // slate-800
+    backgroundColor: '#0F172A',
+    zIndex: 10,
   },
   backButton: {
-    padding: 8,
-    borderRadius: 8,
+    padding: 10,
+    borderRadius: 12,
     backgroundColor: 'rgba(59, 130, 246, 0.1)',
-    marginRight: 12,
+    marginRight: 16,
   },
   headerTitleContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '800',
     color: '#F8FAFC',
+    letterSpacing: 0.3,
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 12,
     color: '#94A3B8',
     marginTop: 2,
   },
   navRow: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
-    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    borderBottomColor: '#1E293B',
+    backgroundColor: '#0F172A',
   },
   navScroll: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     flexDirection: 'row',
     gap: 8,
   },
   navButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: '#1E293B', // slate-800
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: '#334155', // slate-700
   },
   navButtonActive: {
     backgroundColor: 'rgba(59, 130, 246, 0.15)',
     borderColor: '#3B82F6',
   },
   navButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: '#94A3B8',
   },
   navButtonTextActive: {

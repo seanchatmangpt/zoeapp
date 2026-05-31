@@ -226,6 +226,14 @@ const mockUseActorOpsStore = create((set) => ({
   setCounts: (outbox: number, quarantine: number) => set({ outboxCount: outbox, quarantineCount: quarantine }),
 }));
 
+// Mock expo-router
+const mockPush = jest.fn();
+jest.mock('expo-router', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 jest.mock('../../../lib/actor/actorOps', () => {
   return {
     useActorOpsStore: (selector?: any) => {
@@ -528,10 +536,191 @@ describe('Admin Consequence Supervision console tests', () => {
 
     await waitFor(() => {
       expect(getByText('cmd-latest-process-1234')).toBeTruthy();
-      expect(getByText('applied_remote')).toBeTruthy();
+      expect(getByText('applied remote')).toBeTruthy();
       expect(getByText('No error')).toBeTruthy();
     });
 
     expect(queryByText('No commands executed in this session yet.')).toBeNull();
+  });
+
+  it('navigates when clicking a valid diagnostic card', async () => {
+    const { getByText } = render(<AdminConsequenceSupervision />);
+    await waitFor(() => expect(getByText('Quarantine Count')).toBeTruthy());
+    const card = getByText('Quarantine Count');
+    await act(async () => {
+      fireEvent.press(card);
+    });
+    expect(mockPush).toHaveBeenCalledWith('/admin/outbox');
+  });
+
+  it('does nothing when clicking a diagnostic card without a route', async () => {
+    const { getByText } = render(<AdminConsequenceSupervision />);
+    await waitFor(() => expect(getByText('Runtime Health')).toBeTruthy());
+    const card = getByText('Runtime Health');
+    
+    // It's disabled, so press might not fire, but we can call onPress directly to test the ternary null branch
+    await act(async () => {
+      if (card.parent && card.parent.props.onPress) {
+        card.parent.props.onPress();
+      } else {
+        fireEvent.press(card);
+      }
+    });
+    
+    // mockPush should not be called
+    expect(mockPush).not.toHaveBeenCalled(); 
+  });
+
+  it('advances timer and updates uptime', async () => {
+    jest.useFakeTimers();
+    const { getByText } = render(<AdminConsequenceSupervision />);
+    
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+    
+    await waitFor(() => {
+      expect(getByText(/00:00:02/)).toBeTruthy();
+    });
+    
+    jest.useRealTimers();
+  });
+
+  it('covers android platform initialization and animation experimental flag', () => {
+    jest.isolateModules(() => {
+      const { Platform, UIManager } = require('react-native');
+      const originalOS = Platform.OS;
+      Platform.OS = 'android';
+      UIManager.setLayoutAnimationEnabledExperimental = jest.fn();
+      
+      require('../consequence-supervision');
+      
+      expect(UIManager.setLayoutAnimationEnabledExperimental).toHaveBeenCalledWith(true);
+      Platform.OS = originalOS;
+    });
+  });
+
+  it('handles error in refreshCounts safely', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const { db } = require('../../../lib/db/db');
+    
+    // Make the first db.select throw an error to simulate load failure
+    const originalSelect = db.select;
+    db.select = jest.fn().mockImplementationOnce(() => {
+      throw new Error('Database connection failed');
+    }).mockImplementation((...args: any[]) => originalSelect(...args));
+
+    render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to load metrics:', expect.any(Error));
+    });
+
+    db.select = originalSelect;
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('handles error in handleReplay safely', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockStore.quarantine.push({
+      id: 'error-replay-id',
+      commandId: 'cmd-replay-id',
+      actorRef: JSON.stringify({ id: 'actor-replay-ref' }),
+      payload: JSON.stringify({ data: 'mock' }),
+      error: 'Divergence error',
+      createdAt: new Date(),
+    });
+    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+    await waitFor(() => expect(getByText('Divergence error')).toBeTruthy());
+
+    const { db } = require('../../../lib/db/db');
+    const originalInsert = db.insert;
+    db.insert = jest.fn().mockImplementation(() => {
+      throw new Error('Insert failed');
+    });
+
+    const replayButton = getByText('Force Replay');
+    await act(async () => {
+      fireEvent.press(replayButton);
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to replay quarantined item:', expect.any(Error));
+    expect(alertSpy).toHaveBeenCalledWith('Error', 'Failed to dispatch replay for this quarantined flow.');
+
+    db.insert = originalInsert;
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('updates outbox entry correctly when replaying existing id', async () => {
+    mockStore.quarantine.push({
+      id: 'existing-id',
+      commandId: 'cmd-replay-id',
+      actorRef: JSON.stringify({ id: 'actor-replay-ref' }),
+      payload: JSON.stringify({ data: 'mock' }),
+      error: 'Divergence error',
+      createdAt: new Date(),
+    });
+    // Add existing outbox item
+    mockStore.outbox.push({
+      id: 'existing-id',
+      commandId: 'cmd-replay-id',
+      status: 'error',
+    });
+    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+    await waitFor(() => expect(getByText('Divergence error')).toBeTruthy());
+
+    const replayButton = getByText('Force Replay');
+    await act(async () => {
+      fireEvent.press(replayButton);
+    });
+
+    expect(mockStore.outbox.find((o: any) => o.id === 'existing-id')?.status).toBe('pending');
+  });
+
+  it('handles error in handlePurge safely', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockStore.quarantine.push({
+      id: 'error-purge-id',
+      commandId: 'cmd-purge-id',
+      actorRef: JSON.stringify({ id: 'actor-purge-ref' }),
+      payload: JSON.stringify({ data: 'mock' }),
+      error: 'Validation failure',
+      createdAt: new Date(),
+    });
+    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+
+    jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+      if (buttons) {
+        const purgeBtn = buttons.find((b: any) => b.text === 'Purge');
+        if (purgeBtn && purgeBtn.onPress) {
+          purgeBtn.onPress();
+        }
+      }
+    });
+
+    const { getByText } = render(<AdminConsequenceSupervision />);
+    await waitFor(() => expect(getByText('Validation failure')).toBeTruthy());
+
+    const { db } = require('../../../lib/db/db');
+    const originalDelete = db.delete;
+    db.delete = jest.fn().mockImplementation(() => {
+      throw new Error('Delete failed');
+    });
+
+    const purgeButton = getByText('Purge Record');
+    await act(async () => {
+      fireEvent.press(purgeButton);
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to purge item:', expect.any(Error));
+
+    db.delete = originalDelete;
+    consoleErrorSpy.mockRestore();
   });
 });

@@ -73,14 +73,13 @@ export default function AdminIntelligence() {
   };
 
   const handleRun = async () => {
-    if (!selectedCapId) return;
     setRunning(true);
     setLatestReceipt(null);
     setReplayArtifact(null);
 
     try {
-      const input = getFixtureInput(selectedCapId);
-      const receipt = await IntelligenceRunner.run(selectedCapId, input);
+      const input = getFixtureInput(selectedCapId as string);
+      const receipt = await IntelligenceRunner.run(selectedCapId as string, input);
       setLatestReceipt(receipt);
 
       const artifact = IntelligenceRunner.getReplayArtifact(receipt.id);
@@ -118,6 +117,7 @@ export default function AdminIntelligence() {
           {capabilities.map((cap) => (
             <TouchableOpacity
               key={cap.id}
+              activeOpacity={0.8}
               style={[
                 styles.capItem,
                 selectedCapId === cap.id && styles.capItemActive
@@ -250,7 +250,7 @@ export default function AdminIntelligence() {
           <Text style={styles.emptyText}>No local audit logs generated yet.</Text>
         ) : (
           replaysList.map((item) => (
-            <TouchableOpacity key={item.receiptId} style={styles.replayItem} onPress={() => handleSelectReplay(item)}>
+            <TouchableOpacity activeOpacity={0.8} key={item.receiptId} style={styles.replayItem} onPress={() => handleSelectReplay(item)}>
               <View style={styles.replayMeta}>
                 <Text style={styles.replayCap}>{item.capabilityId}</Text>
                 <Text style={styles.replayTime}>{new Date(item.timestamp).toLocaleTimeString()}</Text>

@@ -7,6 +7,7 @@ import { HookMailbox } from '../../hook-otp/mailbox';
 import { HookActorInstance } from '../../hook-otp/registry';
 import { quarantineActor } from '../quarantine';
 import { repairActor } from '../repair';
+import { SupervisionProcessConformanceEvaluator } from '../supervision';
 
 describe('Truex Hook OTP Supervision', () => {
   const actorRef: HookActorRef = {
@@ -120,5 +121,141 @@ describe('Truex Hook OTP Supervision', () => {
     repairActor(mockInstance, { data: 'repaired_data' });
     expect(mockInstance.quarantined).toBe(false);
     expect(mockInstance.state).toEqual({ data: 'repaired_data' });
+  });
+
+  describe('SupervisionProcessConformanceEvaluator', () => {
+    let evaluator: SupervisionProcessConformanceEvaluator;
+    let mockInstance: HookActorInstance;
+    let mailbox: HookMailbox;
+
+    let resolveMailboxProcessor: any;
+
+    beforeEach(() => {
+      resolveMailboxProcessor = undefined;
+      evaluator = new SupervisionProcessConformanceEvaluator(3, 100, 2, 2, 0.9);
+      mailbox = new HookMailbox(async () => {
+        if (resolveMailboxProcessor !== undefined) {
+          await new Promise((resolve) => {
+            resolveMailboxProcessor = resolve;
+          });
+        }
+      });
+      mockInstance = {
+        ref: actorRef,
+        state: { data: 'test_state' },
+        mailbox,
+        behavior: {},
+        supervisor: { onFailure: async () => 'restart' },
+        quarantined: false,
+        history: [],
+        receiptChainHash: 'init',
+      };
+    });
+
+    const msgWithPayload = (payload: any): HookMessage => ({
+      id: 'm-eval',
+      type: 'graph_delta',
+      payload,
+      actorRef,
+      timestamp: new Date().toISOString(),
+    });
+
+    test('should allow message processing under normal circumstances', () => {
+      const msg = msgWithPayload({});
+      const result = evaluator.evaluateMessage(msg, mockInstance, 0.5);
+      expect(result.action).toBe('allow');
+      expect(result.reason).toBeUndefined();
+    });
+
+    test('should recommend quarantine on message oscillation', () => {
+      const msg = msgWithPayload({
+        trace: ['volunteer_cancellation', 'other_hook', 'volunteer_cancellation', 'other_hook', 'volunteer_cancellation']
+      });
+      const result = evaluator.evaluateMessage(msg, mockInstance, 0.5);
+      expect(result.action).toBe('quarantine');
+      expect(result.reason).toContain('oscillation');
+    });
+
+    test('should recommend suppression under flood conditions', () => {
+      evaluator.evaluateMessage(msgWithPayload({}), mockInstance, 0.5);
+      evaluator.evaluateMessage(msgWithPayload({}), mockInstance, 0.5);
+      evaluator.evaluateMessage(msgWithPayload({}), mockInstance, 0.5);
+      const msg = msgWithPayload({});
+      const result = evaluator.evaluateMessage(msg, mockInstance, 0.5);
+      expect(result.action).toBe('suppress');
+      expect(result.reason).toContain('flood');
+    });
+
+    test('should recommend batching under high queue pressure', () => {
+      resolveMailboxProcessor = null;
+
+      mailbox.push(msgWithPayload({})); // blocks
+      mailbox.push(msgWithPayload({})); // queued
+      mailbox.push(msgWithPayload({})); // queued
+      mailbox.push(msgWithPayload({})); // queued
+
+      const msg = msgWithPayload({});
+      const result = evaluator.evaluateMessage(msg, mockInstance, 0.5);
+      expect(result.action).toBe('batch');
+      expect(result.reason).toContain('pressure');
+
+      if (resolveMailboxProcessor) {
+        resolveMailboxProcessor();
+      }
+    });
+
+    test('should recommend suppression under high avatar load', () => {
+      const msg = msgWithPayload({});
+      const result = evaluator.evaluateMessage(msg, mockInstance, 0.95);
+      expect(result.action).toBe('suppress');
+      expect(result.reason).toContain('load');
+    });
+
+    describe('Trace Conformance Evaluation', () => {
+      const declaredWorkflow = ['A', 'B', 'C', 'D'];
+
+      test('should yield 1.0 fitness/precision and TRUTHFUL verdict for exact sequence', () => {
+        const actualEvents = ['A', 'B', 'C', 'D'];
+        const report = evaluator.evaluateTraceConformance(declaredWorkflow, actualEvents);
+        expect(report.isConforming).toBe(true);
+        expect(report.fitness).toBe(1.0);
+        expect(report.precision).toBe(1.0);
+        expect(report.verdict).toBe('TRUTHFUL');
+        expect(report.deviations).toHaveLength(0);
+      });
+
+      test('should yield lower metrics and VARIANCE verdict for slightly deviant sequence', () => {
+        const actualEvents = ['A', 'B', 'X', 'C', 'D'];
+        const report = evaluator.evaluateTraceConformance(declaredWorkflow, actualEvents);
+        expect(report.isConforming).toBe(false);
+        expect(report.fitness).toBeLessThan(1.0);
+        expect(report.verdict).toBe('VARIANCE');
+        expect(report.deviations.length).toBeGreaterThan(0);
+      });
+
+      test('should yield DECEPTIVE verdict for highly deviant sequence', () => {
+        const actualEvents = ['X', 'Y', 'Z'];
+        const report = evaluator.evaluateTraceConformance(declaredWorkflow, actualEvents);
+        expect(report.isConforming).toBe(false);
+        expect(report.fitness).toBe(0.0);
+        expect(report.verdict).toBe('DECEPTIVE');
+      });
+
+      test('should handle empty sequence gracefully', () => {
+        const report = evaluator.evaluateTraceConformance([], []);
+        expect(report.isConforming).toBe(true);
+        expect(report.fitness).toBe(1.0);
+        expect(report.verdict).toBe('TRUTHFUL');
+      });
+
+      test('should throw error for invalid input types', () => {
+        expect(() => {
+          evaluator.evaluateTraceConformance(null as any, []);
+        }).toThrow();
+        expect(() => {
+          evaluator.evaluateTraceConformance([], {} as any);
+        }).toThrow();
+      });
+    });
   });
 });

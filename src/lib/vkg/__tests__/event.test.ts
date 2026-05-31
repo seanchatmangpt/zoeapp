@@ -1,6 +1,11 @@
 import { VirtualKnowledgeGraphClient } from '../client';
 import { DataFactory } from '../rdf';
 import { Event } from '../../../types/semantic/Event';
+import {
+  telemetryToSchemaOrgEvent,
+  dispatchVkgEvent,
+  VkgEventDispatcher,
+} from '../event';
 
 import { db } from '../../db/db';
 
@@ -62,5 +67,94 @@ describe('Schema.org Event Mapping', () => {
     expect(reconstructed['@id']).toBe(doc['@id']);
     expect(reconstructed['name']).toBe(doc['name']);
     expect(reconstructed['description']).toBe(doc['description']);
+  });
+});
+
+describe('VKG Telemetry Mapping and Rebrand Translation', () => {
+  it('correctly maps screen views to Avatar-Relative Projection', () => {
+    const telemetry = {
+      timestamp: '2026-05-30T21:00:00.000Z',
+      type: 'screen_view_home',
+      payload: {
+        screen: 'HomeFeed',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Avatar-Relative Projection Event');
+    expect(event.startDate).toBe(telemetry.timestamp);
+    expect(event.avatarRelativeProjection).toBe('HomeFeed');
+  });
+
+  it('correctly maps API calls to Propagation Triggers', () => {
+    const telemetry = {
+      type: 'api_call_fetch_sermons',
+      payload: {
+        trigger: 'pull_to_refresh',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Propagation Trigger Event');
+    expect(event.propagationTrigger).toBe('pull_to_refresh');
+  });
+
+  it('correctly maps Offline Queue to Pre-Admission Tension Queue', () => {
+    const telemetry = {
+      type: 'offline_queue_sync',
+      payload: {
+        queue: 'sermons',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Pre-Admission Tension Queue Event');
+    expect(event.preAdmissionTensionQueue).toBe('sermons');
+  });
+
+  it('correctly maps Dashboard to Consequence Supervision', () => {
+    const telemetry = {
+      type: 'dashboard_render',
+      payload: {
+        dashboard: 'MainSupervision',
+      },
+    };
+
+    const event = telemetryToSchemaOrgEvent(telemetry);
+    expect(event.name).toBe('Consequence Supervision Event');
+    expect(event.consequenceSupervision).toBe('MainSupervision');
+  });
+
+  it('throws on invalid telemetry input', () => {
+    expect(() => telemetryToSchemaOrgEvent({} as any)).toThrow();
+  });
+});
+
+describe('VKG Event Dispatch', () => {
+  let client: VirtualKnowledgeGraphClient;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    client = new VirtualKnowledgeGraphClient();
+  });
+
+  it('successfully converts and dispatches a telemetry event using VkgEventDispatcher', async () => {
+    const addQuadsSpy = jest.spyOn(client, 'addQuads').mockResolvedValue(undefined);
+    const dispatcher = new VkgEventDispatcher(client);
+
+    const telemetry = {
+      type: 'api_call_fetch',
+      payload: {
+        trigger: 'manual_refresh',
+      },
+    };
+
+    const event = await dispatcher.dispatchTelemetry(telemetry);
+
+    expect(event['@type']).toBe('https://schema.org/Event');
+    expect(event.name).toBe('Propagation Trigger Event');
+    expect(event.propagationTrigger).toBe('manual_refresh');
+    expect(addQuadsSpy).toHaveBeenCalled();
+    expect(dispatcher.getDispatchedCount()).toBe(1);
   });
 });

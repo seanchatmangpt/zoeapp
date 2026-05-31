@@ -33,34 +33,46 @@ export default function AdminReceipts() {
   }, []);
 
   const renderReceiptItem = ({ item }: { item: any }) => {
+    const isError = !!item.error;
     return (
       <AdminCard 
-        title={`Receipt: ${item.id.slice(0, 10)}...`} 
-        subtitle={item.createdAt.toLocaleString()}
+        title={`Receipt: ${item.id.slice(0, 8)}...`} 
+        subtitle={new Date(item.createdAt).toLocaleString()}
         headerRight={<ReceiptBadge status={item.status} />}
+        style={isError ? styles.cardError : undefined}
       >
-        <View style={styles.details}>
+        <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
-            <Text style={styles.label}>Command ID:</Text>
+            <Text style={styles.label}>Command ID</Text>
             <Text style={styles.valueMono}>{item.commandId}</Text>
           </View>
+          <View style={styles.divider} />
+          
           <View style={styles.detailRow}>
-            <Text style={styles.label}>Actor Target:</Text>
+            <Text style={styles.label}>Actor Target</Text>
             <ActorRefView actorRef={item.actorRef} />
           </View>
+
           {item.deltaHash && (
-            <View style={styles.detailRow}>
-              <Text style={styles.label}>Delta Checksum:</Text>
-              <Text style={styles.valueMono}>{item.deltaHash}</Text>
-            </View>
+            <>
+              <View style={styles.divider} />
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Delta Hash</Text>
+                <Text style={styles.valueMono}>{item.deltaHash.slice(0, 16)}...</Text>
+              </View>
+            </>
           )}
+
           {item.error && (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorLabel}>Reason:</Text>
+              <Text style={styles.errorLabel}>Failure Reason</Text>
               <Text style={styles.errorText}>{item.error}</Text>
             </View>
           )}
-          <JsonInspector data={{ eventIds: JSON.parse(item.eventIds) }} title="Associated Event IDs" />
+          
+          <View style={styles.jsonWrapper}>
+            <JsonInspector data={{ eventIds: JSON.parse(item.eventIds || '[]') }} title="Event Payloads" />
+          </View>
         </View>
       </AdminCard>
     );
@@ -74,13 +86,18 @@ export default function AdminReceipts() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={fetchReceipts} tintColor="#3B82F6" />
+          <RefreshControl refreshing={refreshing} onRefresh={fetchReceipts} tintColor="#3B82F6" colors={['#3B82F6']} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No receipt records found.</Text>
+            <View style={styles.emptyIconPlaceholder}>
+              <Text style={styles.emptyIconText}>🧾</Text>
+            </View>
+            <Text style={styles.emptyTitle}>No Receipts Found</Text>
+            <Text style={styles.emptyText}>Dispatched commands will appear here.</Text>
           </View>
         }
+        showsVerticalScrollIndicator={false}
       />
     </AdminShell>
   );
@@ -91,54 +108,86 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
-  details: {
+  cardError: {
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  detailsContainer: {
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    borderRadius: 8,
+    padding: 12,
     marginTop: 4,
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'space-between',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    marginVertical: 10,
   },
   label: {
     color: '#94A3B8',
     fontSize: 12,
-    width: 100,
     fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   valueMono: {
     fontFamily: 'SpaceMono',
-    fontSize: 12,
+    fontSize: 13,
     color: '#E2E8F0',
-    flex: 1,
   },
   errorContainer: {
-    backgroundColor: 'rgba(239, 68, 68, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.2)',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 8,
-    marginBottom: 4,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderLeftWidth: 3,
+    borderLeftColor: '#EF4444',
+    borderRadius: 6,
+    padding: 12,
+    marginTop: 12,
   },
   errorLabel: {
     color: '#F87171',
     fontSize: 11,
     fontWeight: 'bold',
-    marginBottom: 2,
+    marginBottom: 4,
+    textTransform: 'uppercase',
   },
   errorText: {
-    color: '#EF4444',
+    color: '#FCA5A5',
     fontFamily: 'SpaceMono',
-    fontSize: 11,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  jsonWrapper: {
+    marginTop: 12,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: 60,
+  },
+  emptyIconPlaceholder: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyIconText: {
+    fontSize: 28,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#F8FAFC',
+    marginBottom: 8,
   },
   emptyText: {
     color: '#64748B',
     fontSize: 14,
-    fontStyle: 'italic',
   },
 });

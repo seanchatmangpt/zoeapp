@@ -7,4 +7,5 @@ export * from './receipts';
 export * from './trajectories';
 export * from './ontology';
 export * from './quarantine';
-export * from './proxyableBridge';
+export * from './membrane';
+

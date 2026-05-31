@@ -4,3 +4,5 @@ export * from './registry';
 export * from './migration';
 export * from './upgrade';
 export * from './rollback';
+export * from './packs';
+

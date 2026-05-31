@@ -15,6 +15,8 @@ import Colors from '@/src/constants/Colors';
 // Import your global CSS file
 import '../../global.css';
 
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,

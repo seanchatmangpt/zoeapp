@@ -642,6 +642,7 @@ export default function OpenAIAvatarRelativeProjection() {
           onContentSizeChange={scrollToBottom}
           onScroll={handleScroll}
           scrollEventThrottle={16}
+          keyboardShouldPersistTaps="handled"
         >
           {messages.map((item) => (
             <MessageItem

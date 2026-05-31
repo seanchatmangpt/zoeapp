@@ -72,6 +72,8 @@ function deserializeQuad(sq: any): Quad {
  * Synchronizes actor logs up to Supabase.
  */
 export class ActorSyncEngine extends SyncEngine {
+  protected override supportedJobTypes = ['ACTOR_COMMAND', 'ACTOR_EVENT', 'ACTOR_RECEIPT'];
+
   protected async dispatchJob(job: { jobType: string; payload: string; entityId: string | null }): Promise<void> {
     const rawData = JSON.parse(job.payload);
 
@@ -475,12 +477,14 @@ export class ActorDispatcher {
    * Performs reconciliation and compensating rollback on rejection.
    */
   public async syncOutbox(remoteDispatcher: ActorDispatcher): Promise<void> {
+    let offline = false;
     try {
       const { isNetworkOffline } = require('./actorOps');
-      if (isNetworkOffline()) {
-        throw new Error("NetworkError: Device is offline");
-      }
+      offline = isNetworkOffline();
     } catch (e) {}
+    if (offline) {
+      throw new Error("NetworkError: Device is offline");
+    }
 
     const jobs = await db
       .select()
@@ -493,6 +497,8 @@ export class ActorDispatcher {
         .update(actorOutbox)
         .set({ status: 'processing', attempts: job.attempts + 1 })
         .where(eq(actorOutbox.id, job.id));
+
+      job.attempts++;
 
       try {
         const jobData = JSON.parse(job.payload);

@@ -3,14 +3,23 @@ import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextS
 
 interface CommandButtonProps {
   title: string;
-  onPress: () => Promise<any>;
+  onPress: () => Promise<any> | void;
   style?: ViewStyle;
   textStyle?: TextStyle;
   disabled?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger';
   testID?: string;
 }
 
-export function CommandButton({ title, onPress, style, textStyle, disabled = false, testID }: CommandButtonProps) {
+export function CommandButton({ 
+  title, 
+  onPress, 
+  style, 
+  textStyle, 
+  disabled = false, 
+  variant = 'primary',
+  testID 
+}: CommandButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handlePress = async () => {
@@ -25,8 +34,35 @@ export function CommandButton({ title, onPress, style, textStyle, disabled = fal
     }
   };
 
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'secondary':
+        return {
+          button: styles.secondaryButton,
+          text: styles.secondaryText,
+          spinner: '#94A3B8',
+        };
+      case 'danger':
+        return {
+          button: styles.dangerButton,
+          text: styles.dangerText,
+          spinner: '#F8FAFC',
+        };
+      case 'primary':
+      default:
+        return {
+          button: styles.primaryButton,
+          text: styles.primaryText,
+          spinner: '#F8FAFC',
+        };
+    }
+  };
+
+  const vStyles = getVariantStyles();
+
   const buttonStyle = [
-    styles.button,
+    styles.baseButton,
+    vStyles.button,
     disabled && styles.disabledButton,
     style
   ];
@@ -40,36 +76,69 @@ export function CommandButton({ title, onPress, style, textStyle, disabled = fal
       testID={testID}
     >
       {loading ? (
-        <ActivityIndicator size="small" color="#F8FAFC" />
+        <ActivityIndicator size="small" color={vStyles.spinner} testID={`${testID}-spinner`} />
       ) : (
-        <Text style={[styles.text, textStyle]}>{title}</Text>
+        <Text style={[styles.baseText, vStyles.text, disabled && styles.disabledText, textStyle]}>
+          {title}
+        </Text>
       )}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: '#2563EB', // Blue 600
+  baseButton: {
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  primaryButton: {
+    backgroundColor: '#3B82F6', // blue-500
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#334155', // slate-700
+  },
+  dangerButton: {
+    backgroundColor: '#EF4444', // red-500
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   disabledButton: {
-    backgroundColor: '#334155', // Slate 700
-    opacity: 0.6,
+    backgroundColor: '#1E293B', // slate-800
+    borderColor: '#334155',
+    shadowOpacity: 0,
+    elevation: 0,
   },
-  text: {
-    color: '#F8FAFC',
-    fontWeight: 'bold',
+  baseText: {
+    fontWeight: '700',
     fontSize: 14,
+    letterSpacing: 0.5,
+  },
+  primaryText: {
+    color: '#FFFFFF',
+  },
+  secondaryText: {
+    color: '#94A3B8', // slate-400
+  },
+  dangerText: {
+    color: '#FFFFFF',
+  },
+  disabledText: {
+    color: '#64748B', // slate-500
   },
 });
