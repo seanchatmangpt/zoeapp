@@ -99,7 +99,7 @@ describe('VKG Telemetry Mapping and Rebrand Translation', () => {
     expect(event.propagationTrigger).toBe('pull_to_refresh');
   });
 
-  it('correctly maps Offline Queue to Pre-Admission Tension Queue', () => {
+  it('correctly maps legacy queue structures to Pre-Admission Tension Queue', () => {
     const telemetry = {
       type: 'offline_queue_sync',
       payload: {
@@ -112,7 +112,7 @@ describe('VKG Telemetry Mapping and Rebrand Translation', () => {
     expect(event.preAdmissionTensionQueue).toBe('sermons');
   });
 
-  it('correctly maps Dashboard to Consequence Supervision', () => {
+  it('correctly maps legacy supervision structures to Consequence Supervision', () => {
     const telemetry = {
       type: 'dashboard_render',
       payload: {

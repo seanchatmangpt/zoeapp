@@ -102,6 +102,9 @@ jest.mock('expo-router/react-navigation', () => ({
   }),
 }));
 
+// Mock Worklets
+jest.mock('react-native-worklets', () => require('react-native-worklets/src/mock'));
+
 // Mock Reanimated
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
@@ -219,19 +222,24 @@ const mockSupabaseClient = {
 jest.mock('@/lib/supabase', () => mockSupabaseClient);
 jest.mock('../../lib/supabase', () => mockSupabaseClient, { virtual: true });
 
-// Mock Zustand Actor Ops Store globally
-const mockSetNetworkOnline = jest.fn().mockImplementation((online) => {
-  if ((global as any).mockNetworkOnline !== undefined) {
-    (global as any).mockNetworkOnline = online;
-  }
-  mockActorOpsState._networkOnline = online;
-});
-const mockSetRemoteRejectActive = jest.fn().mockImplementation((active) => {
-  mockActorOpsState.remoteRejectActive = active;
-});
+//// Mock Zustand Actor Ops Store globally
+const mockSetNetworkOnline = jest.fn();
+const mockSetRemoteRejectActive = jest.fn();
 const mockSetLatestReceipt = jest.fn();
 const mockSetLatestEvent = jest.fn();
 const mockSetCounts = jest.fn();
+const mockSetCurrentPrincipal = jest.fn();
+const mockSetPacketDropRate = jest.fn();
+const mockSetCdcEventsCount = jest.fn();
+
+const mockIsNetworkOffline = jest.fn();
+const mockSetNetworkOffline = jest.fn();
+const mockIsRemoteRejectionMocked = jest.fn();
+const mockSetRemoteRejectionMocked = jest.fn();
+const mockGetCurrentPrincipal = jest.fn();
+const mockGetPacketDropRate = jest.fn();
+const mockSetPacketDropRateHelper = jest.fn();
+
 let mockLatestReceipt: any = { id: 'mock-rec-id' };
 
 const mockActorOpsState = {
@@ -250,18 +258,17 @@ const mockActorOpsState = {
   latestEvent: null as string | null,
   outboxCount: 0,
   quarantineCount: 0,
+  packetDropRate: 0,
+  cdcEventsCount: 0,
   currentPrincipal: { id: 'usr_admin', role: 'admin' },
   setNetworkOnline: mockSetNetworkOnline,
   setRemoteRejectActive: mockSetRemoteRejectActive,
-  setLatestReceipt: mockSetLatestReceipt.mockImplementation((r) => {
-    mockLatestReceipt = r;
-    mockActorOpsState.latestReceipt = r;
-  }),
+  setCurrentPrincipal: mockSetCurrentPrincipal,
+  setLatestReceipt: mockSetLatestReceipt,
   setLatestEvent: mockSetLatestEvent,
-  setCounts: mockSetCounts.mockImplementation((outbox, quarantine) => {
-    mockActorOpsState.outboxCount = outbox;
-    mockActorOpsState.quarantineCount = quarantine;
-  }),
+  setCounts: mockSetCounts,
+  setPacketDropRate: mockSetPacketDropRate,
+  setCdcEventsCount: mockSetCdcEventsCount,
 };
 
 const mockUseActorOpsStore = jest.fn((selector: any) => {
@@ -284,22 +291,6 @@ const mockUseActorOpsStore = jest.fn((selector: any) => {
   }
 });
 
-// Mock helpers and dispatchers
-const mockIsNetworkOffline = jest.fn(() => !mockActorOpsState.networkOnline);
-const mockSetNetworkOffline = jest.fn((val) => {
-  mockActorOpsState.networkOnline = !val;
-  (mockUseActorOpsStore as any).setState({ networkOnline: !val });
-});
-const mockIsRemoteRejectionMocked = jest.fn(() => mockActorOpsState.remoteRejectActive);
-const mockSetRemoteRejectionMocked = jest.fn((val) => {
-  mockActorOpsState.remoteRejectActive = val;
-  (mockUseActorOpsStore as any).setState({ remoteRejectActive: val });
-});
-const mockGetCurrentPrincipal = jest.fn(() => mockActorOpsState.currentPrincipal);
-const mockSetCurrentPrincipal = jest.fn((p) => {
-  mockActorOpsState.currentPrincipal = p;
-  (mockUseActorOpsStore as any).setState({ currentPrincipal: p });
-});
 
 const mockPushChanges = jest.fn(() => Promise.resolve());
 const mockSyncEngine = {
@@ -339,6 +330,8 @@ const mockGlobalVkgClient = {
 (global as any).__mockSetRemoteRejectionMocked = mockSetRemoteRejectionMocked;
 (global as any).__mockGetCurrentPrincipal = mockGetCurrentPrincipal;
 (global as any).__mockSetCurrentPrincipal = mockSetCurrentPrincipal;
+(global as any).__mockGetPacketDropRate = mockGetPacketDropRate;
+(global as any).__mockSetPacketDropRateHelper = mockSetPacketDropRateHelper;
 
 // Also expose general expected mocks for tests that check global mock properties directly
 (global as any).mockNetworkOnline = true;
@@ -362,6 +355,8 @@ function mockFactory() {
     setRemoteRejectionMocked: (global as any).__mockSetRemoteRejectionMocked,
     getCurrentPrincipal: (global as any).__mockGetCurrentPrincipal,
     setCurrentPrincipal: (global as any).__mockSetCurrentPrincipal,
+    getPacketDropRate: (global as any).__mockGetPacketDropRate,
+    setPacketDropRate: (global as any).__mockSetPacketDropRateHelper,
   };
 }
 
@@ -412,6 +407,29 @@ function setupMockImplementations() {
     mockActorOpsState.currentPrincipal = p;
     (mockUseActorOpsStore as any).setState({ currentPrincipal: p });
   });
+
+  mockSetPacketDropRate.mockImplementation((rate) => {
+    mockActorOpsState.packetDropRate = rate;
+  });
+
+  mockSetCdcEventsCount.mockImplementation((count) => {
+    mockActorOpsState.cdcEventsCount = count;
+  });
+
+  mockGetPacketDropRate.mockImplementation(() => mockActorOpsState.packetDropRate);
+
+  mockSetPacketDropRateHelper.mockImplementation((rate) => {
+    mockActorOpsState.packetDropRate = rate;
+    (mockUseActorOpsStore as any).setState({ packetDropRate: rate });
+  });
+
+  mockSetPacketDropRate.mockImplementation((rate) => {
+    mockActorOpsState.packetDropRate = rate;
+  });
+
+  mockSetCdcEventsCount.mockImplementation((count) => {
+    mockActorOpsState.cdcEventsCount = count;
+  });
 }
 
 // Initial setup of implementations
@@ -428,6 +446,8 @@ beforeEach(() => {
     latestEvent: null,
     outboxCount: 0,
     quarantineCount: 0,
+    packetDropRate: 0,
+    cdcEventsCount: 0,
   });
 
   if ((global as any).mockNetworkOnline !== undefined) {
@@ -445,6 +465,10 @@ beforeEach(() => {
   mockSetNetworkOffline.mockReset();
   mockIsRemoteRejectionMocked.mockReset();
   mockSetRemoteRejectionMocked.mockReset();
+  mockSetPacketDropRate.mockReset();
+  mockSetCdcEventsCount.mockReset();
+  mockGetPacketDropRate.mockReset();
+  mockSetPacketDropRateHelper.mockReset();
 
   // Reapply default implementations
   setupMockImplementations();

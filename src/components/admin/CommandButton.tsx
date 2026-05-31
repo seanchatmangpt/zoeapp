@@ -74,6 +74,10 @@ export function CommandButton({
       style={buttonStyle}
       activeOpacity={0.7}
       testID={testID}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
     >
       {loading ? (
         <ActivityIndicator size="small" color={vStyles.spinner} testID={`${testID}-spinner`} />

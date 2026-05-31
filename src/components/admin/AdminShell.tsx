@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { OfflineBanner } from '../OfflineBanner';
 
 interface AdminShellProps {
   title: string;
@@ -25,7 +26,7 @@ export function AdminShell({ title, subtitle, children, scrollable = true, testI
   const ContentContainer = scrollable ? ScrollView : View;
 
   const navigationItems = [
-    { name: 'Dashboard', route: '/admin/consequence-supervision' },
+    { name: 'Consequence Supervision', route: '/admin/consequence-supervision' },
     { name: 'Actor Lab', route: '/admin/actor-lab' },
     { name: 'Sermons', route: '/admin/sermons' },
     { name: 'Process Intel', route: '/admin/intelligence' },
@@ -34,14 +35,23 @@ export function AdminShell({ title, subtitle, children, scrollable = true, testI
   return (
     <SafeAreaView style={styles.safeArea} testID={testID}>
       <View style={styles.container}>
+        <OfflineBanner />
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton} testID="admin-back-btn" activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={handleBack}
+            style={styles.backButton}
+            testID="admin-back-btn"
+            activeOpacity={0.7}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
             <FontAwesome name="arrow-left" size={16} color="#3B82F6" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.title} numberOfLines={1}>{title}</Text>
-            {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
+            <Text style={styles.title} numberOfLines={1} accessibilityRole="header" testID="admin-shell-title">{title}</Text>
+            {subtitle && <Text style={styles.subtitle} numberOfLines={1} accessibilityRole="header" testID="admin-shell-subtitle">{subtitle}</Text>}
           </View>
         </View>
 
@@ -50,7 +60,7 @@ export function AdminShell({ title, subtitle, children, scrollable = true, testI
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navScroll}>
             {navigationItems.map((item) => {
               const isActive = title === item.name || 
-                (item.name === 'Dashboard' && title === 'Developer Consequence Supervision') ||
+                (item.name === 'Consequence Supervision' && title === 'Developer Consequence Supervision') ||
                 (item.name === 'Process Intel' && title === 'Process Intelligence') ||
                 (item.name === 'Actor Lab' && title === 'Developer Actor Lab') ||
                 (item.name === 'Sermons' && title === 'Sermons Directory');
@@ -61,6 +71,10 @@ export function AdminShell({ title, subtitle, children, scrollable = true, testI
                   style={[styles.navButton, isActive && styles.navButtonActive]}
                   activeOpacity={0.7}
                   testID={`nav-${item.name.replace(/\s+/g, '-').toLowerCase()}`}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item.name} navigation button`}
+                  accessibilityState={{ selected: isActive }}
                 >
                   <Text style={[styles.navButtonText, isActive && styles.navButtonTextActive]}>
                     {item.name}

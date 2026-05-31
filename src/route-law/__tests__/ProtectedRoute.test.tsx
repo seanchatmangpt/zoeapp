@@ -1079,7 +1079,7 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
       },
       onRetry: jest.fn(),
       onRedirect: jest.fn(),
-      redirectText: 'Return to Dashboard',
+      redirectText: 'Return to Consequence Supervision',
     };
 
     beforeEach(() => {
@@ -1130,7 +1130,7 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
       // Retry button should be shown
       expect(getByText('Retry Verification')).toBeTruthy();
       // Redirect/Cancel button should be shown with custom redirect text
-      expect(getByText('Return to Dashboard')).toBeTruthy();
+      expect(getByText('Return to Consequence Supervision')).toBeTruthy();
     });
 
     test('does not render expected hash row when expectedHash is not provided', () => {
@@ -1160,7 +1160,7 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
         <PremiumReceiptBlockingScreen {...defaultProps} onRedirect={onRedirectMock} />
       );
 
-      const redirectBtn = getByText('Return to Dashboard');
+      const redirectBtn = getByText('Return to Consequence Supervision');
       fireEvent.press(redirectBtn);
 
       expect(onRedirectMock).toHaveBeenCalledTimes(1);

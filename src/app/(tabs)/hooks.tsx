@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useVkgEngine } from '@/src/components/VkgProvider';
 import { AvatarRole } from '@/src/lib/truex/avatar/types';
 import { Ionicons } from '@expo/vector-icons';
+import { OfflineBanner } from '@/src/components/OfflineBanner';
 
 const rolesList: AvatarRole[] = ['guest', 'member', 'volunteer', 'teamLead', 'pastor', 'admin', 'operator'];
 
@@ -22,7 +23,9 @@ export default function HooksProjection() {
   const isQuarantined = quarantinedHooks.length > 0;
 
   return (
-    <ScrollView className="flex-1 bg-slate-900" contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
+    <View style={{ flex: 1 }}>
+      <OfflineBanner />
+      <ScrollView className="flex-1 bg-slate-900" contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
       <Text className="text-3xl font-extrabold text-slate-50 text-center mb-8 tracking-tight">
         Truex Hook Cockpit
       </Text>
@@ -187,5 +190,8 @@ export default function HooksProjection() {
         </View>
       )}
     </ScrollView>
+    </View>
   );
 }
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

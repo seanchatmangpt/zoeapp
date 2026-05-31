@@ -1,0 +1,35 @@
+appId: com.truex.membraneclient
+---
+- launchApp:
+    clearState: true
+- tapOn: "your@email.com"
+- inputText: "test@example.com"
+- tapOn: "Enter your password"
+- inputText: "password123"
+- tapOn: "Establish Secure Session"
+- assertVisible: "Truex Membrane"
+
+# Navigate to Account screen to trigger session termination
+- tapOn: "Account"
+- assertVisible: "Account Settings"
+
+# Scroll to the "Session Authority" section and trigger Sign Out
+- scroll
+- tapOn: "Sign Out"
+
+# Confirm sign out in the native dialog
+- tapOn: "Sign Out"
+
+# Verify transition back to the Secure Gateway login page
+- assertVisible: "TRUEX"
+- assertVisible: "Secure Gateway"
+- assertVisible: "Establish Secure Session"
+
+# Relaunch the app without clearing state to verify persistent session expiration
+- launchApp:
+    clearState: false
+
+# Confirm that the user remains unauthenticated on the Secure Gateway screen
+- assertVisible: "TRUEX"
+- assertVisible: "Secure Gateway"
+- assertVisible: "Establish Secure Session"

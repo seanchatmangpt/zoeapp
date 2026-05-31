@@ -46,7 +46,7 @@ describe('AdminShell', () => {
     expect(mockReplace).not.toHaveBeenCalled();
   });
 
-  it('replaces to dashboard when back button is pressed and cannot go back', () => {
+  it('replaces to consequence-supervision when back button is pressed and cannot go back', () => {
     mockCanGoBack.mockReturnValue(false);
     const { getByTestId } = render(
       <AdminShell title="Test Title">
@@ -61,12 +61,40 @@ describe('AdminShell', () => {
 
   it('navigates via top navigation bar', () => {
     const { getByTestId } = render(
-      <AdminShell title="Dashboard">
+      <AdminShell title="Consequence Supervision">
         <Text>Content</Text>
       </AdminShell>
     );
 
     fireEvent.press(getByTestId('nav-actor-lab'));
     expect(mockReplace).toHaveBeenCalledWith('/admin/actor-lab');
+  });
+
+  it('applies accessibility attributes to header and navigation buttons', () => {
+    const { getByTestId, getByText, getAllByText } = render(
+      <AdminShell title="Consequence Supervision" subtitle="Overview">
+        <Text>Content</Text>
+      </AdminShell>
+    );
+
+    // Header Title and Subtitle Roles
+    expect(getAllByText('Consequence Supervision')[0].props.accessibilityRole).toBe('header');
+    expect(getByText('Overview').props.accessibilityRole).toBe('header');
+
+    // Back button
+    const backBtn = getByTestId('admin-back-btn');
+    expect(backBtn.props.accessible).toBe(true);
+    expect(backBtn.props.accessibilityRole).toBe('button');
+    expect(backBtn.props.accessibilityLabel).toBe('Go back');
+
+    // Tab buttons accessibility
+    const supervisionTab = getByTestId('nav-consequence-supervision');
+    expect(supervisionTab.props.accessible).toBe(true);
+    expect(supervisionTab.props.accessibilityRole).toBe('button');
+    expect(supervisionTab.props.accessibilityLabel).toBe('Consequence Supervision navigation button');
+    expect(supervisionTab.props.accessibilityState).toEqual({ selected: true });
+
+    const actorLabTab = getByTestId('nav-actor-lab');
+    expect(actorLabTab.props.accessibilityState).toEqual({ selected: false });
   });
 });

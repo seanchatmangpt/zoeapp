@@ -25,6 +25,10 @@ export function JsonInspector({ data, title, testID }: JsonInspectorProps) {
         onPress={() => setCollapsed(!collapsed)}
         activeOpacity={0.7}
         testID={`${testID}-toggle`}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={title || 'View Payload'}
+        accessibilityState={{ expanded: !collapsed }}
       >
         <Text style={styles.title}>{title || 'View Payload'}</Text>
         <View style={styles.iconContainer}>

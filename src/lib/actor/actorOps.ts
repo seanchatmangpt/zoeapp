@@ -17,6 +17,7 @@ const globalStateTarget = {
   networkOffline: false,
   remoteRejectionMocked: false,
   currentPrincipal: { id: 'usr-admin', role: 'admin' } as Principal,
+  packetDropRate: 0,
 };
 
 // Wrap the target state object in a ProxyableBridge governed by the MembraneContext
@@ -28,6 +29,10 @@ const proxyGlobalState = ProxyableBridge.wrap(globalStateTarget, globalStateMemb
       useActorOpsStore.setState({ remoteRejectActive: value });
     } else if (prop === 'currentPrincipal') {
       useActorOpsStore.setState({ currentPrincipal: value });
+    }
+    /* istanbul ignore next */
+    else if (prop === 'packetDropRate') {
+      useActorOpsStore.setState({ packetDropRate: value });
     }
   },
 });
@@ -56,6 +61,14 @@ export function setCurrentPrincipal(principal: Principal) {
   proxyGlobalState.currentPrincipal = principal;
 }
 
+export function getPacketDropRate(): number {
+  return proxyGlobalState.packetDropRate;
+}
+
+export function setPacketDropRate(val: number) {
+  proxyGlobalState.packetDropRate = val;
+}
+
 // Global Singletons
 export const globalVkgClient = new VirtualKnowledgeGraphClient();
 export const globalSyncEngine = new ActorSyncEngine();
@@ -70,12 +83,16 @@ interface ActorOpsState {
   latestEvent: string | null;
   outboxCount: number;
   quarantineCount: number;
+  packetDropRate: number;
+  cdcEventsCount: number;
   setNetworkOnline: (online: boolean) => void;
   setRemoteRejectActive: (active: boolean) => void;
   setCurrentPrincipal: (principal: Principal) => void;
   setLatestReceipt: (receipt: Receipt | null) => void;
   setLatestEvent: (event: string | null) => void;
   setCounts: (outbox: number, quarantine: number) => void;
+  setPacketDropRate: (rate: number) => void;
+  setCdcEventsCount: (count: number) => void;
 }
 
 export const useActorOpsStore = create<ActorOpsState>((set) => ({
@@ -86,6 +103,8 @@ export const useActorOpsStore = create<ActorOpsState>((set) => ({
   latestEvent: null,
   outboxCount: 0,
   quarantineCount: 0,
+  packetDropRate: proxyGlobalState.packetDropRate || 0,
+  cdcEventsCount: 0,
   setNetworkOnline: (online) => {
     proxyGlobalState.networkOffline = !online;
     set({ networkOnline: online });
@@ -101,4 +120,9 @@ export const useActorOpsStore = create<ActorOpsState>((set) => ({
   setLatestReceipt: (receipt) => set({ latestReceipt: receipt }),
   setLatestEvent: (event) => set({ latestEvent: event }),
   setCounts: (outbox, quarantine) => set({ outboxCount: outbox, quarantineCount: quarantine }),
+  setPacketDropRate: (rate) => {
+    proxyGlobalState.packetDropRate = rate;
+    set({ packetDropRate: rate });
+  },
+  setCdcEventsCount: (count) => set({ cdcEventsCount: count }),
 }));

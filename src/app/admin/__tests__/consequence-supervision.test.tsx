@@ -4,6 +4,7 @@ import AdminConsequenceSupervision from '../consequence-supervision';
 import { Alert } from 'react-native';
 import { create } from 'zustand';
 import { generateReceiptHash } from '../../../lib/crypto/receipts';
+import { useActorOpsStore } from '../../../lib/actor/actorOps';
 
 // Store mock Drizzle records
 const mockStore = {
@@ -214,18 +215,6 @@ jest.mock('../../../lib/db/db', () => {
   };
 });
 
-// Mock Zustand Store
-const mockUseActorOpsStore = create((set) => ({
-  networkOnline: true,
-  remoteRejectActive: false,
-  currentPrincipal: { id: 'usr-admin', role: 'admin' },
-  latestReceipt: null,
-  latestEvent: null,
-  outboxCount: 0,
-  quarantineCount: 0,
-  setCounts: (outbox: number, quarantine: number) => set({ outboxCount: outbox, quarantineCount: quarantine }),
-}));
-
 // Mock expo-router
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
@@ -233,15 +222,6 @@ jest.mock('expo-router', () => ({
     push: mockPush,
   }),
 }));
-
-jest.mock('../../../lib/actor/actorOps', () => {
-  return {
-    useActorOpsStore: (selector?: any) => {
-      if (selector) return selector(mockUseActorOpsStore.getState());
-      return mockUseActorOpsStore();
-    },
-  };
-});
 
 jest.mock('@expo/vector-icons/FontAwesome', () => {
   const React = require('react');
@@ -258,7 +238,7 @@ describe('Admin Consequence Supervision console tests', () => {
     mockStore.quarantine = [];
     mockStore.receipts = [];
     mockStore.quads = [];
-    mockUseActorOpsStore.setState({ outboxCount: 0, quarantineCount: 0 });
+    useActorOpsStore.setState({ outboxCount: 0, quarantineCount: 0 });
   });
 
   it('renders correctly with secure empty state', async () => {
@@ -282,7 +262,7 @@ describe('Admin Consequence Supervision console tests', () => {
       createdAt: new Date(),
     };
     mockStore.quarantine.push(mockQuarantinedItem);
-    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+    useActorOpsStore.setState({ quarantineCount: 1 });
 
     const { getByText } = render(<AdminConsequenceSupervision />);
 
@@ -305,7 +285,7 @@ describe('Admin Consequence Supervision console tests', () => {
       createdAt: new Date(),
     };
     mockStore.quarantine.push(mockQuarantinedItem);
-    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+    useActorOpsStore.setState({ quarantineCount: 1 });
 
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
@@ -355,7 +335,7 @@ describe('Admin Consequence Supervision console tests', () => {
       createdAt: new Date(),
     };
     mockStore.quarantine.push(mockQuarantinedItem);
-    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+    useActorOpsStore.setState({ quarantineCount: 1 });
 
     // Mock Alert.alert to execute the destructive 'Purge' button immediately
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
@@ -523,11 +503,14 @@ describe('Admin Consequence Supervision console tests', () => {
   });
 
   it('displays latest process receipt details when present in store state', async () => {
-    mockUseActorOpsStore.setState({
+    useActorOpsStore.setState({
       latestReceipt: {
         id: 'rec-latest',
         commandId: 'cmd-latest-process-1234',
+        actor: { tenantId: 'tenant-1', kind: 'user', id: 'usr-admin' },
         status: 'applied_remote',
+        eventIds: [],
+        createdAt: new Date().toISOString(),
         error: 'No error',
       },
     });
@@ -630,7 +613,7 @@ describe('Admin Consequence Supervision console tests', () => {
       error: 'Divergence error',
       createdAt: new Date(),
     });
-    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+    useActorOpsStore.setState({ quarantineCount: 1 });
 
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 
@@ -670,7 +653,7 @@ describe('Admin Consequence Supervision console tests', () => {
       commandId: 'cmd-replay-id',
       status: 'error',
     });
-    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+    useActorOpsStore.setState({ quarantineCount: 1 });
 
     const { getByText } = render(<AdminConsequenceSupervision />);
     await waitFor(() => expect(getByText('Divergence error')).toBeTruthy());
@@ -693,7 +676,7 @@ describe('Admin Consequence Supervision console tests', () => {
       error: 'Validation failure',
       createdAt: new Date(),
     });
-    mockUseActorOpsStore.setState({ quarantineCount: 1 });
+    useActorOpsStore.setState({ quarantineCount: 1 });
 
     jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
       if (buttons) {
@@ -722,5 +705,98 @@ describe('Admin Consequence Supervision console tests', () => {
 
     db.delete = originalDelete;
     consoleErrorSpy.mockRestore();
+  });
+
+  it('renders Trace Conformance Analyzer and default TRUTHFUL report', async () => {
+    const { getByText, getByTestId, getAllByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('Trace Conformance Analyzer')).toBeTruthy();
+    });
+
+    expect(getByText('Declared Workflow:')).toBeTruthy();
+    expect(getByText('Scenario Trace Selector:')).toBeTruthy();
+    expect(getByText('Fitness')).toBeTruthy();
+    expect(getByText('Precision')).toBeTruthy();
+    expect(getByText('Simplicity')).toBeTruthy();
+    expect(getAllByText('TRUTHFUL').length).toBeGreaterThan(0);
+    expect(getByText('Perfect Trace Conformance Verified')).toBeTruthy();
+  });
+
+  it('evaluates skipped, deviant, and malformed traces when scenario buttons are clicked', async () => {
+    const { getByText, getByTestId, queryByText, getAllByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('Trace Conformance Analyzer')).toBeTruthy();
+    });
+
+    // Click DEVIANT button
+    const deviantBtn = getByTestId('scenario-btn-deviant');
+    await act(async () => {
+      fireEvent.press(deviantBtn);
+    });
+
+    expect(getByText('VARIANCE')).toBeTruthy();
+    expect(getByText('Detected Trace Deviations:')).toBeTruthy();
+    expect(getByText('Found undeclared transition: VerifyFeed->UpdateDatabase')).toBeTruthy();
+
+    // Click SKIPPED button
+    const skippedBtn = getByTestId('scenario-btn-skipped');
+    await act(async () => {
+      fireEvent.press(skippedBtn);
+    });
+
+    expect(getByText('DECEPTIVE')).toBeTruthy();
+    expect(getByText('Found undeclared transition: PublishSermon->VerifyFeed')).toBeTruthy();
+  });
+
+  it('simulates autonomic dispatch events when tension profile buttons are clicked', async () => {
+    const { getByText, getByTestId, getAllByTestId, queryAllByText } = render(<AdminConsequenceSupervision />);
+
+    await waitFor(() => {
+      expect(getByText('Autonomic Dispatcher Event Log')).toBeTruthy();
+    });
+
+    // Assert default items exist
+    expect(getByText('AL-001')).toBeTruthy();
+    expect(getByText('AL-002')).toBeTruthy();
+
+    // 1. Simulate Normal
+    const normalBtn = getByTestId('simulate-btn-normal');
+    await act(async () => {
+      fireEvent.press(normalBtn);
+    });
+    expect(getAllByTestId('autonomic-log-item').length).toBe(3);
+
+    // 2. Simulate Flood
+    const floodBtn = getByTestId('simulate-btn-flood');
+    await act(async () => {
+      fireEvent.press(floodBtn);
+    });
+    expect(getAllByTestId('autonomic-log-item').length).toBe(4);
+
+    // 3. Simulate Pressure
+    const pressureBtn = getByTestId('simulate-btn-pressure');
+    await act(async () => {
+      fireEvent.press(pressureBtn);
+    });
+    expect(getAllByTestId('autonomic-log-item').length).toBe(5);
+    expect(getByText('BATCH')).toBeTruthy();
+
+    // 4. Simulate Oscillation
+    const oscillationBtn = getByTestId('simulate-btn-oscillation');
+    await act(async () => {
+      fireEvent.press(oscillationBtn);
+    });
+    expect(getAllByTestId('autonomic-log-item').length).toBe(6);
+    expect(getByText('QUARANTINE')).toBeTruthy();
+
+    // 5. Simulate High Load
+    const loadBtn = getByTestId('simulate-btn-high_load');
+    await act(async () => {
+      fireEvent.press(loadBtn);
+    });
+    expect(getAllByTestId('autonomic-log-item').length).toBe(7);
+    expect(queryAllByText('SUPPRESS').length).toBeGreaterThan(0);
   });
 });

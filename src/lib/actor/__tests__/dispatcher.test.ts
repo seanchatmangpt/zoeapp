@@ -3,7 +3,7 @@
  */
 
 import { isNetworkOffline, setNetworkOffline, setRemoteRejectionMocked } from '../actorOps';
-import { ActorDispatcher } from '../dispatcher';
+import { ActorDispatcher, ActorSyncEngine } from '../dispatcher';
 import { ActorRegistry } from '../registry';
 import { VirtualKnowledgeGraphClient } from '../../vkg/client';
 import { DataFactory } from '../../vkg/rdf';
@@ -249,9 +249,36 @@ describe('ActorDispatcher Dynamic Autonomic Triggers', () => {
       CancelShift: {
         roles: ['admin', 'pastor'],
         inputValidator: (payload: any) => {
+          if (payload.reason === 'ThrowValidation') throw new Error('Validator failed');
           return typeof payload.reason === 'string' && payload.reason.trim().length > 0;
         },
         construct: (payload: any, actor: ActorRef) => {
+          if (payload.reason === 'ThrowConstruct') throw new Error('Construct failed');
+          if (payload.reason === 'GenerateAllTermTypes') {
+            return {
+              add: [
+                DataFactory.quad(
+                  DataFactory.blankNode('bn1'),
+                  DataFactory.namedNode('https://schema.org/status'),
+                  DataFactory.literal('lit', 'en'),
+                  DataFactory.defaultGraph()
+                ),
+                DataFactory.quad(
+                  DataFactory.namedNode('https://schema.org/subject'),
+                  DataFactory.namedNode('https://schema.org/predicate'),
+                  DataFactory.blankNode('bn2'),
+                  DataFactory.namedNode('https://schema.org/graph')
+                ),
+                DataFactory.quad(
+                  DataFactory.namedNode('https://schema.org/subject'),
+                  DataFactory.namedNode('https://schema.org/predicate'),
+                  DataFactory.literal('123', DataFactory.namedNode('http://www.w3.org/2001/XMLSchema#integer')),
+                  DataFactory.blankNode('bn3')
+                )
+              ],
+              remove: []
+            };
+          }
           const s = DataFactory.namedNode(`https://schema.org/volunteerShift/${actor.id}`);
           const p = DataFactory.namedNode('https://schema.org/status');
           const oOld = DataFactory.namedNode('https://schema.org/Confirmed');
@@ -402,6 +429,53 @@ describe('ActorDispatcher Dynamic Autonomic Triggers', () => {
       expect(receipt.status).toBe('rejected_local');
       expect(receipt.error).toContain('not supported by actor kind');
     });
+
+    it('records local rejection on validation exception', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-opt-6',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'ThrowValidation' },
+        idempotencyKey: 'key-opt-6'
+      };
+
+      const receipt = await localDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_local');
+      expect(receipt.error).toContain('Validator failed');
+    });
+
+    it('records local rejection on execution exception', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-opt-7',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'ThrowConstruct' },
+        idempotencyKey: 'key-opt-7'
+      };
+
+      const receipt = await localDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_local');
+      expect(receipt.error).toContain('Construct failed');
+    });
+
+    it('records local rejection on VKG write error', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-opt-8',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'VKG Write Error' },
+        idempotencyKey: 'key-opt-8'
+      };
+
+      const addQuadsSpy = jest.spyOn(vkgClient, 'addQuads').mockRejectedValueOnce(new Error('DB is locked'));
+
+      const receipt = await localDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_local');
+      expect(receipt.error).toContain('VKGWriteError: DB is locked');
+    });
   });
 
   describe('Idempotency Guards', () => {
@@ -491,6 +565,96 @@ describe('ActorDispatcher Dynamic Autonomic Triggers', () => {
 
       expect(receipt.status).toBe('rejected_remote');
       expect(receipt.error).toContain('Mock Rejection Active');
+    });
+
+    it('records remote rejection on missing behavior registry', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-rem-3',
+        actor: { ...mockActor, kind: 'UnknownKind' },
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'Missing kind' },
+        idempotencyKey: 'key-rem-3'
+      };
+
+      const receipt = await remoteDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_remote');
+      expect(receipt.error).toContain('RegistryError');
+    });
+
+    it('records remote rejection on missing command spec', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-rem-4',
+        actor: mockActor,
+        command: 'UnknownCommand',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'Unknown' },
+        idempotencyKey: 'key-rem-4'
+      };
+
+      const receipt = await remoteDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_remote');
+      expect(receipt.error).toContain('not supported by actor kind');
+    });
+
+    it('records remote rejection on authorization error', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-rem-5',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-member', role: 'member' },
+        payload: { reason: 'No auth' },
+        idempotencyKey: 'key-rem-5'
+      };
+
+      const receipt = await remoteDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_remote');
+      expect(receipt.error).toContain('AuthorizationError');
+    });
+
+    it('records remote rejection on validation exception', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-rem-6',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'ThrowValidation' },
+        idempotencyKey: 'key-rem-6'
+      };
+
+      const receipt = await remoteDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_remote');
+      expect(receipt.error).toContain('ValidationError: Validator failed');
+    });
+
+    it('records remote rejection on invalid payload', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-rem-7',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: '' },
+        idempotencyKey: 'key-rem-7'
+      };
+
+      const receipt = await remoteDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_remote');
+      expect(receipt.error).toContain('ValidationError: Input payload validation failed');
+    });
+
+    it('records remote rejection on execution exception', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-rem-8',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'ThrowConstruct' },
+        idempotencyKey: 'key-rem-8'
+      };
+
+      const receipt = await remoteDispatcher.dispatch(envelope);
+      expect(receipt.status).toBe('rejected_remote');
+      expect(receipt.error).toContain('ExecutionError: Construct failed');
     });
   });
 
@@ -617,5 +781,92 @@ describe('ActorDispatcher Dynamic Autonomic Triggers', () => {
       expect(getJob().attempts).toBe(3);
       expect(getJob().status).toBe('failed'); // fails because attempts >= 3
     });
-  });
-});
+
+    it('catches and logs ROLLBACK EXCEPTION when vkgClient throws during compensation', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-sync-rollback-err',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'Sync fail rollback err' },
+        idempotencyKey: 'key-sync-rollback-err'
+      };
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      await localDispatcher.dispatch(envelope);
+      setRemoteRejectionMocked(true);
+
+      jest.spyOn(vkgClient, 'removeQuads').mockRejectedValueOnce(new Error('Simulated Rollback Error'));
+
+      await localDispatcher.syncOutbox(remoteDispatcher);
+
+      expect(consoleSpy).toHaveBeenCalledWith('ROLLBACK EXCEPTION:', expect.any(Error));
+      consoleSpy.mockRestore();
+    });
+
+    it('serializes and deserializes all term types during outbox processing and rollback', async () => {
+      const envelope: CommandEnvelope = {
+        id: 'cmd-sync-terms',
+        actor: mockActor,
+        command: 'CancelShift',
+        principal: { id: 'usr-admin', role: 'admin' },
+        payload: { reason: 'GenerateAllTermTypes' },
+        idempotencyKey: 'key-sync-terms'
+      };
+
+      const addQuadsSpy = jest.spyOn(vkgClient, 'addQuads');
+      const removeQuadsSpy = jest.spyOn(vkgClient, 'removeQuads');
+
+      await localDispatcher.dispatch(envelope);
+      setRemoteRejectionMocked(true);
+
+      removeQuadsSpy.mockClear();
+      addQuadsSpy.mockClear();
+
+      await localDispatcher.syncOutbox(remoteDispatcher);
+
+      // Verify deserialization during rollback.
+      // removeQuads should be called on what was added (which has BlankNode, Literal)
+      expect(removeQuadsSpy).toHaveBeenCalled();
+      const removed = removeQuadsSpy.mock.calls[0][0];
+      expect(removed[0].subject.termType).toBe('BlankNode');
+      expect(removed[0].object.termType).toBe('Literal');
+    });
+    });
+
+    describe('ActorSyncEngine & Utilities', () => {
+    it('returns the sync engine instance', () => {
+      expect(localDispatcher.getSyncEngine()).toBeDefined();
+      expect(localDispatcher.getSyncEngine()).toBeInstanceOf(ActorSyncEngine);
+    });
+
+    it('dispatches jobs to supabase correctly and handles errors', async () => {
+      const engine = new ActorSyncEngine();
+      const dispatchJob = (engine as any).dispatchJob.bind(engine);
+      const { supabase } = require('@/lib/supabase');
+
+      // ACTOR_COMMAND success
+      await dispatchJob({ jobType: 'ACTOR_COMMAND', payload: JSON.stringify({ id: 'cmd1' }) });
+
+      // ACTOR_EVENT success
+      await dispatchJob({ jobType: 'ACTOR_EVENT', payload: JSON.stringify({ id: 'evt1' }) });
+
+      // ACTOR_RECEIPT success
+      await dispatchJob({ jobType: 'ACTOR_RECEIPT', payload: JSON.stringify({ id: 'rec1' }) });
+
+      // Unknown type error
+      await expect(dispatchJob({ jobType: 'UNKNOWN', payload: '{}' })).rejects.toThrow('Unrecognized Actor sync job type');
+
+      // Supabase errors
+      supabase._mockUpsert.mockResolvedValueOnce({ error: { message: 'db error' } });
+      await expect(dispatchJob({ jobType: 'ACTOR_COMMAND', payload: '{}' })).rejects.toThrow('Supabase actor command sync failed: db error');
+
+      supabase._mockUpsert.mockResolvedValueOnce({ error: { message: 'db error' } });
+      await expect(dispatchJob({ jobType: 'ACTOR_EVENT', payload: '{}' })).rejects.toThrow('Supabase actor event sync failed: db error');
+
+      supabase._mockUpsert.mockResolvedValueOnce({ error: { message: 'db error' } });
+      await expect(dispatchJob({ jobType: 'ACTOR_RECEIPT', payload: '{}' })).rejects.toThrow('Supabase actor receipt sync failed: db error');
+    });
+    });
+    });

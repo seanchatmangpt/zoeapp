@@ -33,5 +33,6 @@ describe('AdminLayout', () => {
     expect(getByText('people')).toBeTruthy();
     expect(getByText('prayer')).toBeTruthy();
     expect(getByText('volunteers')).toBeTruthy();
+    expect(getByText('intelligence')).toBeTruthy();
   });
 });

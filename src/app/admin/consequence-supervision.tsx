@@ -5,12 +5,16 @@ import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { ReceiptBadge } from '../../components/admin/ReceiptBadge';
 import { JsonInspector } from '../../components/admin/JsonInspector';
-import { useActorOpsStore } from '../../lib/actor/actorOps';
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
 import { db } from '../../lib/db/db';
 import { actorOutbox, actorQuarantine, actorReceipts, quads, ActorReceiptRecord, ActorQuarantineRecord } from '../../lib/db/schema';
 import { count, eq, desc, or } from 'drizzle-orm';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { generateReceiptHash } from '../../lib/crypto/receipts';
+import { SupervisionProcessConformanceEvaluator } from '../../lib/truex/supervision/supervision';
+import { HookMessage, HookActorRef } from '../../lib/truex/hook-otp/types';
+import { HookActorInstance } from '../../lib/truex/hook-otp/registry';
+import { HookMailbox } from '../../lib/truex/hook-otp/mailbox';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -81,6 +85,131 @@ export default function AdminConsequenceSupervision() {
   const [latestRefusal, setLatestRefusal] = useState<ActorReceiptRecord | null>(null);
   const [totalQuads, setTotalQuads] = useState(0);
   const [reconciliationLag, setReconciliationLag] = useState('0ms');
+
+  // Process Conformance Inspector States
+  const [declaredWorkflow] = useState<string[]>([
+    'PublishSermon',
+    'SendNotification',
+    'VerifyFeed',
+    'ArchiveRecord',
+  ]);
+  const [selectedTraceType, setSelectedTraceType] = useState<'truthful' | 'skipped' | 'deviant' | 'malformed'>('truthful');
+  const [conformanceReport, setConformanceReport] = useState<any>(null);
+
+  // Autonomic Dispatch Event Log States
+  const [autonomicLogs, setAutonomicLogs] = useState<Array<{
+    id: string;
+    timestamp: string;
+    hookId: string;
+    messageType: string;
+    verdict: string;
+    reason?: string;
+    mailboxLength: number;
+    loadFactor: number;
+  }>>([
+    {
+      id: 'AL-001',
+      timestamp: new Date(Date.now() - 60000).toLocaleTimeString(),
+      hookId: 'ShortageDetectionHook',
+      messageType: 'graph_delta',
+      verdict: 'allow',
+      mailboxLength: 1,
+      loadFactor: 0.15,
+    },
+    {
+      id: 'AL-002',
+      timestamp: new Date(Date.now() - 45000).toLocaleTimeString(),
+      hookId: 'DefaultHook',
+      messageType: 'graph_delta',
+      verdict: 'allow',
+      mailboxLength: 2,
+      loadFactor: 0.25,
+    }
+  ]);
+
+  const actualTraces = {
+    truthful: ['PublishSermon', 'SendNotification', 'VerifyFeed', 'ArchiveRecord'],
+    skipped: ['PublishSermon', 'VerifyFeed', 'ArchiveRecord'],
+    deviant: ['PublishSermon', 'SendNotification', 'VerifyFeed', 'UpdateDatabase', 'ArchiveRecord'],
+    malformed: ['SendNotification', 'PublishSermon', 'ArchiveRecord'],
+  };
+
+  useEffect(() => {
+    const evaluator = new SupervisionProcessConformanceEvaluator();
+    const report = evaluator.evaluateTraceConformance(
+      declaredWorkflow,
+      actualTraces[selectedTraceType]
+    );
+    setConformanceReport(report);
+  }, [selectedTraceType]);
+
+  const simulateAutonomicDispatch = (profile: 'normal' | 'flood' | 'pressure' | 'oscillation' | 'high_load') => {
+    const evaluator = new SupervisionProcessConformanceEvaluator();
+    const hookId = profile === 'oscillation' ? 'OscillationDetectorHook' : 'DefaultHook';
+    const actorRef: HookActorRef = {
+      tenantId: 'tenant-1',
+      packId: 'pack-1',
+      hookId,
+      instanceId: `inst-${Math.floor(Math.random() * 1000)}`,
+    };
+
+    const mockMailbox = new HookMailbox(async () => {});
+    const mailboxLen = profile === 'pressure' ? 12 : 2;
+    for (let i = 0; i < mailboxLen; i++) {
+      mockMailbox.push({
+        id: `m-${i}`,
+        type: 'graph_delta',
+        payload: {},
+        actorRef,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const mockInstance: HookActorInstance = {
+      ref: actorRef,
+      state: {},
+      mailbox: mockMailbox,
+      behavior: {},
+      supervisor: { onFailure: async () => 'restart' },
+      quarantined: false,
+      history: [],
+      receiptChainHash: '',
+    };
+
+    const trace = profile === 'oscillation' ? ['OscillationDetectorHook', 'OscillationDetectorHook', 'OscillationDetectorHook', 'OscillationDetectorHook'] : [];
+    const msg: HookMessage = {
+      id: `msg-${Date.now()}`,
+      type: 'graph_delta',
+      payload: { trace },
+      actorRef,
+      timestamp: new Date().toISOString(),
+    };
+
+    if (profile === 'flood') {
+      for (let i = 0; i < 5; i++) {
+        evaluator.evaluateMessage({
+          ...msg,
+          id: `msg-flood-${i}-${Date.now()}`
+        }, mockInstance, 0.1);
+      }
+    }
+
+    const loadFactor = profile === 'high_load' ? 0.9 : 0.2;
+    const result = evaluator.evaluateMessage(msg, mockInstance, loadFactor);
+
+    const newLogItem = {
+      id: `AL-${Math.floor(Math.random() * 900) + 100}`,
+      timestamp: new Date().toLocaleTimeString(),
+      hookId,
+      messageType: msg.type,
+      verdict: result.action,
+      reason: result.reason,
+      mailboxLength: mailboxLen,
+      loadFactor,
+    };
+
+    setAutonomicLogs(prev => [newLogItem, ...prev]);
+  };
 
   const [quarantinedItems, setQuarantinedItems] = useState<ActorQuarantineRecord[]>([]);
   const [operatingId, setOperatingId] = useState<string | null>(null);
@@ -449,6 +578,195 @@ export default function AdminConsequenceSupervision() {
           )}
         </AdminCard>
 
+        <Text style={styles.sectionHeader}>Process Conformance & Trace Auditor</Text>
+        <AdminCard 
+          title="Trace Conformance Analyzer" 
+          subtitle="Verifies actual execution trajectory against declared workflow."
+          headerRight={
+            conformanceReport && (
+              <View style={[
+                styles.verdictBadge,
+                conformanceReport.verdict === 'TRUTHFUL' && styles.verdictTruthful,
+                conformanceReport.verdict === 'VARIANCE' && styles.verdictVariance,
+                conformanceReport.verdict === 'DECEPTIVE' && styles.verdictDeceptive
+              ]}>
+                <Text style={styles.verdictBadgeText}>{conformanceReport.verdict}</Text>
+              </View>
+            )
+          }
+        >
+          <View style={styles.conformanceContainer}>
+            <Text style={styles.conformanceLabel}>Declared Workflow:</Text>
+            <View style={styles.workflowChain}>
+              {declaredWorkflow.map((step, idx) => (
+                <React.Fragment key={step}>
+                  {idx > 0 && <FontAwesome name="long-arrow-right" size={12} color="#64748B" style={styles.chainArrow} />}
+                  <View style={styles.workflowStep}><Text style={styles.workflowStepText}>{step}</Text></View>
+                </React.Fragment>
+              ))}
+            </View>
+
+            <Text style={styles.conformanceLabel}>Scenario Trace Selector:</Text>
+            <View style={styles.scenarioRow}>
+              {(['truthful', 'skipped', 'deviant', 'malformed'] as const).map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  activeOpacity={0.8}
+                  style={[
+                    styles.scenarioBtn,
+                    selectedTraceType === type && styles.scenarioBtnActive
+                  ]}
+                  onPress={() => setSelectedTraceType(type)}
+                  testID={`scenario-btn-${type}`}
+                >
+                  <Text style={[
+                    styles.scenarioBtnText,
+                    selectedTraceType === type && styles.scenarioBtnTextActive
+                  ]}>
+                    {type.toUpperCase()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {conformanceReport && (
+              <View style={styles.conformanceResultBox}>
+                <View style={styles.metricsGrid}>
+                  <View style={styles.metricCell}>
+                    <Text style={styles.metricCellVal}>{(conformanceReport.fitness * 100).toFixed(0)}%</Text>
+                    <Text style={styles.metricCellLabel}>Fitness</Text>
+                  </View>
+                  <View style={styles.metricCell}>
+                    <Text style={styles.metricCellVal}>{(conformanceReport.precision * 100).toFixed(0)}%</Text>
+                    <Text style={styles.metricCellLabel}>Precision</Text>
+                  </View>
+                  <View style={styles.metricCell}>
+                    <Text style={styles.metricCellVal}>{(conformanceReport.simplicity * 100).toFixed(0)}%</Text>
+                    <Text style={styles.metricCellLabel}>Simplicity</Text>
+                  </View>
+                </View>
+
+                <Text style={styles.conformanceLabel}>Observed Trace Visualization:</Text>
+                <View style={styles.actualTraceChain}>
+                  {actualTraces[selectedTraceType].map((step, idx) => {
+                    const prevStep = idx > 0 ? actualTraces[selectedTraceType][idx - 1] : null;
+                    const isDeviant = prevStep ? !declaredWorkflow.includes(prevStep) || !declaredWorkflow.includes(step) || (declaredWorkflow.indexOf(step) !== declaredWorkflow.indexOf(prevStep) + 1) : false;
+                    return (
+                      <React.Fragment key={`${step}-${idx}`}>
+                        {idx > 0 && (
+                          <View style={styles.arrowContainer}>
+                            <FontAwesome 
+                              name="long-arrow-right" 
+                              size={12} 
+                              color={isDeviant ? '#EF4444' : '#10B981'} 
+                              style={styles.chainArrow} 
+                            />
+                            {isDeviant && (
+                              <FontAwesome name="exclamation-triangle" size={10} color="#EF4444" style={styles.deviantWarningIcon} />
+                            )}
+                          </View>
+                        )}
+                        <View style={[
+                          styles.workflowStep, 
+                          isDeviant ? styles.stepDeviant : styles.stepConforming
+                        ]}>
+                          <Text style={[
+                            styles.workflowStepText,
+                            isDeviant ? styles.stepTextDeviant : styles.stepTextConforming
+                          ]}>{step}</Text>
+                        </View>
+                      </React.Fragment>
+                    );
+                  })}
+                </View>
+
+                {conformanceReport.deviations.length > 0 ? (
+                  <View style={styles.deviationsBox}>
+                    <Text style={styles.deviationsHeader}>Detected Trace Deviations:</Text>
+                    {conformanceReport.deviations.map((dev: string, dIdx: number) => (
+                      <View key={dIdx} style={styles.deviationRow}>
+                        <FontAwesome name="warning" size={12} color="#F59E0B" style={styles.deviationIcon} />
+                        <Text style={styles.deviationText}>{dev}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <View style={styles.conformanceSuccessBox}>
+                    <FontAwesome name="check-circle" size={14} color="#10B981" style={styles.deviationIcon} />
+                    <Text style={styles.conformanceSuccessText}>Perfect Trace Conformance Verified</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        </AdminCard>
+
+        <Text style={styles.sectionHeader}>Autonomic Dispatch Supervision</Text>
+        <AdminCard title="Autonomic Dispatcher Event Log" subtitle="Monitors lifecycle actions, queue limits and system load levels.">
+          <View style={styles.autonomicContainer}>
+            <Text style={styles.conformanceLabel}>Trigger Simulated Autonomic Tension Profile:</Text>
+            <View style={styles.simulationBtnRow}>
+              {([
+                { label: 'Normal', value: 'normal' },
+                { label: 'Flood', value: 'flood' },
+                { label: 'Pressure', value: 'pressure' },
+                { label: 'Oscillation', value: 'oscillation' },
+                { label: 'High Load', value: 'high_load' }
+              ] as const).map((btn) => (
+                <TouchableOpacity
+                  key={btn.value}
+                  activeOpacity={0.8}
+                  style={styles.simulationBtn}
+                  onPress={() => simulateAutonomicDispatch(btn.value)}
+                  testID={`simulate-btn-${btn.value}`}
+                >
+                  <Text style={styles.simulationBtnText}>{btn.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.conformanceLabel}>Autonomic Log (Most Recent First):</Text>
+            <View style={styles.logList}>
+              {autonomicLogs.map((log) => (
+                <View key={log.id} style={styles.logItem} testID="autonomic-log-item">
+                  <View style={styles.logItemHeader}>
+                    <View style={styles.logItemHeaderLeft}>
+                      <Text style={styles.logItemId}>{log.id}</Text>
+                      <Text style={styles.logItemHook}>{log.hookId}</Text>
+                    </View>
+                    <Text style={styles.logItemTime}>{log.timestamp}</Text>
+                  </View>
+                  <View style={styles.logItemBody}>
+                    <View style={styles.logItemMetaRow}>
+                      <Text style={styles.logItemMeta}>Mailbox Size: <Text style={styles.logItemMetaVal}>{log.mailboxLength}</Text></Text>
+                      <Text style={styles.logItemMeta}>Load Factor: <Text style={styles.logItemMetaVal}>{(log.loadFactor * 100).toFixed(0)}%</Text></Text>
+                      <Text style={styles.logItemMeta}>Type: <Text style={styles.logItemMetaVal}>{log.messageType}</Text></Text>
+                    </View>
+                    <View style={styles.logItemVerdictRow}>
+                      <Text style={styles.verdictLabelText}>Verdict Action: </Text>
+                      <View style={[
+                        styles.verdictActionBadge,
+                        log.verdict === 'allow' && styles.actionAllow,
+                        log.verdict === 'suppress' && styles.actionSuppress,
+                        log.verdict === 'batch' && styles.actionBatch,
+                        log.verdict === 'quarantine' && styles.actionQuarantine
+                      ]}>
+                        <Text style={styles.verdictActionText}>{log.verdict.toUpperCase()}</Text>
+                      </View>
+                    </View>
+                    {log.reason && (
+                      <View style={styles.logReasonBox}>
+                        <FontAwesome name="info-circle" size={10} color="#F87171" style={{ marginRight: 6 }} />
+                        <Text style={styles.logReasonText}>{log.reason}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        </AdminCard>
+
         <Text style={styles.gridHeader}>Operations Modules</Text>
         <View style={styles.gridContainer}>
           {adminModules.map((item) => (
@@ -560,4 +878,66 @@ const styles = StyleSheet.create({
   gridItem: { width: '30%', backgroundColor: 'rgba(15, 23, 42, 0.6)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)', padding: 18, margin: 6, alignItems: 'center', justifyContent: 'center', flexGrow: 1, minWidth: 105, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   iconBox: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   gridText: { fontSize: 12, fontWeight: '700', color: '#E2E8F0', textAlign: 'center' },
+  verdictBadge: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  verdictBadgeText: { fontSize: 10, fontWeight: '800', color: '#FFFFFF' },
+  verdictTruthful: { backgroundColor: '#10B981' },
+  verdictVariance: { backgroundColor: '#F59E0B' },
+  verdictDeceptive: { backgroundColor: '#EF4444' },
+  conformanceContainer: { padding: 4 },
+  conformanceLabel: { fontSize: 11, fontWeight: 'bold', color: '#94A3B8', textTransform: 'uppercase', marginBottom: 8, marginTop: 12, letterSpacing: 0.5 },
+  workflowChain: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 12, marginBottom: 12 },
+  workflowStep: { backgroundColor: 'rgba(255, 255, 255, 0.06)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, marginVertical: 4 },
+  workflowStepText: { fontSize: 12, fontWeight: '600', color: '#E2E8F0' },
+  chainArrow: { marginHorizontal: 8 },
+  actualTraceChain: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.25)', padding: 12, borderRadius: 12, marginVertical: 8 },
+  stepConforming: { borderColor: 'rgba(16, 185, 129, 0.3)', backgroundColor: 'rgba(16, 185, 129, 0.05)' },
+  stepTextConforming: { color: '#34D399' },
+  stepDeviant: { borderColor: 'rgba(239, 68, 68, 0.4)', backgroundColor: 'rgba(239, 68, 68, 0.1)' },
+  stepTextDeviant: { color: '#F87171' },
+  arrowContainer: { flexDirection: 'row', alignItems: 'center', position: 'relative' },
+  deviantWarningIcon: { position: 'absolute', top: -10, right: 6 },
+  conformanceResultBox: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)', marginTop: 12, paddingTop: 12 },
+  metricsGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
+  metricCell: { flex: 1, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', paddingVertical: 10, borderRadius: 10, marginHorizontal: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  metricCellVal: { fontSize: 16, fontWeight: '800', color: '#F8FAFC' },
+  metricCellLabel: { fontSize: 10, color: '#64748B', marginTop: 4, textTransform: 'uppercase' },
+  deviationsBox: { backgroundColor: 'rgba(245, 158, 11, 0.08)', borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.2)', borderRadius: 10, padding: 12, marginTop: 12 },
+  deviationsHeader: { fontSize: 11, fontWeight: 'bold', color: '#FBBF24', marginBottom: 6, textTransform: 'uppercase' },
+  deviationRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  deviationIcon: { marginRight: 8 },
+  deviationText: { fontSize: 12, color: '#FDE68A', flex: 1 },
+  conformanceSuccessBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(16, 185, 129, 0.1)', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.2)', borderRadius: 10, padding: 12, marginTop: 12 },
+  conformanceSuccessText: { fontSize: 12, fontWeight: '600', color: '#34D399', flex: 1 },
+  scenarioRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 6 },
+  scenarioBtn: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 6, paddingVertical: 6, paddingHorizontal: 12 },
+  scenarioBtnActive: { backgroundColor: 'rgba(59, 130, 246, 0.2)', borderWidth: 1, borderColor: '#3B82F6' },
+  scenarioBtnText: { color: '#64748B', fontSize: 11, fontWeight: '600' },
+  scenarioBtnTextActive: { color: '#F8FAFC' },
+  autonomicContainer: { padding: 4 },
+  simulationBtnRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 },
+  simulationBtn: { backgroundColor: 'rgba(59, 130, 246, 0.15)', borderWidth: 1, borderColor: 'rgba(59, 130, 246, 0.3)', borderRadius: 8, paddingVertical: 6, paddingHorizontal: 12, marginVertical: 2 },
+  simulationBtnText: { color: '#60A5FA', fontSize: 11, fontWeight: '700' },
+  logList: { marginTop: 8 },
+  logItem: { backgroundColor: 'rgba(15, 23, 42, 0.4)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 12, marginBottom: 8 },
+  logItemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)', paddingBottom: 6, marginBottom: 8 },
+  logItemHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  logItemId: { fontSize: 10, fontFamily: 'SpaceMono', color: '#94A3B8', fontWeight: 'bold' },
+  logItemHook: { fontSize: 11, fontWeight: '700', color: '#E2E8F0' },
+  logItemTime: { fontSize: 10, color: '#64748B' },
+  logItemBody: { gap: 6 },
+  logItemMetaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  logItemMeta: { fontSize: 11, color: '#64748B' },
+  logItemMetaVal: { color: '#CBD5E1', fontWeight: '600' },
+  logItemVerdictRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  verdictLabelText: { fontSize: 11, color: '#64748B' },
+  verdictActionBadge: { paddingVertical: 2, paddingHorizontal: 8, borderRadius: 6 },
+  verdictActionText: { fontSize: 9, fontWeight: '900', color: '#FFFFFF' },
+  actionAllow: { backgroundColor: '#10B981' },
+  actionSuppress: { backgroundColor: '#EF4444' },
+  actionBatch: { backgroundColor: '#F59E0B' },
+  actionQuarantine: { backgroundColor: '#7C3AED' },
+  logReasonBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(239, 68, 68, 0.08)', borderWidth: 1, borderColor: 'rgba(239, 68, 68, 0.15)', borderRadius: 8, padding: 8, marginTop: 4 },
+  logReasonText: { fontSize: 11, color: '#F87171', fontWeight: '600' },
 });
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

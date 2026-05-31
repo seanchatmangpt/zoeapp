@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { useSession } from '../../../context/SessionProvider';
-import { useActorOpsStore } from '../../lib/actor/actorOps';
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
 import { mmkvInstance } from '../../lib/store/mmkvStorage';
 import { Ionicons } from '@expo/vector-icons';
 const Switch = ({ active, colorClass }: { active: boolean; colorClass: string }) => (
@@ -22,11 +22,15 @@ export default function AdminSettings() {
   const [supervisionRestart, setSupervisionRestart] = useState(true);
   const [mmkvKeysCount, setMmkvKeysCount] = useState(0);
 
-  // Sync state with Zustand store
+    // Sync state with Zustand store
   const networkOnline = useActorOpsStore((state) => state.networkOnline);
   const setNetworkOnline = useActorOpsStore((state) => state.setNetworkOnline);
   const remoteRejectActive = useActorOpsStore((state) => state.remoteRejectActive);
   const setRemoteRejectActive = useActorOpsStore((state) => state.setRemoteRejectActive);
+  const packetDropRate = useActorOpsStore((state) => state.packetDropRate);
+  const setPacketDropRate = useActorOpsStore((state) => state.setPacketDropRate);
+  const cdcEventsCount = useActorOpsStore((state) => state.cdcEventsCount);
+  const setCdcEventsCount = useActorOpsStore((state) => state.setCdcEventsCount);
 
   useEffect(() => {
     try {
@@ -115,6 +119,7 @@ export default function AdminSettings() {
   };
 
   const handleResetZustand = () => {
+    console.log('DEBUG handleResetZustand: setNetworkOnline is', setNetworkOnline, 'isMock:', (setNetworkOnline as any)._isMockFunction || (setNetworkOnline as any).mock !== undefined);
     Alert.alert(
       'Reset Local Actor Ops Store',
       'Restores outboxes, queues, and sync parameters back to initial clean states.',
@@ -129,6 +134,8 @@ export default function AdminSettings() {
               useActorOpsStore.getState().setLatestReceipt(null);
               useActorOpsStore.getState().setLatestEvent(null);
               useActorOpsStore.getState().setCounts(0, 0);
+              useActorOpsStore.getState().setPacketDropRate(0);
+              useActorOpsStore.getState().setCdcEventsCount(0);
               Alert.alert('Success', 'Zustand operations store reset completed.');
             } catch (err) {
               Alert.alert('Error', err instanceof Error ? err.message : 'Reset failed');
@@ -154,7 +161,7 @@ export default function AdminSettings() {
 
 
   return (
-    <AdminShell title="System Settings" subtitle="Admin panel parameters and configurations">
+    <AdminShell title="System Settings" subtitle="Supervision Geometry parameters and configurations">
       
       {/* SECTION 1: Authentication Context */}
       <AdminCard title="Authentication Context" subtitle="Active session properties">
@@ -221,6 +228,127 @@ export default function AdminSettings() {
             </View>
             <Switch active={supervisionRestart} colorClass="bg-blue-500" />
           </Pressable>
+
+        </View>
+      </AdminCard>
+
+      {/* SECTION 2.5: Network Simulator & Telemetry Consequence Supervision */}
+      <AdminCard title="Network Simulator Consequence Supervision" subtitle="Autonomic routing membrane & real-time telemetry">
+        <View className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 space-y-4">
+          
+          {/* Status Row */}
+          <View className="flex-row justify-between items-center bg-slate-900/40 p-3 rounded-lg border border-slate-700/30">
+            <View className="flex-row items-center space-x-2">
+              <View className={`w-3.5 h-3.5 rounded-full ${networkOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} testID="network-status-indicator" />
+              <Text className="text-slate-300 text-sm font-semibold">
+                Network Link: {networkOnline ? 'Connected' : 'Offline'}
+              </Text>
+            </View>
+            <View className={`px-2 py-0.5 rounded text-[10px] font-bold ${networkOnline ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+              {networkOnline ? 'ADMITTING' : 'TENSION_QUEUE'}
+            </View>
+          </View>
+
+          {/* Packet Drop Rate Indicator */}
+          <View className="space-y-2">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-slate-300 text-xs font-semibold">Simulated Packet Drop Rate</Text>
+              <Text className="text-slate-200 text-xs font-bold" testID="drop-rate-value">
+                {packetDropRate}% ({
+                  packetDropRate === 0 ? 'Stable' :
+                  packetDropRate <= 25 ? 'Low Loss' :
+                  packetDropRate <= 50 ? 'Moderate Loss' :
+                  packetDropRate <= 75 ? 'Heavy Loss' :
+                  'Blackout'
+                })
+              </Text>
+            </View>
+            
+            {/* Visual Bar Indicator */}
+            <View className="h-2 w-full bg-slate-700/50 rounded-full overflow-hidden flex-row">
+              <View 
+                style={{ width: `${packetDropRate}%` }} 
+                className={`h-full ${
+                  packetDropRate <= 25 ? 'bg-amber-500' :
+                  packetDropRate <= 50 ? 'bg-orange-500' :
+                  'bg-rose-500'
+                }`}
+                testID="packet-drop-bar"
+              />
+              <View 
+                style={{ width: `${100 - packetDropRate}%` }} 
+                className="h-full bg-emerald-500"
+                testID="packet-success-bar"
+              />
+            </View>
+
+            {/* Selector Buttons */}
+            <View className="flex-row space-x-1.5 pt-1">
+              {[0, 25, 50, 75, 100].map((rate) => (
+                <TouchableOpacity
+                  key={rate}
+                  activeOpacity={0.7}
+                  onPress={() => setPacketDropRate(rate)}
+                  className={`flex-1 py-1.5 rounded-lg border items-center justify-center ${
+                    packetDropRate === rate
+                      ? 'bg-blue-600 border-blue-500'
+                      : 'bg-slate-800/80 border-slate-700 active:bg-slate-700/80'
+                  }`}
+                  testID={`drop-rate-btn-${rate}`}
+                >
+                  <Text className={`text-[10px] font-bold ${packetDropRate === rate ? 'text-white' : 'text-slate-400'}`}>
+                    {rate}%
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* CDC Pipeline Telemetry */}
+          <View className="border-t border-slate-700/50 pt-3.5 space-y-3">
+            <Text className="text-slate-300 text-xs font-semibold">Change Data Capture (CDC) Pipeline</Text>
+            
+            <View className="flex-row space-x-3">
+              <View className="flex-1 bg-slate-900/40 p-3 rounded-lg border border-slate-700/30 justify-between">
+                <Text className="text-slate-400 text-[10px] font-medium uppercase tracking-wider">CDC Stream</Text>
+                <View className="flex-row items-center space-x-1.5 mt-1">
+                  <View className={`w-2 h-2 rounded-full ${networkOnline ? 'bg-emerald-400' : 'bg-slate-500'}`} testID="cdc-stream-dot" />
+                  <Text className="text-slate-200 text-xs font-bold" testID="cdc-stream-status">
+                    {networkOnline ? 'Subscribed' : 'Suspended'}
+                  </Text>
+                </View>
+              </View>
+
+              <View className="flex-1 bg-slate-900/40 p-3 rounded-lg border border-slate-700/30 justify-between">
+                <Text className="text-slate-400 text-[10px] font-medium uppercase tracking-wider">Events Intake</Text>
+                <Text className="text-slate-200 text-sm font-mono font-bold mt-1" testID="cdc-events-counter">
+                  {cdcEventsCount} evts
+                </Text>
+              </View>
+            </View>
+
+            {/* CDC Simulation controls */}
+            <View className="flex-row space-x-2">
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setCdcEventsCount(cdcEventsCount + 1)}
+                className="flex-1 bg-slate-800/80 active:bg-slate-700/80 border border-slate-700 rounded-lg py-2 items-center justify-center flex-row space-x-1.5"
+                testID="simulate-cdc-btn"
+              >
+                <Ionicons name="pulse" size={12} color="#60A5FA" style={{ marginRight: 4 }} />
+                <Text className="text-slate-200 text-xs font-bold">Simulate CDC Event</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setCdcEventsCount(0)}
+                className="bg-slate-800/80 active:bg-slate-700/80 border border-slate-700 rounded-lg px-3 py-2 items-center justify-center"
+                testID="reset-cdc-btn"
+              >
+                <Ionicons name="trash-outline" size={12} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+          </View>
 
         </View>
       </AdminCard>

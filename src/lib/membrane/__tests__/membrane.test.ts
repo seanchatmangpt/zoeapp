@@ -428,5 +428,216 @@ describe('Universal Operational Membrane', () => {
     // Cleanup
     ProxyableBridge.clearTelemetryListeners();
   });
+
+  it('unregisterTelemetryListener removes the listener', () => {
+    const listener = jest.fn();
+    ProxyableBridge.registerTelemetryListener(listener);
+    ProxyableBridge.unregisterTelemetryListener(listener);
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    const proxy = ProxyableBridge.wrap(target, context, { flowName: 'Test' });
+    (proxy as any).a = 1;
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('emitGlobalTelemetry handles errors from listeners', () => {
+    const errorLogSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const errorListener = () => { throw new Error('Listener error'); };
+    ProxyableBridge.registerTelemetryListener(errorListener);
+    
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    const proxy = ProxyableBridge.wrap(target, context, { flowName: 'Test' });
+    (proxy as any).a = 1; // triggers emit
+    
+    expect(errorLogSpy).toHaveBeenCalledWith('Error in global membrane telemetry listener:', expect.any(Error));
+    
+    ProxyableBridge.unregisterTelemetryListener(errorListener);
+    errorLogSpy.mockRestore();
+  });
+
+  it('returns falsy target directly', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    expect(ProxyableBridge.wrap(null as any, context)).toBeNull();
+  });
+
+  it('returns already proxied target directly', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    const proxy = ProxyableBridge.wrap(target, context);
+    const proxy2 = ProxyableBridge.wrap(proxy, context);
+    expect(proxy).toBe(proxy2);
+  });
+
+  it('calls options.onTelemetry', () => {
+    const onTelemetry = jest.fn();
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    const proxy = ProxyableBridge.wrap(target, context, { onTelemetry });
+    (proxy as any).a = 1;
+    expect(onTelemetry).toHaveBeenCalled();
+  });
+
+  it('handles set trap failure when Reflect.set fails', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    Object.freeze(target);
+    const proxy = ProxyableBridge.wrap(target, context);
+    
+    expect(Reflect.set(proxy, 'a', 1)).toBe(false);
+  });
+
+  it('handles deleteProperty trap failure when Reflect.deleteProperty fails', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = { a: 1 };
+    Object.seal(target);
+    const proxy = ProxyableBridge.wrap(target, context);
+    
+    expect(Reflect.deleteProperty(proxy, 'a')).toBe(false);
+  });
+
+  it('calls onMutation on defineProperty success', async () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = { a: 1 };
+    const mutations: any[] = [];
+    const proxy = ProxyableBridge.wrap(target, context, {
+      onMutation: (prop, val) => mutations.push({ prop, val })
+    });
+
+    Object.defineProperty(proxy, 'a', { value: 2 });
+    await new Promise(resolve => setTimeout(resolve, 15));
+
+    expect(mutations).toContainEqual({ prop: 'a', val: 2 });
+  });
+
+  it('handles deleteProperty when property does not exist', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    const proxy = ProxyableBridge.wrap(target, context);
+    const res = delete (proxy as any).b;
+    expect(res).toBe(true);
+  });
+
+  it('calls onMutation on deleteProperty and its rollback', async () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = { a: 1, b: 2 };
+    const mutations: any[] = [];
+    const proxy = ProxyableBridge.wrap(target, context, {
+      onMutation: (prop, val) => mutations.push({ prop, val })
+    });
+    
+    // allow delete
+    delete (proxy as any).a;
+    expect(mutations).toContainEqual({ prop: 'a', val: undefined });
+
+    // deny delete
+    const originalInterceptorsEvaluate = Interceptors.evaluate;
+    Interceptors.evaluate = jest.fn().mockResolvedValue('deny');
+    
+    delete (proxy as any).b;
+    await new Promise(resolve => setTimeout(resolve, 15));
+    
+    expect(mutations).toContainEqual({ prop: 'b', val: undefined }); // Optimistic
+    expect(mutations).toContainEqual({ prop: 'b', val: 2 }); // Rollback
+
+    Interceptors.evaluate = originalInterceptorsEvaluate;
+  });
+
+  it('calls onMutation on defineProperty and its rollback for existing property', async () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = { a: 1 };
+    const mutations: any[] = [];
+    const proxy = ProxyableBridge.wrap(target, context, {
+      onMutation: (prop, val) => mutations.push({ prop, val })
+    });
+
+    const originalInterceptorsEvaluate = Interceptors.evaluate;
+    Interceptors.evaluate = jest.fn().mockResolvedValue('deny');
+
+    Object.defineProperty(proxy, 'a', { value: 2 });
+    await new Promise(resolve => setTimeout(resolve, 15));
+
+    expect(mutations).toContainEqual({ prop: 'a', val: 2 }); // Optimistic
+    expect(mutations).toContainEqual({ prop: 'a', val: 1 }); // Rollback
+
+    Interceptors.evaluate = originalInterceptorsEvaluate;
+  });
+
+  it('calls onMutation on defineProperty and its rollback for new property', async () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {} as any;
+    const mutations: any[] = [];
+    const proxy = ProxyableBridge.wrap(target, context, {
+      onMutation: (prop, val) => mutations.push({ prop, val })
+    });
+
+    const originalInterceptorsEvaluate = Interceptors.evaluate;
+    Interceptors.evaluate = jest.fn().mockResolvedValue('deny');
+
+    Object.defineProperty(proxy, 'b', { value: 2, configurable: true });
+    await new Promise(resolve => setTimeout(resolve, 15));
+
+    expect(mutations).toContainEqual({ prop: 'b', val: 2 }); // Optimistic
+    expect(mutations).toContainEqual({ prop: 'b', val: undefined }); // Rollback
+
+    Interceptors.evaluate = originalInterceptorsEvaluate;
+  });
+
+  it('handles defineProperty trap failure when Reflect.defineProperty fails', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {};
+    Object.preventExtensions(target);
+    const proxy = ProxyableBridge.wrap(target, context);
+    
+    expect(() => {
+      Object.defineProperty(proxy, 'a', { value: 1 });
+    }).toThrow(TypeError);
+  });
+
+  it('hits activeTrap across different traps via accessors', () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    const target = {
+      get triggerGet() { return (this as any).otherProp; },
+      set triggerSet(val: any) { (this as any).otherProp = val; },
+      set triggerDelete(val: any) { delete (this as any).otherProp; },
+      set triggerDefine(val: any) { Object.defineProperty(this, 'otherProp', { value: val, configurable: true }); },
+      otherProp: 'initial'
+    };
+    
+    const proxy = ProxyableBridge.wrap(target, context) as any;
+    
+    expect(proxy.triggerGet).toBe('initial');
+    
+    proxy.triggerSet = 'new';
+    expect(proxy.otherProp).toBe('new');
+    
+    proxy.triggerDelete = true;
+    expect('otherProp' in proxy).toBe(false);
+    
+    proxy.triggerDefine = 'defined';
+    expect(proxy.otherProp).toBe('defined');
+  });
+
+  it('handles rollback fallbacks when context run fails without error and without onMutation', async () => {
+    const context = new MembraneContext({ mode: 'strict', tenantId: '1', authorityRole: 'admin' });
+    jest.spyOn(context, 'run').mockResolvedValue({ success: false, receipt: {} as any, result: null });
+    
+    const target = { a: 1 };
+    const proxy = ProxyableBridge.wrap(target, context) as any;
+    
+    // 1. set fallback (res.error falsy -> 'Transition denied')
+    proxy.a = 2;
+    
+    // 2. delete fallback (res.error falsy -> 'Delete denied')
+    delete proxy.a;
+    
+    // 3. define fallback for new property without onMutation (covers line 316 and 333)
+    Object.defineProperty(proxy, 'b', { value: 3, configurable: true });
+    
+    await new Promise(resolve => setTimeout(resolve, 20));
+    
+    expect(proxy.a).toBe(2); // Since there is no onMutation or explicit error handling in this mock that actually restores the value synchronously before this check, it remains the mutated value locally in strict mode when fallback isn't fully implemented in the context test mock.
+    expect(proxy.b).toBeUndefined();
+  });
 });
 

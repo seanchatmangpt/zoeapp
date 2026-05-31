@@ -7,3 +7,10 @@ export interface HookPacket {
   sentAt: string;
   attempts: number;
 }
+
+export function createHookPacket(packet: HookPacket): HookPacket {
+  return {
+    ...packet,
+    attempts: packet.attempts || 0,
+  };
+}

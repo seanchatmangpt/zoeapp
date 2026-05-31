@@ -1,5 +1,9 @@
 import React from 'react';
 import { Stack as ExpoStack, Tabs as ExpoTabs } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { AvatarRole } from '../lib/truex/avatar/types';
+import { PROJECTION_MATRIX } from '../lib/truex/avatar/matrix';
 
 type CustomStackType = any;
 type CustomTabsType = any;
@@ -15,9 +19,42 @@ export const TabsProtected: React.FC<{ guard: boolean; children: React.ReactNode
 };
 TabsProtected.displayName = 'TabsProtected';
 
-const StackComponent = React.forwardRef<any, any>(({ avatarRelativeProjectionOptions, screenOptions, children, ...props }, ref) => {
-  // Filter children so that only matching guarded screens are passed as direct children to React Navigation
-  const processedChildren = React.useMemo(() => {
+// Custom hooks for render stability and avoiding double-renders
+function useShallowStable<T>(obj: T): T {
+  const ref = React.useRef<T>(obj);
+  
+  const prev = ref.current;
+  let isEquivalent = prev === obj;
+  if (!isEquivalent && prev && obj && typeof prev === 'object' && typeof obj === 'object') {
+    const keysPrev = Object.keys(prev);
+    const keysObj = Object.keys(obj);
+    if (keysPrev.length === keysObj.length) {
+      isEquivalent = true;
+      for (const key of keysPrev) {
+        if ((prev as any)[key] !== (obj as any)[key]) {
+          isEquivalent = false;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!isEquivalent) {
+    ref.current = obj;
+  }
+
+  return ref.current;
+}
+
+function useMemoizedChildren(children: React.ReactNode): React.ReactNode[] {
+  const prevChildrenRef = React.useRef<React.ReactNode[]>([]);
+  const prevInputRef = React.useRef<React.ReactNode>(null);
+
+  return React.useMemo(() => {
+    if (children === prevInputRef.current) {
+      return prevChildrenRef.current;
+    }
+
     const list: React.ReactNode[] = [];
     React.Children.forEach(children, (child) => {
       if (!child || !React.isValidElement(child)) return;
@@ -29,17 +66,77 @@ const StackComponent = React.forwardRef<any, any>(({ avatarRelativeProjectionOpt
             if (nestedChild) list.push(nestedChild);
           });
         }
+      } else if (child.type === TabsProtected || (child.type as any).displayName === 'TabsProtected') {
+        const guardedChild = child as React.ReactElement<any>;
+        if (guardedChild.props.guard) {
+          React.Children.forEach(guardedChild.props.children, (nestedChild) => {
+            if (nestedChild) list.push(nestedChild);
+          });
+        }
       } else {
         list.push(child);
       }
     });
+
+    const prevList = prevChildrenRef.current;
+    let isEquivalent = prevList.length === list.length;
+    if (isEquivalent) {
+      for (let i = 0; i < list.length; i++) {
+        const c1 = list[i];
+        const c2 = prevList[i];
+        if (!React.isValidElement(c1) || !React.isValidElement(c2)) {
+          if (c1 !== c2) {
+            isEquivalent = false;
+            break;
+          }
+        } else {
+          if (c1.type !== c2.type || c1.key !== c2.key) {
+            isEquivalent = false;
+            break;
+          }
+          const p1 = c1.props as any;
+          const p2 = c2.props as any;
+          const k1 = Object.keys(p1);
+          const k2 = Object.keys(p2);
+          if (k1.length !== k2.length) {
+            isEquivalent = false;
+            break;
+          }
+          for (const key of k1) {
+            if (key === 'children') {
+              if (p1.children !== p2.children) {
+                isEquivalent = false;
+                break;
+              }
+            } else if (p1[key] !== p2[key]) {
+              isEquivalent = false;
+              break;
+            }
+          }
+          if (!isEquivalent) break;
+        }
+      }
+    }
+
+    if (isEquivalent) {
+      prevInputRef.current = children;
+      return prevList;
+    }
+
+    prevChildrenRef.current = list;
+    prevInputRef.current = children;
     return list;
   }, [children]);
+}
+
+const StackComponent = React.forwardRef<any, any>(({ avatarRelativeProjectionOptions, screenOptions, children, ...props }, ref) => {
+  const processedChildren = useMemoizedChildren(children);
+  const stableScreenOptions = useShallowStable(avatarRelativeProjectionOptions || screenOptions);
 
   return (
     <ExpoStack
       ref={ref}
-      screenOptions={avatarRelativeProjectionOptions || screenOptions}
+      screenOptions={stableScreenOptions}
       {...props}
     >
       {processedChildren}
@@ -53,35 +150,14 @@ export const Stack = Object.assign(StackComponent, ExpoStack, {
   Protected: StackProtected,
 }) as unknown as CustomStackType;
 
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { AvatarRole } from '../lib/truex/avatar/types';
-import { PROJECTION_MATRIX } from '../lib/truex/avatar/matrix';
-
 const TabsComponent = React.forwardRef<any, any>(({ avatarRelativeProjectionOptions, screenOptions, children, ...props }, ref) => {
-  const processedChildren = React.useMemo(() => {
-    const list: React.ReactNode[] = [];
-    React.Children.forEach(children, (child) => {
-      if (!child || !React.isValidElement(child)) return;
-
-      if (child.type === TabsProtected || (child.type as any).displayName === 'TabsProtected') {
-        const guardedChild = child as React.ReactElement<any>;
-        if (guardedChild.props.guard) {
-          React.Children.forEach(guardedChild.props.children, (nestedChild) => {
-            if (nestedChild) list.push(nestedChild);
-          });
-        }
-      } else {
-        list.push(child);
-      }
-    });
-    return list;
-  }, [children]);
+  const processedChildren = useMemoizedChildren(children);
+  const stableScreenOptions = useShallowStable(avatarRelativeProjectionOptions || screenOptions);
 
   return (
     <ExpoTabs
       ref={ref}
-      screenOptions={avatarRelativeProjectionOptions || screenOptions}
+      screenOptions={stableScreenOptions}
       {...props}
     >
       {processedChildren}
@@ -107,6 +183,225 @@ export interface AvatarRelativeProjectionMatrixViewProps {
   };
 }
 
+const ROLES: AvatarRole[] = ['guest', 'member', 'volunteer', 'teamLead', 'pastor', 'admin', 'operator'];
+
+const ROLE_COLORS: Record<AvatarRole, string> = {
+  guest: '#64748B', // Slate
+  member: '#3B82F6', // Blue
+  volunteer: '#10B981', // Green
+  teamLead: '#8B5CF6', // Purple
+  pastor: '#F59E0B', // Amber
+  admin: '#EF4444', // Red
+  operator: '#06B6D4', // Cyan
+};
+
+interface AvatarProjectionCardProps {
+  role: AvatarRole;
+  data: any;
+  roleColor: string;
+  projectionKey?: string;
+}
+
+const AvatarProjectionCard = React.memo(
+  ({ role, data, roleColor, projectionKey = 'volunteer_shortage' }: AvatarProjectionCardProps) => {
+    const projection = (PROJECTION_MATRIX[projectionKey] || PROJECTION_MATRIX.volunteer_shortage)(data, role);
+
+    return (
+      <View style={[matrixStyles.roleCard, !projection.visible && matrixStyles.roleCardHidden]}>
+        {/* Card Header */}
+        <View style={[matrixStyles.roleHeader, { borderLeftColor: roleColor }]}>
+          <View style={matrixStyles.roleTitleContainer}>
+            <View style={[matrixStyles.roleBadge, { backgroundColor: roleColor + '20', borderColor: roleColor }]}>
+              <Text style={[matrixStyles.roleBadgeText, { color: roleColor }]}>{role}</Text>
+            </View>
+            <Text style={matrixStyles.surfaceText} accessibilityRole="header">{projection.surface.toUpperCase()}</Text>
+          </View>
+          <View style={matrixStyles.visibilityBadge}>
+            <FontAwesome 
+              name={projection.visible ? "eye" : "eye-slash"} 
+              size={14} 
+              color={projection.visible ? "#10B981" : "#64748B"} 
+            />
+            <Text style={[matrixStyles.visibilityText, { color: projection.visible ? "#10B981" : "#64748B" }]}>
+              {projection.visible ? "Visible" : "Hidden"}
+            </Text>
+          </View>
+        </View>
+
+        {/* Card Body */}
+        {projection.visible ? (
+          <View style={matrixStyles.cardBody}>
+            {projection.payload?.message && (
+              <Text style={matrixStyles.messageText}>{projection.payload.message}</Text>
+            )}
+
+            {/* Actions */}
+            <View style={matrixStyles.actionsGroup}>
+              <Text style={matrixStyles.cardLabel}>Allowed Actions:</Text>
+              <View style={matrixStyles.actionBadgesList}>
+                {projection.allowedActions.length > 0 ? (
+                  projection.allowedActions.map((act) => (
+                    <View key={act} style={matrixStyles.actionBadge}>
+                      <Text style={matrixStyles.actionBadgeText}>⚡ {act}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text style={matrixStyles.noActionsText}>None</Text>
+                )}
+              </View>
+            </View>
+
+            {/* Payload Details */}
+            <View style={matrixStyles.payloadSection}>
+              <Text style={matrixStyles.cardLabel}>Projected Payload State:</Text>
+              <View style={matrixStyles.payloadBox}>
+                {role === 'member' && (
+                  <Text style={matrixStyles.payloadText}>• Context: Volunteer encouragement</Text>
+                )}
+                {role === 'volunteer' && (
+                  <Text style={matrixStyles.payloadText}>• Open slots count: {projection.payload?.openSlots}</Text>
+                )}
+                {role === 'teamLead' && (
+                  <Text style={matrixStyles.payloadText}>• Candidates count: {projection.payload?.candidates?.length ?? 0}</Text>
+                )}
+                {role === 'pastor' && (
+                  <View>
+                    <Text style={matrixStyles.payloadText}>• Risk Level: {projection.payload?.riskLevel}</Text>
+                    <Text style={matrixStyles.payloadText}>• Shortage Ratio: {projection.payload?.shortageRatio}</Text>
+                  </View>
+                )}
+                {role === 'admin' && (
+                  <View>
+                    <Text style={matrixStyles.payloadText}>• Run ID: {projection.payload?.runId}</Text>
+                    <Text style={matrixStyles.payloadText}>• History Logs: {projection.payload?.history?.length ?? 0} entries</Text>
+                  </View>
+                )}
+                {role === 'operator' && (
+                  <View>
+                    <Text style={matrixStyles.payloadText}>• Nodes count: {projection.payload?.topology?.nodes ?? 0}</Text>
+                    <Text style={matrixStyles.payloadText}>• State Hash: {projection.payload?.stateHash}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={matrixStyles.cardBodyHidden}>
+            <Text style={matrixStyles.hiddenMessage}>
+              This avatar role does not have authorization to view this state projection.
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  },
+  (prevProps, nextProps) => {
+    if (prevProps.role !== nextProps.role) return false;
+    if (prevProps.roleColor !== nextProps.roleColor) return false;
+    
+    const key = prevProps.projectionKey || 'volunteer_shortage';
+    const nextKey = nextProps.projectionKey || 'volunteer_shortage';
+    if (key !== nextKey) return false;
+
+    const role = prevProps.role;
+    const d1 = prevProps.data;
+    const d2 = nextProps.data;
+
+    // Fast path for volunteer_shortage
+    if (key === 'volunteer_shortage') {
+      if (role === 'guest' || role === 'member') return true;
+      if (role === 'volunteer') return d1.openSlots === d2.openSlots;
+      if (role === 'pastor') return d1.shortageRatio === d2.shortageRatio;
+      if (role === 'teamLead') {
+        if (d1.candidates === d2.candidates) return true;
+        if (!d1.candidates || !d2.candidates) return false;
+        if (d1.candidates.length !== d2.candidates.length) return false;
+        for (let i = 0; i < d1.candidates.length; i++) {
+          if (d1.candidates[i] !== d2.candidates[i]) return false;
+        }
+        return true;
+      }
+      if (role === 'admin') {
+        if (d1.runId !== d2.runId) return false;
+        if (d1.history === d2.history) return true;
+        if (!d1.history || !d2.history) return false;
+        if (d1.history.length !== d2.history.length) return false;
+        for (let i = 0; i < d1.history.length; i++) {
+          const h1 = d1.history[i];
+          const h2 = d2.history[i];
+          if (h1.timestamp !== h2.timestamp || h1.event !== h2.event || h1.detail !== h2.detail) return false;
+        }
+        return true;
+      }
+      if (role === 'operator') {
+        if (d1.stateHash !== d2.stateHash) return false;
+        if (d1.topology === d2.topology) return true;
+        if (!d1.topology || !d2.topology) return false;
+        return (
+          d1.topology.nodes === d2.topology.nodes &&
+          d1.topology.channels === d2.topology.channels &&
+          d1.topology.supervisorStatus === d2.topology.supervisorStatus
+        );
+      }
+    }
+
+    // Generic fallback: evaluate and compare projection outputs
+    const projFn1 = PROJECTION_MATRIX[key];
+    const projFn2 = PROJECTION_MATRIX[nextKey];
+    if (!projFn1 || !projFn2) return false;
+
+    const p1 = projFn1(d1, role);
+    const p2 = projFn2(d2, role);
+
+    if (p1.visible !== p2.visible) return false;
+    if (p1.surface !== p2.surface) return false;
+
+    if (p1.allowedActions.length !== p2.allowedActions.length) return false;
+    for (let i = 0; i < p1.allowedActions.length; i++) {
+      if (p1.allowedActions[i] !== p2.allowedActions[i]) return false;
+    }
+
+    if (p1.payload === p2.payload) return true;
+    if (!p1.payload || !p2.payload) return false;
+
+    const keys1 = Object.keys(p1.payload);
+    const keys2 = Object.keys(p2.payload);
+    if (keys1.length !== keys2.length) return false;
+
+    for (const k of keys1) {
+      const val1 = p1.payload[k];
+      const val2 = p2.payload[k];
+      if (Array.isArray(val1) && Array.isArray(val2)) {
+        if (val1.length !== val2.length) return false;
+        for (let i = 0; i < val1.length; i++) {
+          if (typeof val1[i] === 'object' && val1[i] !== null && typeof val2[i] === 'object' && val2[i] !== null) {
+            const subKeys1 = Object.keys(val1[i]);
+            const subKeys2 = Object.keys(val2[i]);
+            if (subKeys1.length !== subKeys2.length) return false;
+            for (const subK of subKeys1) {
+              if (val1[i][subK] !== val2[i][subK]) return false;
+            }
+          } else {
+            if (val1[i] !== val2[i]) return false;
+          }
+        }
+      } else if (typeof val1 === 'object' && val1 !== null && typeof val2 === 'object' && val2 !== null) {
+        const subKeys1 = Object.keys(val1);
+        const subKeys2 = Object.keys(val2);
+        if (subKeys1.length !== subKeys2.length) return false;
+        for (const subK of subKeys1) {
+          if (val1[subK] !== val2[subK]) return false;
+        }
+      } else {
+        if (val1 !== val2) return false;
+      }
+    }
+
+    return true;
+  }
+);
+AvatarProjectionCard.displayName = 'AvatarProjectionCard';
+
 export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelativeProjectionMatrixViewProps) {
   const [openSlots, setOpenSlots] = React.useState(initialData?.openSlots ?? 4);
   const [candidates, setCandidates] = React.useState<string[]>(initialData?.candidates ?? ['Sarah Brown', 'Michael Green', 'David White']);
@@ -114,42 +409,55 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
   
   const shortageRatio = Number((openSlots / 8).toFixed(2));
   
+  // Stabilize initialData fields
+  const initialRunId = initialData?.runId;
+  const initialHistory = initialData?.history;
+  const initialTopology = initialData?.topology;
+
+  const memoizedInitialData = React.useMemo(() => {
+    return {
+      runId: initialRunId ?? 'run-9988',
+      history: initialHistory ?? [
+        { timestamp: '16:21:05', event: 'slot_opened', detail: 'Slot opened by cancellation' },
+        { timestamp: '16:20:12', event: 'shift_assigned', detail: 'Sarah assigned by teamLead' }
+      ],
+      topology: initialTopology ?? { nodes: 12, channels: 4, supervisorStatus: 'healthy' }
+    };
+  }, [initialRunId, initialHistory, initialTopology]);
+
   const data = React.useMemo(() => ({
     openSlots,
     candidates,
     shortageRatio,
-    runId: initialData?.runId ?? 'run-9988',
-    history: initialData?.history ?? [
-      { timestamp: '16:21:05', event: 'slot_opened', detail: 'Slot opened by cancellation' },
-      { timestamp: '16:20:12', event: 'shift_assigned', detail: 'Sarah assigned by teamLead' }
-    ],
-    topology: initialData?.topology ?? { nodes: 12, channels: 4, supervisorStatus: 'healthy' },
+    runId: memoizedInitialData.runId,
+    history: memoizedInitialData.history,
+    topology: memoizedInitialData.topology,
     stateHash,
-  }), [openSlots, candidates, shortageRatio, stateHash, initialData]);
+  }), [openSlots, candidates, shortageRatio, stateHash, memoizedInitialData]);
 
-  const roles: AvatarRole[] = ['guest', 'member', 'volunteer', 'teamLead', 'pastor', 'admin', 'operator'];
-
-  const getRoleColor = (role: AvatarRole) => {
-    switch (role) {
-      case 'guest': return '#64748B'; // Slate
-      case 'member': return '#3B82F6'; // Blue
-      case 'volunteer': return '#10B981'; // Green
-      case 'teamLead': return '#8B5CF6'; // Purple
-      case 'pastor': return '#F59E0B'; // Amber
-      case 'admin': return '#EF4444'; // Red
-      case 'operator': return '#06B6D4'; // Cyan
-    }
-  };
-
-  const addCandidate = () => {
+  const addCandidate = React.useCallback(() => {
     const names = ['Emma Stone', 'Liam Neeson', 'Olivia Wilde', 'Noah Centineo', 'Sophia Loren', 'Lucas Scott'];
-    const randomName = names[Math.floor(Math.random() * names.length)] + ` (${candidates.length + 1})`;
-    setCandidates([...candidates, randomName]);
-  };
+    setCandidates((prev) => {
+      const randomName = names[Math.floor(Math.random() * names.length)] + ` (${prev.length + 1})`;
+      return [...prev, randomName];
+    });
+  }, []);
 
-  const removeCandidate = (index: number) => {
-    setCandidates(candidates.filter((_, i) => i !== index));
-  };
+  const removeCandidate = React.useCallback((index: number) => {
+    setCandidates((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const decreaseOpenSlots = React.useCallback(() => {
+    setOpenSlots((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const increaseOpenSlots = React.useCallback(() => {
+    setOpenSlots((prev) => Math.min(8, prev + 1));
+  }, []);
+
+  const handleSelectStep = React.useCallback((val: number) => {
+    setOpenSlots(val);
+  }, []);
 
   return (
     <View style={matrixStyles.container}>
@@ -163,13 +471,19 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
             <View style={matrixStyles.btnGroup}>
               <TouchableOpacity 
                 style={matrixStyles.smallBtn} 
-                onPress={() => setOpenSlots(Math.max(0, openSlots - 1))}
+                onPress={decreaseOpenSlots}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Decrease open slots"
               >
                 <Text style={matrixStyles.btnText}>-</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={matrixStyles.smallBtn} 
-                onPress={() => setOpenSlots(Math.min(8, openSlots + 1))}
+                onPress={increaseOpenSlots}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Increase open slots"
               >
                 <Text style={matrixStyles.btnText}>+</Text>
               </TouchableOpacity>
@@ -201,8 +515,11 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
                       matrixStyles.sliderStepPoint,
                       openSlots === val && matrixStyles.sliderStepPointActive
                     ]}
-                    onPress={() => setOpenSlots(val)}
+                    onPress={() => handleSelectStep(val)}
+                    accessible={true}
+                    accessibilityRole="button"
                     accessibilityLabel={`Set open slots to ${val}`}
+                    accessibilityState={{ selected: openSlots === val }}
                   >
                     <Text style={[
                       matrixStyles.sliderStepText,
@@ -220,7 +537,13 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
         <View style={matrixStyles.candidatesSection}>
           <View style={matrixStyles.candidatesHeader}>
             <Text style={matrixStyles.controlLabel}>Candidates ({candidates.length})</Text>
-            <TouchableOpacity style={matrixStyles.addBtn} onPress={addCandidate}>
+            <TouchableOpacity
+              style={matrixStyles.addBtn}
+              onPress={addCandidate}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Add Candidate"
+            >
               <Text style={matrixStyles.addBtnText}>+ Add Candidate</Text>
             </TouchableOpacity>
           </View>
@@ -228,7 +551,12 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
             {candidates.map((cand, idx) => (
               <View key={idx} style={matrixStyles.candidateBadge}>
                 <Text style={matrixStyles.candidateText} numberOfLines={1}>{cand}</Text>
-                <TouchableOpacity onPress={() => removeCandidate(idx)}>
+                <TouchableOpacity
+                  onPress={() => removeCandidate(idx)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove candidate ${cand}`}
+                >
                   <FontAwesome name="times-circle" size={12} color="#EF4444" style={matrixStyles.removeIcon} />
                 </TouchableOpacity>
               </View>
@@ -249,6 +577,8 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
             onChangeText={setStateHash}
             placeholder="State hash (e.g. vkg_genesis_a4f9)"
             placeholderTextColor="#64748B"
+            accessibilityLabel="VKG State Hash input"
+            accessibilityHint="Edit the VKG state hash"
           />
         </View>
       </View>
@@ -257,97 +587,16 @@ export function AvatarRelativeProjectionMatrixView({ initialData }: AvatarRelati
       
       {/* Grid of Projections */}
       <View style={matrixStyles.grid}>
-        {roles.map((role) => {
-          const projection = PROJECTION_MATRIX.volunteer_shortage(data, role);
-          const roleColor = getRoleColor(role);
+        {ROLES.map((role) => {
+          const roleColor = ROLE_COLORS[role];
           
           return (
-            <View key={role} style={[matrixStyles.roleCard, !projection.visible && matrixStyles.roleCardHidden]}>
-              {/* Card Header */}
-              <View style={[matrixStyles.roleHeader, { borderLeftColor: roleColor }]}>
-                <View style={matrixStyles.roleTitleContainer}>
-                  <View style={[matrixStyles.roleBadge, { backgroundColor: roleColor + '20', borderColor: roleColor }]}>
-                    <Text style={[matrixStyles.roleBadgeText, { color: roleColor }]}>{role}</Text>
-                  </View>
-                  <Text style={matrixStyles.surfaceText}>{projection.surface.toUpperCase()}</Text>
-                </View>
-                <View style={matrixStyles.visibilityBadge}>
-                  <FontAwesome 
-                    name={projection.visible ? "eye" : "eye-slash"} 
-                    size={14} 
-                    color={projection.visible ? "#10B981" : "#64748B"} 
-                  />
-                  <Text style={[matrixStyles.visibilityText, { color: projection.visible ? "#10B981" : "#64748B" }]}>
-                    {projection.visible ? "Visible" : "Hidden"}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Card Body */}
-              {projection.visible ? (
-                <View style={matrixStyles.cardBody}>
-                  {projection.payload?.message && (
-                    <Text style={matrixStyles.messageText}>{projection.payload.message}</Text>
-                  )}
-
-                  {/* Actions */}
-                  <View style={matrixStyles.actionsGroup}>
-                    <Text style={matrixStyles.cardLabel}>Allowed Actions:</Text>
-                    <View style={matrixStyles.actionBadgesList}>
-                      {projection.allowedActions.length > 0 ? (
-                        projection.allowedActions.map((act) => (
-                          <View key={act} style={matrixStyles.actionBadge}>
-                            <Text style={matrixStyles.actionBadgeText}>⚡ {act}</Text>
-                          </View>
-                        ))
-                      ) : (
-                        <Text style={matrixStyles.noActionsText}>None</Text>
-                      )}
-                    </View>
-                  </View>
-
-                  {/* Payload Details */}
-                  <View style={matrixStyles.payloadSection}>
-                    <Text style={matrixStyles.cardLabel}>Projected Payload State:</Text>
-                    <View style={matrixStyles.payloadBox}>
-                      {role === 'member' && (
-                        <Text style={matrixStyles.payloadText}>• Context: Volunteer encouragement</Text>
-                      )}
-                      {role === 'volunteer' && (
-                        <Text style={matrixStyles.payloadText}>• Open slots count: {projection.payload?.openSlots}</Text>
-                      )}
-                      {role === 'teamLead' && (
-                        <Text style={matrixStyles.payloadText}>• Candidates count: {projection.payload?.candidates?.length ?? 0}</Text>
-                      )}
-                      {role === 'pastor' && (
-                        <View>
-                          <Text style={matrixStyles.payloadText}>• Risk Level: {projection.payload?.riskLevel}</Text>
-                          <Text style={matrixStyles.payloadText}>• Shortage Ratio: {projection.payload?.shortageRatio}</Text>
-                        </View>
-                      )}
-                      {role === 'admin' && (
-                        <View>
-                          <Text style={matrixStyles.payloadText}>• Run ID: {projection.payload?.runId}</Text>
-                          <Text style={matrixStyles.payloadText}>• History Logs: {projection.payload?.history?.length ?? 0} entries</Text>
-                        </View>
-                      )}
-                      {role === 'operator' && (
-                        <View>
-                          <Text style={matrixStyles.payloadText}>• Nodes count: {projection.payload?.topology?.nodes ?? 0}</Text>
-                          <Text style={matrixStyles.payloadText}>• State Hash: {projection.payload?.stateHash}</Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                </View>
-              ) : (
-                <View style={matrixStyles.cardBodyHidden}>
-                  <Text style={matrixStyles.hiddenMessage}>
-                    This avatar role does not have authorization to view this state projection.
-                  </Text>
-                </View>
-              )}
-            </View>
+            <AvatarProjectionCard
+              key={role}
+              role={role}
+              data={data}
+              roleColor={roleColor}
+            />
           );
         })}
       </View>

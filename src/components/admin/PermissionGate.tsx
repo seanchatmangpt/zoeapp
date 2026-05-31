@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useActorOpsStore } from '../../lib/actor/actorOps';
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 interface PermissionGateProps {
@@ -20,7 +20,12 @@ export function PermissionGate({ allowedRoles, children, fallback, testID }: Per
       return <View testID={testID}>{fallback}</View>;
     }
     return (
-      <View style={styles.container} testID={testID}>
+      <View
+        style={styles.container}
+        testID={testID}
+        accessible={true}
+        accessibilityLabel={`Access Restricted. Requires one of: ${allowedRoles.join(', ')}. Current role: ${currentPrincipal.role}`}
+      >
         <FontAwesome name="lock" size={24} color="#F87171" style={styles.icon} />
         <Text style={styles.errorTitle}>Access Restricted</Text>
         <Text style={styles.errorText}>

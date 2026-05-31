@@ -7,7 +7,7 @@
  * @version 1.1.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
   View,
@@ -26,6 +26,7 @@ import { mmkvInstance } from '@/src/lib/store/mmkvStorage';
 import { useActorOpsStore } from '@/src/lib/actor/actorOps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { OfflineBanner } from '@/src/components/OfflineBanner';
 
 const AVATAR_PRESETS = [
   { id: '1', name: 'Ava', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face' },
@@ -36,6 +37,49 @@ const AVATAR_PRESETS = [
   { id: '6', name: 'Ben', url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&h=150&fit=crop&crop=face' },
 ];
 
+// Validation functions declared outside the component to avoid recreation on each render
+const validateUsername = (val: string): string | null => {
+  const trimmed = val.trim();
+  if (!trimmed) {
+    return 'Username is required';
+  }
+  if (trimmed.length < 3) {
+    return 'Username must be at least 3 characters';
+  }
+  if (trimmed.length > 20) {
+    return 'Username must be at most 20 characters';
+  }
+  const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
+  if (!usernameRegex.test(trimmed)) {
+    return 'Username can only contain alphanumeric characters, underscores, hyphens, and periods';
+  }
+  return null;
+};
+
+const validateWebsite = (val: string): string | null => {
+  const trimmed = val.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i;
+  if (!urlRegex.test(trimmed)) {
+    return 'Please enter a valid website URL';
+  }
+  return null;
+};
+
+const validateAvatarUrl = (val: string): string | null => {
+  const trimmed = val.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i;
+  if (!urlRegex.test(trimmed)) {
+    return 'Please enter a valid image URL';
+  }
+  return null;
+};
+
 export default function Account() {
   const { session } = useSession();
 
@@ -45,6 +89,47 @@ export default function Account() {
   const [username, setUsername] = useState('');
   const [website, setWebsite] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+
+  // Focus states
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [isWebsiteFocused, setIsWebsiteFocused] = useState(false);
+  const [isAvatarFocused, setIsAvatarFocused] = useState(false);
+
+  // Error states
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [websiteError, setWebsiteError] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
+  const handleUsernameChange = useCallback((val: string) => {
+    setUsername(val);
+    setUsernameError(validateUsername(val));
+  }, []);
+
+  const handleWebsiteChange = useCallback((val: string) => {
+    setWebsite(val);
+    setWebsiteError(validateWebsite(val));
+  }, []);
+
+  const handleAvatarUrlChange = useCallback((val: string) => {
+    setAvatarUrl(val);
+    setImageError(false);
+    setAvatarError(validateAvatarUrl(val));
+  }, []);
+
+  const handleUsernameBlur = useCallback(() => {
+    setIsUsernameFocused(false);
+    setUsernameError(validateUsername(username));
+  }, [username]);
+
+  const handleWebsiteBlur = useCallback(() => {
+    setIsWebsiteFocused(false);
+    setWebsiteError(validateWebsite(website));
+  }, [website]);
+
+  const handleAvatarBlur = useCallback(() => {
+    setIsAvatarFocused(false);
+    setAvatarError(validateAvatarUrl(avatarUrl));
+  }, [avatarUrl]);
 
   // Picker modal and state
   const [showPicker, setShowPicker] = useState(false);
@@ -83,6 +168,9 @@ export default function Account() {
           setWebsite(data.website || '');
           setAvatarUrl(data.avatar_url || '');
           setImageError(false);
+          setUsernameError(null);
+          setWebsiteError(null);
+          setAvatarError(null);
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -107,19 +195,33 @@ export default function Account() {
     }
   }, [session?.user?.id]);
 
-  const refreshMMKVKeyCount = () => {
+  const refreshMMKVKeyCount = useCallback(() => {
     try {
       setMmkvKeysCount(mmkvInstance.getAllKeys().length);
     } catch (e) {
       console.warn(e);
     }
-  };
+  }, []);
 
   // Update profile database record
-  async function handleUpdateProfile() {
+  const handleUpdateProfile = useCallback(async () => {
     try {
-      setUpdating(true);
       if (!session?.user) throw new Error('No user on the session!');
+
+      const uError = validateUsername(username);
+      const wError = validateWebsite(website);
+      const aError = validateAvatarUrl(avatarUrl);
+
+      setUsernameError(uError);
+      setWebsiteError(wError);
+      setAvatarError(aError);
+
+      if (uError || wError || aError) {
+        Alert.alert('Validation Error', 'Please correct the highlighted errors before saving.');
+        return;
+      }
+
+      setUpdating(true);
 
       const updates = {
         id: session.user.id,
@@ -141,34 +243,34 @@ export default function Account() {
     } finally {
       setUpdating(false);
     }
-  }
+  }, [session?.user?.id, username, website, avatarUrl, refreshMMKVKeyCount]);
 
   // Get user initials for avatar fallback placeholder
-  const getInitials = () => {
+  const initials = useMemo(() => {
     if (username && username.trim()) {
       return username.trim().slice(0, 2).toUpperCase();
     }
     if (session?.user?.email) {
-      return session.user.email.slice(0, 2).toUpperCase();
+      return session?.user?.email.slice(0, 2).toUpperCase();
     }
     return '??';
-  };
+  }, [username, session?.user?.email]);
 
   // Toggle handlers that persist to local MMKV instance
-  const handleToggleDarkMode = (value: boolean) => {
+  const handleToggleDarkMode = useCallback((value: boolean) => {
     setDarkMode(value);
     mmkvInstance.set('sim_dark_mode', value);
     refreshMMKVKeyCount();
-  };
+  }, [refreshMMKVKeyCount]);
 
-  const handleToggleSaveLogs = (value: boolean) => {
+  const handleToggleSaveLogs = useCallback((value: boolean) => {
     setSaveLogs(value);
     mmkvInstance.set('sim_save_logs', value);
     refreshMMKVKeyCount();
-  };
+  }, [refreshMMKVKeyCount]);
 
   // Developer debugging reset procedures
-  const handleClearMMKV = () => {
+  const handleClearMMKV = useCallback(() => {
     Alert.alert(
       'Clear MMKV Cache ⚠️',
       'This will clear all fast key-value caches stored in the Zustand/Zoe persistence storage. This does not affect remote Supabase database. Proceed?',
@@ -189,9 +291,9 @@ export default function Account() {
         },
       ]
     );
-  };
+  }, []);
 
-  const handleResetZustand = () => {
+  const handleResetZustand = useCallback(() => {
     Alert.alert(
       'Reset Zustand Store 🔄',
       'This will restore all local sync outboxes, quarantine queue counters, and simulation toggles back to default values.',
@@ -214,9 +316,9 @@ export default function Account() {
         },
       ]
     );
-  };
+  }, [setNetworkOnline, setRemoteRejectActive]);
 
-  const handleClearAsyncStorage = () => {
+  const handleClearAsyncStorage = useCallback(() => {
     Alert.alert(
       'Clear AsyncStorage 💾',
       'This clears traditional async-storage items, such as authentication sessions, token indices, and caches.',
@@ -236,7 +338,7 @@ export default function Account() {
         },
       ]
     );
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -247,37 +349,36 @@ export default function Account() {
     );
   }
 
-  const renderAvatar = () => {
-    if (avatarUrl && !imageError) {
-      return (
-        <Image
-          testID="avatar-image"
-          source={{ uri: avatarUrl }}
-          className="w-24 h-24 rounded-full border-4 border-white shadow-md"
-          onError={() => setImageError(true)}
-        />
-      );
-    }
-    return (
-      <View className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 items-center justify-center border-4 border-white shadow-md bg-blue-600">
-        <Text className="text-white text-3xl font-bold tracking-wider">{getInitials()}</Text>
-      </View>
-    );
-  };
-
   return (
-    <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ paddingBottom: 110 }}>
+    <View style={{ flex: 1 }}>
+      <OfflineBanner />
+      <ScrollView className="flex-1 bg-gray-50" contentContainerStyle={{ paddingBottom: 110 }}>
       <Stack.AvatarRelativeProjection options={{ title: 'Account Settings' }} />
 
       {/* Header and Avatar Projection Card */}
       <View className="bg-white border-b border-gray-200 pb-6 pt-4">
         <View className="items-center px-6">
           <View className="relative">
-            {renderAvatar()}
+            {avatarUrl && !imageError ? (
+              <Image
+                testID="avatar-image"
+                source={{ uri: avatarUrl }}
+                className="w-24 h-24 rounded-full border-4 border-white shadow-md"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <View className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 items-center justify-center border-4 border-white shadow-md bg-blue-600">
+                <Text className="text-white text-3xl font-bold tracking-wider">{initials}</Text>
+              </View>
+            )}
             <Pressable
               testID="camera-toggle"
               onPress={() => setShowPicker(!showPicker)}
-              className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full border-2 border-white shadow active:bg-blue-700">
+              className="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full border-2 border-white shadow active:bg-blue-700"
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Toggle avatar selection tray"
+            >
               <Ionicons name="camera-outline" size={16} color="white" />
             </Pressable>
           </View>
@@ -308,7 +409,12 @@ export default function Account() {
                   }}
                   className={`mr-4 p-1 rounded-full border-2 ${
                     avatarUrl === preset.url ? 'border-blue-600 bg-blue-50' : 'border-transparent'
-                  }`}>
+                  }`}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select avatar preset ${preset.id}`}
+                  accessibilityState={{ selected: avatarUrl === preset.url }}
+                >
                   <Image source={{ uri: preset.url }} className="w-14 h-14 rounded-full" />
                 </Pressable>
               ))}
@@ -320,15 +426,30 @@ export default function Account() {
               </Text>
               <TextInput
                 testID="custom-avatar-input"
-                className="border border-gray-300 rounded-lg p-2 text-sm text-gray-900 bg-white"
+                className={`border rounded-lg p-2 text-sm text-gray-900 bg-white ${
+                  isAvatarFocused
+                    ? 'border-blue-500'
+                    : avatarError
+                    ? 'border-red-400'
+                    : 'border-gray-300'
+                }`}
                 placeholder="https://example.com/avatar.jpg"
                 value={avatarUrl}
-                onChangeText={(val) => {
-                  setAvatarUrl(val);
-                  setImageError(false);
+                onChangeText={handleAvatarUrlChange}
+                onFocus={() => setIsAvatarFocused(true)}
+                onBlur={() => {
+                  setIsAvatarFocused(false);
+                  setAvatarError(validateAvatarUrl(avatarUrl));
                 }}
                 autoCapitalize="none"
+                accessibilityLabel="Custom Avatar Image URL"
+                accessibilityHint="Enter the URL for your avatar image"
               />
+              {avatarError && (
+                <Text testID="avatar-error" className="text-red-500 text-xs mt-1 font-medium px-1">
+                  {avatarError}
+                </Text>
+              )}
             </View>
           </View>
         )}
@@ -346,25 +467,58 @@ export default function Account() {
             <Text className="text-xs font-medium text-gray-400 uppercase">Username</Text>
             <TextInput
               testID="username-input"
-              className="text-base text-gray-800 font-medium py-2 px-3 mt-1 bg-gray-50/50 rounded-lg border border-gray-100"
+              className={`text-base text-gray-800 font-medium py-2 px-3 mt-1 bg-gray-50/50 rounded-lg border ${
+                isUsernameFocused
+                  ? 'border-blue-500 bg-white'
+                  : usernameError
+                  ? 'border-red-400 bg-red-50/5'
+                  : 'border-gray-200'
+              }`}
               value={username}
-              onChangeText={setUsername}
+              onChangeText={handleUsernameChange}
+              onFocus={() => setIsUsernameFocused(true)}
+              onBlur={() => {
+                setIsUsernameFocused(false);
+                setUsernameError(validateUsername(username));
+              }}
               placeholder="Enter username"
               placeholderTextColor="#9CA3AF"
+              accessibilityLabel="Username"
+              accessibilityHint="Enter your username"
             />
+            {usernameError && (
+              <Text testID="username-error" className="text-red-500 text-xs mt-1 font-medium px-1">
+                {usernameError}
+              </Text>
+            )}
           </View>
           <View className="p-4">
             <Text className="text-xs font-medium text-gray-400 uppercase">Website</Text>
             <TextInput
               testID="website-input"
-              className="text-base text-gray-800 font-medium py-2 px-3 mt-1 bg-gray-50/50 rounded-lg border border-gray-100"
+              className={`text-base text-gray-800 font-medium py-2 px-3 mt-1 bg-gray-50/50 rounded-lg border ${
+                isWebsiteFocused
+                  ? 'border-blue-500 bg-white'
+                  : websiteError
+                  ? 'border-red-400 bg-red-50/5'
+                  : 'border-gray-200'
+              }`}
               value={website}
-              onChangeText={setWebsite}
+              onChangeText={handleWebsiteChange}
+              onFocus={() => setIsWebsiteFocused(true)}
+              onBlur={handleWebsiteBlur}
               placeholder="https://yourwebsite.com"
               placeholderTextColor="#9CA3AF"
               keyboardType="url"
               autoCapitalize="none"
+              accessibilityLabel="Website"
+              accessibilityHint="Enter your website URL"
             />
+            {websiteError && (
+              <Text testID="website-error" className="text-red-500 text-xs mt-1 font-medium px-1">
+                {websiteError}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -372,15 +526,26 @@ export default function Account() {
         <TouchableOpacity
           testID="save-profile-button"
           onPress={handleUpdateProfile}
-          disabled={updating}
+          disabled={updating || !networkOnline}
           className={`rounded-xl py-3.5 px-6 flex-row justify-center items-center shadow-sm mb-6 ${
-            updating ? 'bg-gray-300' : 'bg-blue-600 active:bg-blue-700'
-          }`}>
+            updating || !networkOnline ? 'bg-gray-300' : 'bg-blue-600 active:bg-blue-700'
+          }`}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Save profile changes"
+          accessibilityState={{ disabled: updating || !networkOnline }}
+        >
           <Ionicons name="save-outline" size={18} color="white" style={{ marginRight: 8 }} />
           <Text className="text-white font-bold text-center text-base">
             {updating ? 'Updating database...' : 'Save Profile Changes'}
           </Text>
         </TouchableOpacity>
+
+        {!networkOnline && (
+          <Text testID="account-offline-help" className="text-center text-xs text-amber-600 font-semibold mb-4">
+            Profile updates require network connection.
+          </Text>
+        )}
 
         {/* GROUP 2: App & Node Configurations */}
         <Text className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 ml-1">
@@ -396,7 +561,12 @@ export default function Account() {
             <Pressable
               testID="toggle-offline"
               onPress={() => setNetworkOnline(!networkOnline)}
-              className={`w-12 h-7 rounded-full p-1 ${!networkOnline ? 'bg-yellow-500' : 'bg-gray-200'}`}>
+              className={`w-12 h-7 rounded-full p-1 ${!networkOnline ? 'bg-yellow-500' : 'bg-gray-200'}`}
+              accessible={true}
+              accessibilityRole="switch"
+              accessibilityLabel="Simulate Offline Mode"
+              accessibilityState={{ checked: !networkOnline }}
+            >
               <View
                 className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${
                   !networkOnline ? 'translate-x-5' : 'translate-x-0'
@@ -414,7 +584,12 @@ export default function Account() {
             <Pressable
               testID="toggle-rejections"
               onPress={() => setRemoteRejectActive(!remoteRejectActive)}
-              className={`w-12 h-7 rounded-full p-1 ${remoteRejectActive ? 'bg-red-500' : 'bg-gray-200'}`}>
+              className={`w-12 h-7 rounded-full p-1 ${remoteRejectActive ? 'bg-red-500' : 'bg-gray-200'}`}
+              accessible={true}
+              accessibilityRole="switch"
+              accessibilityLabel="Mock Remote Rejections"
+              accessibilityState={{ checked: remoteRejectActive }}
+            >
               <View
                 className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${
                   remoteRejectActive ? 'translate-x-5' : 'translate-x-0'
@@ -432,7 +607,12 @@ export default function Account() {
             <Pressable
               testID="toggle-dark-mode"
               onPress={() => handleToggleDarkMode(!darkMode)}
-              className={`w-12 h-7 rounded-full p-1 ${darkMode ? 'bg-blue-600' : 'bg-gray-200'}`}>
+              className={`w-12 h-7 rounded-full p-1 ${darkMode ? 'bg-blue-600' : 'bg-gray-200'}`}
+              accessible={true}
+              accessibilityRole="switch"
+              accessibilityLabel="Dark Mode Interface"
+              accessibilityState={{ checked: darkMode }}
+            >
               <View
                 className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${
                   darkMode ? 'translate-x-5' : 'translate-x-0'
@@ -450,7 +630,12 @@ export default function Account() {
             <Pressable
               testID="toggle-save-logs"
               onPress={() => handleToggleSaveLogs(!saveLogs)}
-              className={`w-12 h-7 rounded-full p-1 ${saveLogs ? 'bg-blue-600' : 'bg-gray-200'}`}>
+              className={`w-12 h-7 rounded-full p-1 ${saveLogs ? 'bg-blue-600' : 'bg-gray-200'}`}
+              accessible={true}
+              accessibilityRole="switch"
+              accessibilityLabel="Save Local Transaction Logs"
+              accessibilityState={{ checked: saveLogs }}
+            >
               <View
                 className={`w-5 h-5 rounded-full bg-white shadow-sm transform-gpu transition-all ${
                   saveLogs ? 'translate-x-5' : 'translate-x-0'
@@ -475,7 +660,11 @@ export default function Account() {
           <Pressable
             testID="clear-mmkv-button"
             onPress={handleClearMMKV}
-            className="p-4 border-b border-gray-100 flex-row items-center active:bg-gray-50">
+            className="p-4 border-b border-gray-100 flex-row items-center active:bg-gray-50"
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear MMKV Storage"
+          >
             <Ionicons name="trash-bin-outline" size={18} color="#EF4444" style={{ marginRight: 12 }} />
             <View className="flex-1">
               <Text className="text-sm font-semibold text-red-600">Clear MMKV Storage</Text>
@@ -487,7 +676,11 @@ export default function Account() {
           <Pressable
             testID="reset-zustand-button"
             onPress={handleResetZustand}
-            className="p-4 border-b border-gray-100 flex-row items-center active:bg-gray-50">
+            className="p-4 border-b border-gray-100 flex-row items-center active:bg-gray-50"
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Reset Zustand Store States"
+          >
             <Ionicons name="refresh-outline" size={18} color="#2563EB" style={{ marginRight: 12 }} />
             <View className="flex-1">
               <Text className="text-sm font-semibold text-blue-600">Reset Zustand Store States</Text>
@@ -499,7 +692,11 @@ export default function Account() {
           <Pressable
             testID="clear-async-storage-button"
             onPress={handleClearAsyncStorage}
-            className="p-4 flex-row items-center active:bg-gray-50">
+            className="p-4 flex-row items-center active:bg-gray-50"
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear AsyncStorage Cache"
+          >
             <Ionicons name="cloud-offline-outline" size={18} color="#D97706" style={{ marginRight: 12 }} />
             <View className="flex-1">
               <Text className="text-sm font-semibold text-amber-600">Clear AsyncStorage Cache</Text>
@@ -525,7 +722,11 @@ export default function Account() {
                 },
               ]);
             }}
-            className="p-4 flex-row items-center justify-between bg-red-50/50 active:bg-red-100/50">
+            className="p-4 flex-row items-center justify-between bg-red-50/50 active:bg-red-100/50"
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Sign Out"
+          >
             <View className="flex-row items-center">
               <Ionicons name="log-out-outline" size={18} color="#DC2626" style={{ marginRight: 12 }} />
               <Text className="text-sm font-semibold text-red-700">Sign Out</Text>
@@ -544,6 +745,9 @@ export default function Account() {
         </Text>
       </View>
     </ScrollView>
+    </View>
   );
 }
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';
 

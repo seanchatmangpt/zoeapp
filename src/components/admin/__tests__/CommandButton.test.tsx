@@ -136,4 +136,34 @@ describe('CommandButton', () => {
 
     consoleErrorMock.mockRestore();
   });
+
+  it('applies accessibility attributes correctly', () => {
+    const { getByTestId } = render(<CommandButton title="Submit" onPress={() => {}} testID="accessible-btn" />);
+    const button = getByTestId('accessible-btn');
+    expect(button.props.accessible).toBe(true);
+    expect(button.props.accessibilityRole).toBe('button');
+    expect(button.props.accessibilityLabel).toBe('Submit');
+    expect(button.props.accessibilityState).toEqual({ disabled: false, busy: false });
+  });
+
+  it('updates accessibilityState when loading/disabled', async () => {
+    let resolvePromise: any;
+    const promise = new Promise(resolve => {
+      resolvePromise = resolve;
+    });
+    const onPressMock = jest.fn(() => promise);
+
+    const { getByTestId, getByText } = render(
+      <CommandButton title="Submit" onPress={onPressMock} testID="accessible-btn" />
+    );
+
+    fireEvent.press(getByText('Submit'));
+    const button = getByTestId('accessible-btn');
+    expect(button.props.accessibilityState).toEqual({ disabled: true, busy: true });
+
+    await act(async () => {
+      resolvePromise();
+      await new Promise(r => setTimeout(r, 0));
+    });
+  });
 });

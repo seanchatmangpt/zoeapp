@@ -7,7 +7,7 @@ import { CommandButton } from '../../components/admin/CommandButton';
 import { db } from '../../lib/db/db';
 import { actorOutbox, actorQuarantine } from '../../lib/db/schema';
 import { desc } from 'drizzle-orm';
-import { globalLocalDispatcher, globalRemoteDispatcher } from '../../lib/actor/actorOps';
+import { globalLocalDispatcher, globalRemoteDispatcher, useActorOpsStore } from '@/src/lib/actor/actorOps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export function formatTimestamp(date: Date | any): string {
@@ -73,6 +73,7 @@ export default function AdminOutbox() {
   const [refreshing, setRefreshing] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
+  const networkOnline = useActorOpsStore((state) => state.networkOnline);
 
   const fetchQueueData = async () => {
     setRefreshing(true);
@@ -187,18 +188,26 @@ export default function AdminOutbox() {
           <CommandButton 
             title={syncing ? 'Flushing...' : 'Flush Outbox'} 
             onPress={triggerSync}
-            disabled={syncing}
+            disabled={syncing || !networkOnline}
             testID="flush-outbox"
             style={styles.flushBtn}
           />
           <CommandButton 
             title={syncing ? 'Syncing...' : 'Sync Outbox Now'} 
             onPress={triggerSync}
-            disabled={syncing}
+            disabled={syncing || !networkOnline}
             testID="sync-outbox-now"
             style={styles.syncBtn}
           />
         </View>
+        {!networkOnline && (
+          <View testID="outbox-offline-state" style={styles.offlineContainer}>
+            <FontAwesome name="exclamation-triangle" size={12} color="#D97706" style={{ marginRight: 6 }} />
+            <Text style={styles.offlineText}>
+              Device is offline. Synchronization is disabled until network is restored.
+            </Text>
+          </View>
+        )}
         {syncStatusMsg && (
           <View style={[
             styles.statusMessageContainer,
@@ -617,5 +626,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#34D399', // Emerald-400
     lineHeight: 16,
+  },
+  offlineContainer: {
+    backgroundColor: 'rgba(217, 119, 6, 0.1)',
+    borderColor: 'rgba(217, 119, 6, 0.2)',
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  offlineText: {
+    color: '#FBBF24',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

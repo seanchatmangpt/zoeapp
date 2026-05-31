@@ -20,4 +20,11 @@ describe('ReceiptBadge', () => {
       expect(getByText(formattedStatus)).toBeTruthy();
     });
   });
+
+  it('sets accessibility attributes correctly', () => {
+    const { getByTestId } = render(<ReceiptBadge status="applied_remote" testID="badge" />);
+    const badge = getByTestId('badge');
+    expect(badge.props.accessible).toBe(true);
+    expect(badge.props.accessibilityLabel).toBe('Receipt status: applied remote');
+  });
 });

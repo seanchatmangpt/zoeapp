@@ -16,7 +16,7 @@ export function AdminCard({ title, subtitle, children, style, headerRight, testI
       {(title || subtitle || headerRight) && (
         <View style={styles.header}>
           <View style={styles.headerText}>
-            {title && <Text style={styles.title} testID={`${testID}-title`}>{title}</Text>}
+            {title && <Text style={styles.title} testID={`${testID}-title`} accessibilityRole="header">{title}</Text>}
             {subtitle && <Text style={styles.subtitle} testID={`${testID}-subtitle`}>{subtitle}</Text>}
           </View>
           {headerRight && <View testID={`${testID}-header-right`}>{headerRight}</View>}

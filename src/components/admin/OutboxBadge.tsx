@@ -30,7 +30,12 @@ export function OutboxBadge({ status, testID }: OutboxBadgeProps) {
   }
 
   return (
-    <View style={[styles.badge, { backgroundColor }]} testID={testID}>
+    <View
+      style={[styles.badge, { backgroundColor }]}
+      testID={testID}
+      accessible={true}
+      accessibilityLabel={`Outbox status: ${status}`}
+    >
       <Text style={[styles.text, { color: textColor }]}>{status}</Text>
     </View>
   );

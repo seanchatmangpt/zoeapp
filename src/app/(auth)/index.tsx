@@ -325,6 +325,9 @@ export default function Auth() {
                   testID="close-banner-button"
                   onPress={() => setBanner(null)}
                   className="p-0.5"
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Close alert banner"
                 >
                   <Feather
                     name="x"
@@ -363,9 +366,17 @@ export default function Auth() {
                   autoCorrect={false}
                   onFocus={() => setEmailFocused(true)}
                   onBlur={() => setEmailFocused(false)}
+                  accessibilityLabel="Email Address"
+                  accessibilityHint="Enter your email address"
                 />
                 {email.length > 0 && (
-                  <TouchableOpacity testID="clear-email-button" onPress={() => setEmail('')}>
+                  <TouchableOpacity
+                    testID="clear-email-button"
+                    onPress={() => setEmail('')}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel="Clear email"
+                  >
                     <Feather name="x" size={18} color="#94a3b8" />
                   </TouchableOpacity>
                 )}
@@ -399,12 +410,17 @@ export default function Auth() {
                   autoCapitalize="none"
                   onFocus={() => setPasswordFocused(true)}
                   onBlur={() => setPasswordFocused(false)}
+                  accessibilityLabel="Password"
+                  accessibilityHint="Enter your password"
                 />
                 {password.length > 0 && (
                   <TouchableOpacity
                     testID="password-visibility-toggle"
                     onPress={() => setShowPassword(!showPassword)}
                     className="p-1"
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={showPassword ? "Hide password" : "Show password"}
                   >
                     <Feather
                       name={showPassword ? 'eye-off' : 'eye'}
@@ -508,6 +524,9 @@ export default function Auth() {
                   ? 'bg-slate-100 border border-slate-200'
                   : 'bg-indigo-600 shadow-lg shadow-indigo-200/50'
               }`}
+              accessibilityRole="button"
+              accessibilityLabel={loading ? 'Authorizing Node' : isSignUp ? 'Initialize Registration' : 'Establish Secure Session'}
+              accessibilityState={{ disabled: loading || !email || !password }}
             >
               {loading ? (
                 <Animated.View
@@ -542,6 +561,9 @@ export default function Auth() {
               className="py-2"
               onPress={toggleAuthMode}
               disabled={loading}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
             >
               <Text className="text-center text-indigo-600 font-semibold text-sm">
                 {isSignUp
@@ -565,3 +587,5 @@ export default function Auth() {
     </KeyboardAvoidingView>
   );
 }
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

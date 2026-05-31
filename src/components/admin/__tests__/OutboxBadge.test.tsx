@@ -22,4 +22,11 @@ describe('OutboxBadge', () => {
     const { getByText } = render(<OutboxBadge status="failed" />);
     expect(getByText('failed')).toBeTruthy();
   });
+
+  it('sets accessibility attributes correctly', () => {
+    const { getByTestId } = render(<OutboxBadge status="pending" testID="badge" />);
+    const badge = getByTestId('badge');
+    expect(badge.props.accessible).toBe(true);
+    expect(badge.props.accessibilityLabel).toBe('Outbox status: pending');
+  });
 });

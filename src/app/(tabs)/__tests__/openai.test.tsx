@@ -413,7 +413,7 @@ describe('OpenAIAvatarRelativeProjection Component', () => {
       fireEvent.press(sendButton);
     });
 
-    // Unmount while API call is pending
+    // Unmount while Propagation Trigger is pending
     unmount();
 
     // Resolve the invoke promise

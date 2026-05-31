@@ -2,22 +2,12 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { PermissionGate } from '../PermissionGate';
-
-// Mock the store hook
-jest.mock('../../../lib/actor/actorOps', () => ({
-  useActorOpsStore: jest.fn(),
-}));
-
 import { useActorOpsStore } from '../../../lib/actor/actorOps';
 
 describe('PermissionGate', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('renders children if role is allowed', () => {
-    (useActorOpsStore as unknown as jest.Mock).mockReturnValue({
-      currentPrincipal: { role: 'admin' }
+    useActorOpsStore.setState({
+      currentPrincipal: { id: 'admin-id', role: 'admin' }
     });
 
     const { getByText } = render(
@@ -30,8 +20,8 @@ describe('PermissionGate', () => {
   });
 
   it('renders default fallback if role is not allowed', () => {
-    (useActorOpsStore as unknown as jest.Mock).mockReturnValue({
-      currentPrincipal: { role: 'member' }
+    useActorOpsStore.setState({
+      currentPrincipal: { id: 'member-id', role: 'member' }
     });
 
     const { getByText } = render(
@@ -45,8 +35,8 @@ describe('PermissionGate', () => {
   });
 
   it('renders custom fallback if provided and role is not allowed', () => {
-    (useActorOpsStore as unknown as jest.Mock).mockReturnValue({
-      currentPrincipal: { role: 'guest' }
+    useActorOpsStore.setState({
+      currentPrincipal: { id: 'guest-id', role: 'guest' }
     });
 
     const { getByText, queryByText } = render(

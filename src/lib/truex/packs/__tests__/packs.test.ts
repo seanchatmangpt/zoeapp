@@ -198,16 +198,23 @@ describe('Truex Hook Pack Runtime', () => {
     });
 
     test('should handle json parse errors gracefully during audit', async () => {
-      const badJob = {
-        id: 'job-bad',
+      const badActorJob = {
+        id: 'job-bad-actor',
         commandId: 'cmd-bad',
         jobType: 'DISPATCH_AUTHORITATIVE',
         payload: '{invalid-json',
         status: 'pending',
       };
 
-      mockedDb._mockWhereSelect.mockResolvedValueOnce([badJob]);
-      mockedDb._mockWhereSelect.mockResolvedValueOnce([]);
+      const badSyncJob = {
+        id: 102,
+        jobType: 'ACTOR_RECEIPT',
+        payload: '{invalid-json',
+        status: 'pending',
+      };
+
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([badActorJob]);
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([badSyncJob]);
 
       const result = await mapper.auditTensionQueue('volunteer');
       expect(result.pendingJobsCount).toBe(0);
@@ -278,6 +285,206 @@ describe('Truex Hook Pack Runtime', () => {
         return payloadStr && payloadStr.includes('newField') && !payloadStr.includes('oldField');
       });
       expect(syncUpdateCall).toBeDefined();
+    });
+
+    test('should handle json parse errors in delta quads and map remove array', async () => {
+      const actorJob = {
+        id: 'job-1',
+        commandId: 'cmd-1',
+        jobType: 'DISPATCH_AUTHORITATIVE',
+        payload: JSON.stringify({
+          envelope: {
+            actor: {
+              packId: 'volunteer',
+              hookId: 'volunteer_shortage',
+            },
+          },
+          delta: {
+            add: [
+              'invalid-quad-json',
+              JSON.stringify({ subject: 's1', predicate: 'oldPredicate', objectValue: 'o1' })
+            ],
+            remove: [
+              'invalid-remove-quad',
+              JSON.stringify({ subject: 's2', predicate: 'oldPredicate', objectValue: 'o2' })
+            ],
+          },
+        }),
+        status: 'pending',
+      };
+
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([actorJob]);
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([]); // no sync jobs
+
+      mockedDb._mockWhereUpdate.mockResolvedValue({ changes: 1 });
+
+      const mappingRules = {
+        oldPredicate: 'newPredicate',
+      };
+
+      const result = await mapper.mapTensionQueueState('volunteer', mappingRules);
+      expect(result.success).toBe(true);
+      expect(result.mappedCount).toBe(1);
+
+      const actorUpdateCall = mockedDb._mockSet.mock.calls.find((c: any) => {
+        return c[0].payload && c[0].payload.includes('newPredicate');
+      });
+      expect(actorUpdateCall).toBeDefined();
+      
+      const updatedPayload = JSON.parse(actorUpdateCall[0].payload);
+      expect(updatedPayload.delta.add[0]).toBe('invalid-quad-json');
+      expect(updatedPayload.delta.add[1]).toContain('newPredicate');
+      expect(updatedPayload.delta.remove[0]).toBe('invalid-remove-quad');
+      expect(updatedPayload.delta.remove[1]).toContain('newPredicate');
+    });
+
+    test('should handle exhaustive edge cases for branch coverage', async () => {
+      const actorJobEdge = {
+        id: 'job-edge-actor',
+        jobType: 'DISPATCH',
+        payload: JSON.stringify({
+          envelope: {
+            actor: { kind: 'volunteer', hookId: undefined },
+            payload: { sameKey: 'val', newKey: 'val' },
+          },
+          // delta exists but no add/remove arrays
+          delta: { },
+        }),
+        // no status
+      };
+
+      const actorJobNoDelta = {
+        id: 'job-no-delta-actor',
+        jobType: 'DISPATCH',
+        payload: JSON.stringify({
+          envelope: {
+            actor: { packId: 'volunteer' },
+          },
+        }),
+        status: 'pending',
+      };
+
+      const actorJobUnmodified = {
+        id: 'job-unmodified-actor',
+        jobType: 'DISPATCH',
+        payload: JSON.stringify({
+          envelope: {
+            actor: { kind: 'volunteer' },
+            payload: { noMatchKey: 'val' },
+          },
+          delta: {
+            add: [JSON.stringify({ subject: 's', predicate: 'noMatchPredicate', objectValue: 'o' })],
+            remove: [JSON.stringify({ subject: 's', predicate: 'noMatchPredicate', objectValue: 'o' })],
+          },
+        }),
+        status: 'pending',
+      };
+
+      const actorJobRemoveEdge = {
+        id: 'job-remove-edge-actor',
+        jobType: 'DISPATCH',
+        payload: JSON.stringify({
+          envelope: {
+            actor: { packId: 'volunteer' },
+          },
+          delta: {
+            add: [
+              JSON.stringify({ subject: 's', predicate: 'samePredicate', objectValue: 'o' })
+            ],
+            remove: [
+              JSON.stringify({ subject: 's', predicate: 'oldPredicate', objectValue: 'o' }),
+              JSON.stringify({ subject: 's', predicate: 'samePredicate', objectValue: 'o' })
+            ],
+          },
+        }),
+        status: '', // falsy status
+      };
+
+      const actorJobNoEnvelope = {
+        id: 'job-no-env',
+        jobType: 'DISPATCH',
+        payload: JSON.stringify({
+          noEnvelope: true,
+        }),
+        status: 'pending',
+      };
+
+      const syncJobEdge = {
+        id: 103,
+        jobType: 'ACTOR_RECEIPT',
+        payload: JSON.stringify({
+          actor: { kind: 'volunteer' }, // parsed.actor instead of actorRef
+          sameKey: 'val',
+          newKey: 'val',
+        }),
+        entityId: 'other',
+        // no status
+      };
+
+      const syncJobEntityMatch = {
+        id: 104,
+        jobType: 'SYNC',
+        payload: JSON.stringify({ packId: 'other' }), // parsed.packId !== packName
+        entityId: 'volunteer', // job.entityId === packName
+        status: 'pending',
+      };
+      
+      const syncJobPackIdMatch = {
+        id: 105,
+        jobType: 'SYNC',
+        payload: JSON.stringify({ packId: 'volunteer' }), // parsed.packId === packName
+        entityId: 'other',
+        status: 'pending',
+      };
+
+      const syncJobFallbackMatch = {
+        id: 106,
+        jobType: 'SYNC',
+        payload: JSON.stringify({ }), // no actorRef, no parsed.packId
+        entityId: 'volunteer', // matches to be included
+        status: 'pending',
+      };
+
+      const syncJobMismatch = {
+        id: 107,
+        jobType: 'SYNC',
+        payload: JSON.stringify({ }),
+        entityId: 'other',
+        status: 'pending',
+      };
+
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([actorJobEdge, actorJobNoDelta, actorJobUnmodified, actorJobRemoveEdge, actorJobNoEnvelope]);
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([syncJobEdge, syncJobEntityMatch, syncJobPackIdMatch, syncJobFallbackMatch, syncJobMismatch]);
+
+      mockedDb._mockWhereUpdate.mockResolvedValue({ changes: 1 });
+
+      const mappingRules = {
+        sameKey: 'sameKey', // newKey === key
+        newKey: 'mappedKey',
+        samePredicate: 'samePredicate',
+        oldPredicate: 'newPredicate'
+      };
+
+      const result = await mapper.mapTensionQueueState('volunteer', mappingRules);
+      expect(result.success).toBe(true);
+
+      // Validate queue consistency should pass if job.hookId is undefined
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([actorJobEdge]);
+      mockedDb._mockWhereSelect.mockResolvedValueOnce([]);
+      const consist = await mapper.validateQueueConsistency('volunteer', ['volunteer_shortage']);
+      expect(consist.consistent).toBe(true);
+    });
+
+    test('should ignore unknown sources', async () => {
+      jest.spyOn(mapper, 'auditTensionQueue').mockResolvedValueOnce({
+        packName: 'volunteer',
+        pendingJobsCount: 1,
+        jobs: [
+          { id: '1', source: 'invalid' as any, jobType: 'DISPATCH', status: 'pending', payload: {} }
+        ]
+      });
+      const result = await mapper.mapTensionQueueState('volunteer', {});
+      expect(result.mappedCount).toBe(0);
     });
 
     test('should validate queue consistency against allowed hooks', async () => {

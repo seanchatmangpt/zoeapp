@@ -60,7 +60,12 @@ export function QuadDeltaPreview({ delta, testID }: QuadDeltaPreviewProps) {
   };
 
   return (
-    <View style={styles.container} testID={testID}>
+    <View
+      style={styles.container}
+      testID={testID}
+      accessible={true}
+      accessibilityLabel={`Quad Delta Preview: ${removals.length} removals, ${additions.length} additions`}
+    >
       {removals.map((q, i) => renderQuad(q, 'remove', i))}
       {additions.map((q, i) => renderQuad(q, 'add', i))}
     </View>

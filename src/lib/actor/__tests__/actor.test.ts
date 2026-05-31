@@ -2,6 +2,9 @@
  * @fileoverview Jest tests for the Actor Dispatcher, Actor Registry, and Supervisor, including local optimistic simulation and remote authority rollback.
  */
 
+jest.unmock('../actorOps');
+jest.unmock('@/src/lib/actor/actorOps');
+
 import { ActorDispatcher } from '../dispatcher';
 import { ActorRegistry } from '../registry';
 import { VirtualKnowledgeGraphClient } from '../../vkg/client';

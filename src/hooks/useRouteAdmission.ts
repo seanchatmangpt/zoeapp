@@ -42,7 +42,7 @@ export function useRouteAdmission(
   route: RouteDefinition,
   options?: UseRouteAdmissionOptions
 ): UseRouteAdmissionResult {
-  const { session, loading } = useSession();
+  const { session, loading, isTransitioning = false } = useSession();
 
   const hierarchy = options?.hierarchy ?? DEFAULT_IDENTITY_HIERARCHY;
   const resolver = options?.resolveParticipant ?? defaultResolveParticipant;
@@ -50,8 +50,8 @@ export function useRouteAdmission(
   // Use explicit participant if provided, otherwise resolve from session context
   const activeParticipant = options?.participant ?? resolver(session);
 
-  // If session state is still loading and no explicit participant override is present, defer check
-  if (loading && !options?.participant) {
+  // If session state is still loading or transitioning and no explicit participant override is present, defer check
+  if ((loading || isTransitioning) && !options?.participant) {
     return {
       admitted: false,
       loading: true,

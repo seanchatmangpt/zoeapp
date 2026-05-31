@@ -51,4 +51,12 @@ describe('ExternalLink', () => {
     expect(preventDefault).not.toHaveBeenCalled();
     expect(WebBrowser.openBrowserAsync).not.toHaveBeenCalled();
   });
+
+  it('sets accessibilityRole to link correctly', () => {
+    const { getByTestId } = render(
+      <ExternalLink href="https://example.com">Link Text</ExternalLink>
+    );
+    const link = getByTestId('external-link');
+    expect(link.props.accessibilityRole).toBe('link');
+  });
 });

@@ -16,3 +16,12 @@ export interface HookReceiptContract {
   timestamp: string;
   signature?: string;
 }
+
+export function createHookReceiptContract(receipt: HookReceiptContract): HookReceiptContract {
+  return {
+    ...receipt,
+    status: receipt.status || 'Pending',
+    avatarProjectionHashes: receipt.avatarProjectionHashes || {},
+    supervisorEvents: receipt.supervisorEvents || [],
+  };
+}

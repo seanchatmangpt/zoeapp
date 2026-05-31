@@ -1,0 +1,79 @@
+appId: com.truex.membraneclient
+---
+- launchApp:
+    clearState: true
+- tapOn: "your@email.com"
+- inputText: "test@example.com"
+- tapOn: "Enter your password"
+- inputText: "password123"
+- tapOn: "Establish Secure Session"
+- assertVisible: "Truex Membrane"
+
+# Navigate to Account and turn offline mode ON
+- tapOn: "Account"
+- assertVisible: "Account Settings"
+- tapOn:
+    id: "toggle-offline"
+- assertVisible: "Device Offline — Using Pre-Admission Tension Queue"
+
+# Navigate to Hooks and queue a task
+- tapOn: "Hooks"
+- assertVisible: "Truex Hook Cockpit"
+- tapOn: "Trigger Volunteer Cancellation"
+
+# Verify optimistic queue state shows pending receipt
+- assertVisible: "Processing local optimistic VKG sync..."
+- assertVisible: "Pending Receipts: 1"
+
+# Go Home and navigate to Admin Console
+- tapOn: "Home"
+- assertVisible: "Welcome back, test! 👋"
+- tapOn:
+    id: "admin-card"
+- assertVisible: "Mission Control Diagnostics"
+
+# Open Outbox Queue screen
+- tapOn: "Outbox Queue"
+- assertVisible: "Outbox & Sync Manager"
+
+# Verify offline warnings and pending count of 1
+- assertVisible: "Device is offline. Synchronization is disabled until network is restored."
+- assertVisible: "Outbox Queue"
+
+# Go back to Consequence Supervision, then to Home tab
+- tapOn:
+    id: "admin-back-btn"
+- assertVisible: "Mission Control Diagnostics"
+- tapOn:
+    id: "admin-back-btn"
+- assertVisible: "Welcome back, test! 👋"
+
+# Navigate to Account and restore network connection
+- tapOn: "Account"
+- assertVisible: "Account Settings"
+- tapOn:
+    id: "toggle-offline"
+
+# Verify offline banner connection restoration
+- assertVisible: "Connection Restored"
+
+# Navigate back to Home, then Admin
+- tapOn: "Home"
+- tapOn:
+    id: "admin-card"
+- assertVisible: "Mission Control Diagnostics"
+
+# Navigate to Outbox Queue
+- tapOn: "Outbox Queue"
+- assertVisible: "Outbox & Sync Manager"
+
+# Execute manual Outbox Flush
+- tapOn:
+    id: "flush-outbox"
+
+# Verify sync completion alert and dismiss it
+- assertVisible: "Sync Completed Successfully!"
+- tapOn: "OK"
+
+# Confirm outbox queue is now empty
+- assertVisible: "Outbox queue is empty. Ready for offline commands."

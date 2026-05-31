@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, act } from '@testing-library/react-native';
-import { Animated } from 'react-native';
 import { TransitionOverlay } from '../TransitionOverlay';
 import { useSession } from '@/context/SessionProvider';
 import { useColorScheme } from '@/src/components/useColorScheme';
+import * as Reanimated from 'react-native-reanimated';
 
 jest.mock('@/context/SessionProvider', () => ({
   useSession: jest.fn(),
@@ -17,33 +17,14 @@ const mockUseSession = useSession as jest.Mock;
 const mockUseColorScheme = useColorScheme as jest.Mock;
 
 describe('TransitionOverlay Component', () => {
-  let startMock: jest.Mock;
-  let stopMock: jest.Mock;
-  let timingSpy: jest.SpyInstance;
-  let springSpy: jest.SpyInstance;
-  let parallelSpy: jest.SpyInstance;
+  let withTimingSpy: jest.SpyInstance;
+  let withSpringSpy: jest.SpyInstance;
+  let cancelAnimationSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    startMock = jest.fn();
-    stopMock = jest.fn();
-    timingSpy = jest.spyOn(Animated, 'timing').mockImplementation(() => {
-      return {
-        start: startMock,
-        stop: stopMock,
-      } as any;
-    });
-    springSpy = jest.spyOn(Animated, 'spring').mockImplementation(() => {
-      return {
-        start: startMock,
-        stop: stopMock,
-      } as any;
-    });
-    parallelSpy = jest.spyOn(Animated, 'parallel').mockImplementation(() => {
-      return {
-        start: startMock,
-        stop: stopMock,
-      } as any;
-    });
+    withTimingSpy = jest.spyOn(Reanimated, 'withTiming');
+    withSpringSpy = jest.spyOn(Reanimated, 'withSpring');
+    cancelAnimationSpy = jest.spyOn(Reanimated, 'cancelAnimation');
 
     mockUseSession.mockReturnValue({
       session: null,
@@ -57,9 +38,9 @@ describe('TransitionOverlay Component', () => {
   });
 
   afterEach(() => {
-    timingSpy.mockRestore();
-    springSpy.mockRestore();
-    parallelSpy.mockRestore();
+    withTimingSpy.mockRestore();
+    withSpringSpy.mockRestore();
+    cancelAnimationSpy.mockRestore();
     jest.clearAllMocks();
   });
 
@@ -68,7 +49,7 @@ describe('TransitionOverlay Component', () => {
     expect(toJSON()).toBeNull();
   });
 
-  test('should render welcome text and start parallel animation for signin transition in light mode', () => {
+  test('should render welcome text and start animations for signin transition in light mode', () => {
     mockUseSession.mockReturnValue({
       session: null,
       loading: false,
@@ -82,28 +63,11 @@ describe('TransitionOverlay Component', () => {
     expect(getByText('Welcome back!')).toBeTruthy();
     expect(getByText('Securing session & preparing your workspace')).toBeTruthy();
 
-    expect(timingSpy).toHaveBeenCalledWith(
-      expect.any(Animated.Value),
-      expect.objectContaining({
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      })
-    );
-    expect(springSpy).toHaveBeenCalledWith(
-      expect.any(Animated.Value),
-      expect.objectContaining({
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      })
-    );
-    expect(parallelSpy).toHaveBeenCalled();
-    expect(startMock).toHaveBeenCalledTimes(1);
+    expect(withTimingSpy).toHaveBeenCalledWith(1, { duration: 300 });
+    expect(withSpringSpy).toHaveBeenCalledWith(1, { damping: 15, stiffness: 100 });
   });
 
-  test('should render signing out text and start parallel animation for signout transition in dark mode', () => {
+  test('should render signing out text and start animations for signout transition in dark mode', () => {
     mockUseSession.mockReturnValue({
       session: null,
       loading: false,
@@ -118,16 +82,8 @@ describe('TransitionOverlay Component', () => {
     expect(getByText('Signing out...')).toBeTruthy();
     expect(getByText('Clearing session cache & returning to login')).toBeTruthy();
 
-    expect(timingSpy).toHaveBeenCalledWith(
-      expect.any(Animated.Value),
-      expect.objectContaining({
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      })
-    );
-    expect(parallelSpy).toHaveBeenCalled();
-    expect(startMock).toHaveBeenCalledTimes(1);
+    expect(withTimingSpy).toHaveBeenCalledWith(1, { duration: 300 });
+    expect(withSpringSpy).toHaveBeenCalledWith(1, { damping: 15, stiffness: 100 });
   });
 
   test('should trigger fade-out animation and hide overlay when transitioning ceases', async () => {
@@ -141,7 +97,6 @@ describe('TransitionOverlay Component', () => {
 
     const { getByText, queryByText, rerender } = render(<TransitionOverlay />);
     expect(getByText('Welcome back!')).toBeTruthy();
-    expect(startMock).toHaveBeenCalledTimes(1);
 
     mockUseSession.mockReturnValue({
       session: null,
@@ -151,24 +106,12 @@ describe('TransitionOverlay Component', () => {
       setIsTransitioning: jest.fn(),
     });
 
-    rerender(<TransitionOverlay />);
-
-    expect(timingSpy).toHaveBeenLastCalledWith(
-      expect.any(Animated.Value),
-      expect.objectContaining({
-        toValue: 0,
-        duration: 350,
-        useNativeDriver: true,
-      })
-    );
-    expect(startMock).toHaveBeenCalledTimes(2);
-
-    const startCallback = startMock.mock.calls[1][0];
-    expect(startCallback).toBeInstanceOf(Function);
-
     await act(async () => {
-      startCallback({ finished: true });
+      rerender(<TransitionOverlay />);
     });
+
+    expect(withTimingSpy).toHaveBeenCalledWith(0, { duration: 350 }, expect.any(Function));
+    expect(withSpringSpy).toHaveBeenCalledWith(0.95, { damping: 15, stiffness: 100 });
 
     expect(queryByText('Welcome back!')).toBeNull();
   });
@@ -183,10 +126,25 @@ describe('TransitionOverlay Component', () => {
     });
 
     const { unmount } = render(<TransitionOverlay />);
-    expect(stopMock).not.toHaveBeenCalled();
+    expect(cancelAnimationSpy).not.toHaveBeenCalled();
 
     unmount();
-    // Timing and Spring stops are called
-    expect(stopMock).toHaveBeenCalledTimes(2);
+    expect(cancelAnimationSpy).toHaveBeenCalledTimes(2);
+  });
+
+  test('should apply accessibility alert properties correctly when transitioning', () => {
+    mockUseSession.mockReturnValue({
+      session: null,
+      loading: false,
+      isTransitioning: true,
+      transitionType: 'signin',
+      setIsTransitioning: jest.fn(),
+    });
+
+    const { getByLabelText } = render(<TransitionOverlay />);
+    const overlay = getByLabelText('Welcome back! Securing session & preparing your workspace');
+    expect(overlay.props.accessible).toBe(true);
+    expect(overlay.props.accessibilityRole).toBe('alert');
+    expect(overlay.props.accessibilityLiveRegion).toBe('assertive');
   });
 });

@@ -9,6 +9,7 @@ export function ExternalLink(
   return (
     <Link
       target="_blank"
+      accessibilityRole="link"
       {...props}
       href={props.href as any}
       onPress={(e) => {

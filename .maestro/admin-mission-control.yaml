@@ -1,0 +1,50 @@
+appId: com.truex.membraneclient
+---
+- launchApp:
+    clearState: true
+- tapOn: "your@email.com"
+- inputText: "test@example.com"
+- tapOn: "Enter your password"
+- inputText: "password123"
+- tapOn: "Establish Secure Session"
+
+# Route into Admin stack via home dashboard card
+- tapOn:
+    id: "admin-card"
+- assertVisible: "System Settings"
+- assertVisible: "Operations Modules"
+
+# Jump into Actor Lab using the quick navigation header
+- tapOn:
+    id: "nav-actor-lab"
+- assertVisible: "Actor Lab"
+- assertVisible: "Active Connector Geometry"
+
+# Transition to Process Intel using the quick navigation header
+- tapOn:
+    id: "nav-process-intel"
+- assertVisible: "Process Intelligence"
+- assertVisible: "Truex OCEL 2.0 Receipt Verifier"
+
+# Trigger audit verifier run
+- tapOn:
+    id: "run-intel-truex-receipt-verifier"
+- assertVisible: "Audit Run Receipt"
+- assertVisible: "VERIFIED"
+- assertVisible: "[Truex] Audit verdict: VERIFIED"
+
+# Return to Consequence Supervision main dashboard
+- tapOn:
+    id: "nav-consequence-supervision"
+- assertVisible: "System Settings"
+
+# Open settings module within operations grid
+- tapOn: "Settings"
+- assertVisible: "System Settings"
+- assertVisible: "Engine Configurations"
+
+# Navigate back to Home screen
+- tapOn:
+    id: "admin-back-btn"
+- assertVisible: "Welcome back, test! 👋"
+- assertVisible: "What would you like to do today?"

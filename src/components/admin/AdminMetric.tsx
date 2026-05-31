@@ -13,10 +13,15 @@ interface AdminMetricProps {
 }
 
 export function AdminMetric({ label, value, icon, iconColor = '#3B82F6', trend, trendDirection = 'neutral', testID }: AdminMetricProps) {
-  const trendColor = trendDirection === 'up' ? '#10B981' : trendDirection === 'down' ? '#EF4444' : '#94A3B8';
+  const trendColor = trendDirection === 'up' ? '#10B981' : trendDirection === 'down' ? '#FCA5A5' : '#94A3B8';
 
   return (
-    <View style={styles.container} testID={testID}>
+    <View
+      style={styles.container}
+      testID={testID}
+      accessible={true}
+      accessibilityLabel={`Metric: ${label}, Value: ${value}${trend ? `, trend: ${trend}` : ''}`}
+    >
       <View style={styles.header}>
         <Text style={styles.label} numberOfLines={1}>{label}</Text>
         <View style={[styles.iconWrapper, { backgroundColor: iconColor + '20' }]}>

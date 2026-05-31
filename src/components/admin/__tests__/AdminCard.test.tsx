@@ -41,4 +41,14 @@ describe('AdminCard', () => {
     // Since there's no header elements, title/subtitle won't be rendered.
     expect(queryByTestId('test-card-title')).toBeNull();
   });
+
+  it('applies accessibilityRole="header" to the title when provided', () => {
+    const { getByTestId } = render(
+      <AdminCard title="Card Title" testID="test-card">
+        <Text>Content</Text>
+      </AdminCard>
+    );
+    const titleText = getByTestId('test-card-title');
+    expect(titleText.props.accessibilityRole).toBe('header');
+  });
 });

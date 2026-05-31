@@ -1,46 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { Animated, View, Text, ActivityIndicator, StyleSheet, Easing } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  runOnJS,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { useSession } from '@/context/SessionProvider';
 import { useColorScheme } from '@/src/components/useColorScheme';
 
 export function TransitionOverlay() {
   const { isTransitioning, transitionType } = useSession();
   const colorScheme = useColorScheme();
-  const [fadeAnim] = useState(() => new Animated.Value(0));
-  const [scaleAnim] = useState(() => new Animated.Value(0.95));
   const [visible, setVisible] = useState(false);
 
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.95);
+
   useEffect(() => {
-    const fade = Animated.timing(fadeAnim, {
-      toValue: isTransitioning ? 1 : 0,
-      duration: isTransitioning ? 300 : 350,
-      easing: isTransitioning ? Easing.out(Easing.ease) : Easing.in(Easing.ease),
-      useNativeDriver: true,
-    });
-
-    const scale = Animated.spring(scaleAnim, {
-      toValue: isTransitioning ? 1 : 0.95,
-      friction: 8,
-      tension: 40,
-      useNativeDriver: true,
-    });
-
     if (isTransitioning) {
       setVisible(true);
-      Animated.parallel([fade, scale]).start();
+      opacity.value = withTiming(1, { duration: 300 });
+      scale.value = withSpring(1, { damping: 15, stiffness: 100 });
     } else {
-      Animated.parallel([fade, scale]).start(({ finished }) => {
+      opacity.value = withTiming(0, { duration: 350 }, (finished) => {
         if (finished) {
-          setVisible(false);
+          runOnJS(setVisible)(false);
         }
       });
+      scale.value = withSpring(0.95, { damping: 15, stiffness: 100 });
     }
 
     return () => {
-      fade.stop();
-      scale.stop();
+      cancelAnimation(opacity);
+      cancelAnimation(scale);
     };
-  }, [isTransitioning, fadeAnim, scaleAnim]);
+  }, [isTransitioning]);
+
+  const animatedOverlayStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+
+  const animatedContentStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
 
   if (!visible) return null;
 
@@ -52,21 +61,27 @@ export function TransitionOverlay() {
       pointerEvents={isTransitioning ? 'auto' : 'none'}
       style={[
         StyleSheet.absoluteFill,
+        animatedOverlayStyle,
         {
-          opacity: fadeAnim,
           backgroundColor: isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(248, 250, 252, 0.85)',
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',
         },
       ]}
+      accessible={true}
+      accessibilityRole="alert"
+      accessibilityLabel={isSignIn ? 'Welcome back! Securing session & preparing your workspace' : 'Signing out... Clearing session cache & returning to login'}
+      accessibilityLiveRegion="assertive"
     >
       <Animated.View
-        style={{
-          transform: [{ scale: scaleAnim }],
-          width: '100%',
-          alignItems: 'center',
-        }}
+        style={[
+          animatedContentStyle,
+          {
+            width: '100%',
+            alignItems: 'center',
+          },
+        ]}
       >
         <View
           className={`items-center p-8 rounded-3xl shadow-2xl border ${
@@ -91,3 +106,4 @@ export function TransitionOverlay() {
     </Animated.View>
   );
 }
+

@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { Stack, Tabs, AvatarRelativeProjectionMatrixView } from '../AvatarRelativeProjection';
+import { PROJECTION_MATRIX } from '../../lib/truex/avatar/matrix';
 
 jest.mock('@expo/vector-icons/FontAwesome', () => {
   const React = require('react');
@@ -276,5 +277,66 @@ describe('AvatarRelativeProjectionMatrixView', () => {
     fireEvent.press(getByTestId('slider-step-5'));
     expect(getByText('Shortage Ratio: 0.63')).toBeTruthy();
     expect(getByText('• Risk Level: High')).toBeTruthy();
+  });
+
+  test('has correct accessibility properties on interactive controls', () => {
+    const { getByLabelText, getByPlaceholderText, getByTestId } = render(<AvatarRelativeProjectionMatrixView />);
+    
+    // Increment / Decrement buttons
+    expect(getByLabelText('Decrease open slots').props.accessibilityRole).toBe('button');
+    expect(getByLabelText('Increase open slots').props.accessibilityRole).toBe('button');
+
+    // Slider step points
+    const step4 = getByTestId('slider-step-4');
+    expect(step4.props.accessibilityRole).toBe('button');
+    expect(step4.props.accessibilityState).toEqual({ selected: true });
+
+    // Add candidate button
+    expect(getByLabelText('Add Candidate').props.accessibilityRole).toBe('button');
+
+    // TextInput
+    const textInput = getByPlaceholderText('State hash (e.g. vkg_genesis_a4f9)');
+    expect(textInput.props.accessibilityLabel).toBe('VKG State Hash input');
+    expect(textInput.props.accessibilityHint).toBe('Edit the VKG state hash');
+  });
+
+  test('eliminates double-renders and avoids unnecessary re-calculation of unaffected roles', () => {
+    const spy = jest.spyOn(PROJECTION_MATRIX, 'volunteer_shortage');
+    spy.mockClear();
+
+    const { getByPlaceholderText } = render(<AvatarRelativeProjectionMatrixView />);
+    expect(spy).toHaveBeenCalledTimes(7);
+
+    spy.mockClear();
+
+    const textInput = getByPlaceholderText('State hash (e.g. vkg_genesis_a4f9)');
+    fireEvent.changeText(textInput, 'vkg_genesis_new_hash_1');
+
+    // Only Operator card should re-render and invoke the projector function
+    expect(spy).toHaveBeenCalledTimes(1);
+    const lastCall = spy.mock.calls[0];
+    expect(lastCall[1]).toBe('operator');
+    expect(lastCall[0].stateHash).toBe('vkg_genesis_new_hash_1');
+
+    spy.mockRestore();
+  });
+
+  test('adding candidates only recalculates teamLead projection card', () => {
+    const spy = jest.spyOn(PROJECTION_MATRIX, 'volunteer_shortage');
+    spy.mockClear();
+
+    const { getByText } = render(<AvatarRelativeProjectionMatrixView />);
+    expect(spy).toHaveBeenCalledTimes(7);
+
+    spy.mockClear();
+
+    const addBtn = getByText('+ Add Candidate');
+    fireEvent.press(addBtn);
+
+    // Only teamLead card should re-render and invoke the projector function
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][1]).toBe('teamLead');
+
+    spy.mockRestore();
   });
 });

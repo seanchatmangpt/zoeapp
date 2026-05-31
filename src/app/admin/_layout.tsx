@@ -24,6 +24,9 @@ export default function AdminLayout() {
       <Stack.Screen name="people" />
       <Stack.Screen name="prayer" />
       <Stack.Screen name="volunteers" />
+      <Stack.Screen name="intelligence" />
     </Stack>
   );
 }
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

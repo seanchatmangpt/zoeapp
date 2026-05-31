@@ -10,6 +10,10 @@ import {
 } from '../../../lib/actor/actorOps';
 import { DataFactory } from '../../../lib/vkg/rdf';
 
+// Mock Zustand Actor Ops Store and operations locally
+
+
+
 jest.mock('@expo/vector-icons/FontAwesome', () => {
   const React = require('react');
   const { View } = require('react-native');

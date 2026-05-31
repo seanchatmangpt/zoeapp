@@ -7,6 +7,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.css$': '<rootDir>/src/test/styleMock.ts',
     '^@\\/(.*)$': '<rootDir>/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.test.{js,jsx,ts,tsx}'],
   modulePathIgnorePatterns: ['<rootDir>/supabase/'],

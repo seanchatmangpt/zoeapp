@@ -2,15 +2,9 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import AdminSermons from '../sermons';
 import { Alert } from 'react-native';
-import { globalLocalDispatcher } from '../../../lib/actor/actorOps';
+import { globalLocalDispatcher } from '@/src/lib/actor/actorOps';
 
-// Mock dependencies
-jest.mock('../../../lib/actor/actorOps', () => ({
-  useActorOpsStore: () => ({ currentPrincipal: { id: 'admin1' } }),
-  globalLocalDispatcher: {
-    dispatch: jest.fn(),
-  },
-}));
+
 
 // Mock inner components that might use contexts or icons
 jest.mock('../../../components/admin/AdminShell', () => {
@@ -50,8 +44,10 @@ jest.mock('../../../components/admin/CommandButton', () => {
   };
 });
 
+
 describe('AdminSermons Component', () => {
   beforeEach(() => {
+    console.log('DEBUG globalLocalDispatcher:', globalLocalDispatcher);
     jest.spyOn(Alert, 'alert').mockImplementation(() => {});
     jest.clearAllMocks();
   });

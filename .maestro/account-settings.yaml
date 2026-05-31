@@ -1,0 +1,72 @@
+appId: com.truex.membraneclient
+---
+- launchApp:
+    clearState: true
+- tapOn: "your@email.com"
+- inputText: "test@example.com"
+- tapOn: "Enter your password"
+- inputText: "password123"
+- tapOn: "Establish Secure Session"
+- tapOn: "Account"
+- assertVisible: "Account Settings"
+
+# Toggle Avatar Preset picker tray
+- tapOn:
+    id: "camera-toggle"
+- assertVisible: "Select Preset Avatar"
+
+# Select preset avatar
+- tapOn:
+    id: "preset-avatar-2"
+
+# Test username validation error
+- tapOn:
+    id: "username-input"
+- eraseText: 20
+- inputText: "ab"
+- tapOn: "Website"
+- assertVisible: "Username must be at least 3 characters"
+
+# Correct username
+- tapOn:
+    id: "username-input"
+- eraseText: 5
+- inputText: "test_principal"
+
+# Test website validation error
+- tapOn:
+    id: "website-input"
+- eraseText: 50
+- inputText: "invalid_url_test"
+- tapOn: "Username"
+- assertVisible: "Please enter a valid website URL"
+
+# Correct website
+- tapOn:
+    id: "website-input"
+- eraseText: 20
+- inputText: "https://truex.org"
+
+# Save profile details and dismiss confirmation alert
+- tapOn:
+    id: "save-profile-button"
+- assertVisible: "Success"
+- assertVisible: "Profile updated successfully!"
+- tapOn: "OK"
+
+# Toggle simulation settings
+- tapOn:
+    id: "toggle-offline"
+- tapOn:
+    id: "toggle-rejections"
+
+# Validate developer diagnostic resets (open alert, cancel out)
+- tapOn:
+    id: "reset-zustand-button"
+- assertVisible: "Reset Zustand Store 🔄"
+- tapOn: "Cancel"
+
+- tapOn:
+    id: "clear-mmkv-button"
+- assertVisible: "Clear MMKV Cache ⚠️"
+- tapOn: "Cancel"

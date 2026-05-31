@@ -49,4 +49,14 @@ describe('AdminMetric', () => {
     );
     expect(getByText('— 0%')).toBeTruthy();
   });
+
+  it('applies accessibility attributes correctly', () => {
+    const { getByTestId } = render(
+      <AdminMetric label="Active Connections" value="42" icon="plug" trend="5%" trendDirection="up" testID="metric-conn" />
+    );
+
+    const container = getByTestId('metric-conn');
+    expect(container.props.accessible).toBe(true);
+    expect(container.props.accessibilityLabel).toBe('Metric: Active Connections, Value: 42, trend: 5%');
+  });
 });

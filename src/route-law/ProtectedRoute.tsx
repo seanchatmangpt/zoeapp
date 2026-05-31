@@ -12,6 +12,12 @@ import { mmkvInstance } from '../lib/store/mmkvStorage';
 import { admitRoute, DEFAULT_IDENTITY_HIERARCHY } from './guards';
 import { RouteDefinition, ParticipantBasis, RefusalReason, IdentityBoundary } from './types';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+} from 'react-native-reanimated';
 
 /**
  * Props for the ProtectedRoute component.
@@ -66,7 +72,7 @@ export const PremiumReceiptBlockingScreen: React.FC<PremiumReceiptBlockingScreen
   refusalReason,
   onRetry,
   onRedirect,
-  redirectText = 'Return to Dashboard',
+  redirectText = 'Return to Consequence Supervision',
 }) => {
   return (
     <View className="flex-1 bg-slate-950 items-center justify-center p-6">
@@ -273,6 +279,29 @@ export function defaultResolveParticipant(session: any): ParticipantBasis {
   };
 }
 
+const AdmissionLoadingOverlay: React.FC = () => {
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.95);
+
+  React.useEffect(() => {
+    opacity.value = withTiming(1, { duration: 300 });
+    scale.value = withSpring(1, { damping: 15, stiffness: 100 });
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <View style={styles.loadingContainer}>
+      <Animated.View style={animatedStyle}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </Animated.View>
+    </View>
+  );
+};
+
 /**
  * ProtectedRoute component that gates access to child components.
  * Employs typestate checks on the participant identity and disclosures.
@@ -468,11 +497,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (loadingComponent) {
       return <>{loadingComponent}</>;
     }
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </View>
-    );
+    return <AdmissionLoadingOverlay />;
   }
 
   // Resolve participant details (explicit override takes precedence)

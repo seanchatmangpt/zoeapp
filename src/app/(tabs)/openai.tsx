@@ -7,7 +7,7 @@
  * @version 1.1.0
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import {
   View,
   TextInput,
@@ -26,6 +26,8 @@ import { supabase } from '@/lib/supabase';
 import { Stack } from '@/src/components/AvatarRelativeProjection';
 import { useSession } from '@/context/SessionProvider';
 import { Ionicons } from '@expo/vector-icons';
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
+import { OfflineBanner } from '@/src/components/OfflineBanner';
 
 interface Message {
   id: string;
@@ -90,7 +92,7 @@ export function parseMarkdown(text: string): Segment[] {
 /**
  * Formats inline code and bold styling
  */
-function FormattedText({ text, textColorClass }: { text: string; textColorClass: string }) {
+const FormattedText = memo(function FormattedText({ text, textColorClass }: { text: string; textColorClass: string }) {
   const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_)/g;
   const parts = text.split(regex);
 
@@ -128,12 +130,12 @@ function FormattedText({ text, textColorClass }: { text: string; textColorClass:
       })}
     </Text>
   );
-}
+});
 
 /**
  * CodeBlock component with dark styling, language badge, copy button, and syntax highlighting
  */
-function CodeBlock({ code, language }: { code: string; language: string }) {
+const CodeBlock = memo(function CodeBlock({ code, language }: { code: string; language: string }) {
   const tokens: CodeToken[] = [];
 
   // Basic Syntax highlighting regex
@@ -214,6 +216,9 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
           onPress={copyToClipboard}
           className="flex-row items-center bg-slate-800 px-2.5 py-1 rounded"
           activeOpacity={0.7}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Copy code to clipboard"
         >
           <Ionicons name="copy-outline" size={12} color="#94A3B8" />
           <Text className="text-xs text-slate-300 ml-1">Copy</Text>
@@ -254,12 +259,12 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
       </ScrollView>
     </View>
   );
-}
+});
 
 /**
  * Custom MarkdownRenderer to display assistant responses beautifully
  */
-function MarkdownRenderer({ content, isUser }: { content: string; isUser: boolean }) {
+const MarkdownRenderer = memo(function MarkdownRenderer({ content, isUser }: { content: string; isUser: boolean }) {
   const segments = parseMarkdown(content);
   const textColorClass = isUser ? 'text-white' : 'text-slate-800';
 
@@ -325,7 +330,7 @@ function MarkdownRenderer({ content, isUser }: { content: string; isUser: boolea
       })}
     </View>
   );
-}
+});
 
 interface MessageItemProps {
   message: Message;
@@ -336,7 +341,7 @@ interface MessageItemProps {
 /**
  * Chat bubble wrapper component
  */
-function MessageItem({ message, userAvatarUrl, userInitials }: MessageItemProps) {
+const MessageItem = memo(function MessageItem({ message, userAvatarUrl, userInitials }: MessageItemProps) {
   const isUser = message.role === 'user';
 
   if (isUser) {
@@ -376,7 +381,7 @@ function MessageItem({ message, userAvatarUrl, userInitials }: MessageItemProps)
       </View>
     );
   }
-}
+});
 
 /**
  * Pulsing skeleton loading indicator for assistant responses
@@ -427,6 +432,7 @@ export default function OpenAIAvatarRelativeProjection() {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const networkOnline = useActorOpsStore((state) => state.networkOnline);
 
   const [userProfile, setUserProfile] = useState<{ avatarUrl: string; initials: string }>({
     avatarUrl: '',
@@ -503,7 +509,7 @@ export default function OpenAIAvatarRelativeProjection() {
     }
   }, [session?.user?.id]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
@@ -512,22 +518,19 @@ export default function OpenAIAvatarRelativeProjection() {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }
     }, 100);
-  };
+  }, []);
 
-  const handleScroll = (event: any) => {
+  const handleScroll = useCallback((event: any) => {
     const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
     const paddingToBottom = 150;
     const isCloseToBottom =
       contentSize.height - layoutMeasurement.height - contentOffset.y <= paddingToBottom;
 
-    if (!isCloseToBottom && contentSize.height > layoutMeasurement.height) {
-      setShowScrollBottomBtn(true);
-    } else {
-      setShowScrollBottomBtn(false);
-    }
-  };
+    const targetState = !isCloseToBottom && contentSize.height > layoutMeasurement.height;
+    setShowScrollBottomBtn((prev) => (prev !== targetState ? targetState : prev));
+  }, []);
 
-  const callOpenAIFunction = async () => {
+  const callOpenAIFunction = useCallback(async () => {
     if (!prompt.trim()) {
       Alert.alert('Please enter a prompt');
       return;
@@ -581,9 +584,9 @@ export default function OpenAIAvatarRelativeProjection() {
         scrollToBottom();
       }
     }
-  };
+  }, [prompt, scrollToBottom]);
 
-  const clearChat = () => {
+  const clearChat = useCallback(() => {
     Alert.alert('Clear Chat', 'Are you sure you want to clear conversation history?', [
       { text: 'Cancel', style: 'cancel' },
       {
@@ -603,7 +606,7 @@ export default function OpenAIAvatarRelativeProjection() {
         },
       },
     ]);
-  };
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -612,20 +615,26 @@ export default function OpenAIAvatarRelativeProjection() {
       className="flex-1 bg-slate-50"
     >
       <Stack.AvatarRelativeProjection options={{ title: 'AI Assistant' }} />
+      <OfflineBanner />
 
       {/* Header Info */}
       <View className="bg-white px-4 py-3 border-b border-slate-200 flex-row justify-between items-center shadow-sm">
         <View className="flex-row items-center">
-          <View className="w-2.5 h-2.5 bg-emerald-500 rounded-full mr-2" />
+          <View className={`w-2.5 h-2.5 ${networkOnline ? 'bg-emerald-500' : 'bg-rose-500'} rounded-full mr-2`} />
           <View>
             <Text className="font-bold text-slate-800 text-sm">GPT Assistant</Text>
-            <Text className="text-[10px] text-slate-500">Always active & ready to help</Text>
+            <Text className="text-[10px] text-slate-500">
+              {networkOnline ? 'Always active & ready to help' : 'Offline Mode'}
+            </Text>
           </View>
         </View>
         <TouchableOpacity
           onPress={clearChat}
           className="flex-row items-center px-2 py-1 rounded bg-slate-100 border border-slate-200"
           activeOpacity={0.7}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Clear chat history"
         >
           <Ionicons name="trash-outline" size={14} color="#64748B" />
           <Text className="text-xs text-slate-600 ml-1 font-medium">Clear</Text>
@@ -664,37 +673,57 @@ export default function OpenAIAvatarRelativeProjection() {
             className="absolute bottom-4 right-4 bg-indigo-600 w-10 h-10 rounded-full items-center justify-center shadow-lg border border-indigo-500"
             activeOpacity={0.8}
             style={{ zIndex: 10 }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Scroll to bottom"
           >
             <Ionicons name="arrow-down" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         )}
       </View>
 
+      {/* Offline Alert Banner */}
+      {!networkOnline && (
+        <View testID="openai-offline-state" className="bg-amber-50 border-t border-b border-amber-200 p-3 flex-row items-center justify-center">
+          <Ionicons name="alert-circle-outline" size={18} color="#D97706" style={{ marginRight: 6 }} />
+          <Text className="text-amber-800 text-xs font-bold text-center">
+            AI Assistant is offline. Please check your network connection.
+          </Text>
+        </View>
+      )}
+
       {/* Input Tray */}
       <View className="p-3 bg-white border-t border-slate-200">
         <View className="flex-row items-end bg-slate-50 border border-slate-200 rounded-2xl p-1.5 pl-3.5 pr-1.5 shadow-sm">
           <TextInput
             className="flex-1 text-slate-800 text-base py-1.5 max-h-24 bg-transparent"
-            placeholder="Ask AI anything..."
+            placeholder={networkOnline ? "Ask AI anything..." : "AI Assistant is offline..."}
             placeholderTextColor="#94A3B8"
             value={prompt}
             onChangeText={setPrompt}
             multiline
             textAlignVertical="center"
+            editable={networkOnline && !loading}
+            accessibilityLabel="AI Prompt Input"
+            accessibilityHint="Type your question for the AI assistant"
           />
           <TouchableOpacity
             testID="send-button"
             className={`rounded-xl p-2.5 items-center justify-center ${
-              loading || !prompt.trim() ? 'bg-slate-100' : 'bg-indigo-600 shadow-sm'
+              loading || !prompt.trim() || !networkOnline ? 'bg-slate-100' : 'bg-indigo-600 shadow-sm'
             }`}
             onPress={callOpenAIFunction}
-            disabled={loading || !prompt.trim()}
+            disabled={loading || !prompt.trim() || !networkOnline}
             activeOpacity={0.7}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Send message"
+            accessibilityState={{ disabled: loading || !prompt.trim() || !networkOnline }}
           >
             <Ionicons
               name={loading ? 'ellipsis-horizontal' : 'send'}
               size={16}
-              color={loading || !prompt.trim() ? '#94A3B8' : '#FFFFFF'}
+              color={loading || !prompt.trim() || !networkOnline ? '#94A3B8' : '#FFFFFF'}
             />
           </TouchableOpacity>
         </View>
@@ -702,3 +731,5 @@ export default function OpenAIAvatarRelativeProjection() {
     </KeyboardAvoidingView>
   );
 }
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

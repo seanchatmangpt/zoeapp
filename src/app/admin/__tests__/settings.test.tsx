@@ -18,7 +18,7 @@ jest.mock('@expo/vector-icons/FontAwesome', () => {
 const mockSession: { session: any } = {
   session: {
     user: {
-      email: 'admin@zoeapp.com',
+      email: 'admin@membrane-client.com',
       id: 'admin-uuid-12345',
       email_confirmed_at: '2026-05-30T16:00:00Z',
     },
@@ -66,7 +66,7 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     
     mockSession.session = {
       user: {
-        email: 'admin@zoeapp.com',
+        email: 'admin@membrane-client.com',
         id: 'admin-uuid-12345',
         email_confirmed_at: '2026-05-30T16:00:00Z',
       },
@@ -92,7 +92,7 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     const { getByText } = render(<AdminSettings />);
     
     // Verify email and UUID rendering
-    expect(getByText('admin@zoeapp.com')).toBeTruthy();
+    expect(getByText('admin@membrane-client.com')).toBeTruthy();
     expect(getByText('admin-uuid-12345')).toBeTruthy();
     expect(getByText('Yes')).toBeTruthy(); // Email confirmed yes
   });
@@ -191,6 +191,8 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     const mockSetLatestReceipt = useActorOpsStore.getState().setLatestReceipt;
     const mockSetLatestEvent = useActorOpsStore.getState().setLatestEvent;
     const mockSetCounts = useActorOpsStore.getState().setCounts;
+    const mockSetPacketDropRate = useActorOpsStore.getState().setPacketDropRate;
+    const mockSetCdcEventsCount = useActorOpsStore.getState().setCdcEventsCount;
 
     console.log('TEST DEBUG: mockSetNetworkOnline is', mockSetNetworkOnline);
     console.log('TEST DEBUG: store setNetworkOnline is', useActorOpsStore.getState().setNetworkOnline);
@@ -202,6 +204,8 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
     expect(mockSetLatestReceipt).toHaveBeenCalledWith(null);
     expect(mockSetLatestEvent).toHaveBeenCalledWith(null);
     expect(mockSetCounts).toHaveBeenCalledWith(0, 0);
+    expect(mockSetPacketDropRate).toHaveBeenCalledWith(0);
+    expect(mockSetCdcEventsCount).toHaveBeenCalledWith(0);
 
     // Verify success alert is triggered afterward
     expect(alertSpy).toHaveBeenCalledWith('Success', 'Zustand operations store reset completed.');
@@ -362,5 +366,58 @@ describe('AdminSettings Screen - Developer Resets & Diagnostics', () => {
 
     expect(warnSpy).toHaveBeenCalledWith(expect.any(Error));
     warnSpy.mockRestore();
+  });
+
+  test('renders network simulator Consequence Supervision with packet drop selectors and CDC telemetry indicators', () => {
+    useActorOpsStore.setState({ networkOnline: true, packetDropRate: 0, cdcEventsCount: 5 });
+    
+    const { getByText, getByTestId } = render(<AdminSettings />);
+    
+    // Consequence Supervision header
+    expect(getByText('Network Simulator Consequence Supervision')).toBeTruthy();
+    expect(getByText('Autonomic routing membrane & real-time telemetry')).toBeTruthy();
+    
+    // Status indicator
+    expect(getByTestId('network-status-indicator')).toBeTruthy();
+    expect(getByText('Network Link: Connected')).toBeTruthy();
+    
+    // CDC indicators
+    expect(getByTestId('cdc-stream-dot')).toBeTruthy();
+    expect(getByText('Subscribed')).toBeTruthy();
+    expect(getByText('5 evts')).toBeTruthy();
+    
+    // Packet drop rate value text
+    expect(getByText('0% (Stable)')).toBeTruthy();
+  });
+
+  test('toggles packet drop rate using selectors', async () => {
+    const { getByTestId } = render(<AdminSettings />);
+    
+    const rateBtn25 = getByTestId('drop-rate-btn-25');
+    await act(async () => {
+      fireEvent.press(rateBtn25);
+    });
+    
+    const mockSetPacketDropRate = useActorOpsStore.getState().setPacketDropRate;
+    expect(mockSetPacketDropRate).toHaveBeenCalledWith(25);
+  });
+
+  test('simulates and resets CDC event counter', async () => {
+    useActorOpsStore.setState({ cdcEventsCount: 10 });
+    const { getByTestId } = render(<AdminSettings />);
+    
+    const simulateCdcBtn = getByTestId('simulate-cdc-btn');
+    await act(async () => {
+      fireEvent.press(simulateCdcBtn);
+    });
+    
+    const mockSetCdcEventsCount = useActorOpsStore.getState().setCdcEventsCount;
+    expect(mockSetCdcEventsCount).toHaveBeenCalledWith(11);
+    
+    const resetCdcBtn = getByTestId('reset-cdc-btn');
+    await act(async () => {
+      fireEvent.press(resetCdcBtn);
+    });
+    expect(mockSetCdcEventsCount).toHaveBeenCalledWith(0);
   });
 });

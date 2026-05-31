@@ -12,7 +12,7 @@ import {
   globalLocalDispatcher,
   globalRemoteDispatcher,
   globalVkgClient
-} from '../../lib/actor/actorOps';
+} from '@/src/lib/actor/actorOps';
 import { DataFactory } from '../../lib/vkg/rdf';
 import { db } from '../../lib/db/db';
 import { actorOutbox, actorQuarantine } from '../../lib/db/schema';
@@ -1208,3 +1208,5 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

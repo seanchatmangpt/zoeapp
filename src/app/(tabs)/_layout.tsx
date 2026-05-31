@@ -110,3 +110,5 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+export { ErrorBoundary } from '@/src/components/ErrorBoundary';

@@ -4,7 +4,7 @@ import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { CommandButton } from '../../components/admin/CommandButton';
 import { ReceiptBadge } from '../../components/admin/ReceiptBadge';
-import { globalLocalDispatcher, useActorOpsStore } from '../../lib/actor/actorOps';
+import { globalLocalDispatcher, useActorOpsStore } from '@/src/lib/actor/actorOps';
 import { CommandEnvelope } from '../../lib/actor/types';
 
 export default function AdminSermons() {
@@ -70,6 +70,8 @@ export default function AdminSermons() {
             onFocus={() => setIsFocusedTitle(true)}
             onBlur={() => setIsFocusedTitle(false)}
             testID="sermon-title-input"
+            accessibilityLabel="Sermon Title"
+            accessibilityHint="Enter the title of the sermon"
           />
         </View>
 
@@ -86,6 +88,8 @@ export default function AdminSermons() {
             autoCapitalize="none"
             keyboardType="url"
             testID="sermon-video-input"
+            accessibilityLabel="Sermon Video URL"
+            accessibilityHint="Enter the video URL for the sermon (optional)"
           />
         </View>
 

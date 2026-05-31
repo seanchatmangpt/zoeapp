@@ -22,14 +22,25 @@ export function ActorRefView({ actorRef, testID }: ActorRefViewProps) {
 
   if (hasError || !parsed) {
     return (
-      <View style={[styles.container, styles.errorContainer]} testID={testID}>
+      <View
+        style={[styles.container, styles.errorContainer]}
+        testID={testID}
+        accessible={true}
+        accessibilityLabel="Invalid Actor reference"
+        accessibilityRole="text"
+      >
         <Text style={styles.errorText}>Invalid ActorRef</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container} testID={testID}>
+    <View
+      style={styles.container}
+      testID={testID}
+      accessible={true}
+      accessibilityLabel={`Actor reference: Kind ${parsed.kind}, ID ${parsed.id}`}
+    >
       <View style={styles.kindBadge}>
         <Text style={styles.badgeText}>{parsed.kind}</Text>
       </View>

@@ -19,11 +19,7 @@ export interface TelemetryEvent {
 
 /**
  * Converts a raw TelemetryEvent into a standard Schema.org Event JSON-LD document.
- * Leverages Truex architectural terminology mappings:
- * - "User Interface" / "Screen" -> "Avatar-Relative Projection"
- * - "API Call" -> "Propagation Trigger"
- * - "Offline Queue" -> "Pre-Admission Tension Queue"
- * - "Dashboard" -> "Consequence Supervision"
+ * Leverages Truex architectural terminology mappings.
  */
 export function telemetryToSchemaOrgEvent(telemetry: TelemetryEvent): SchemaOrgEvent {
   if (!telemetry || !telemetry.type) {

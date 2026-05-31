@@ -4,7 +4,7 @@ import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Account from '../account';
 import { mmkvInstance } from '../../../lib/store/mmkvStorage';
-import { useActorOpsStore } from '../../../lib/actor/actorOps';
+import { useActorOpsStore } from '@/src/lib/actor/actorOps';
 import { supabase } from '@/lib/supabase';
 
 // Mock Stack from AvatarRelativeProjection
@@ -74,34 +74,14 @@ jest.mock('../../../lib/store/mmkvStorage', () => {
   };
 });
 
-// Mock Zustand Actor Ops Store
-jest.mock('../../../lib/actor/actorOps', () => {
-  const mockSetNetworkOnline = jest.fn();
-  const mockSetRemoteRejectActive = jest.fn();
-  const mockSetLatestReceipt = jest.fn();
-  const mockSetLatestEvent = jest.fn();
-  const mockSetCounts = jest.fn();
 
-  const mockActorOpsState = {
-    networkOnline: true,
-    remoteRejectActive: false,
-    setNetworkOnline: mockSetNetworkOnline,
-    setRemoteRejectActive: mockSetRemoteRejectActive,
-  };
 
-  const mockUseActorOpsStore = jest.fn((selector: any) => selector(mockActorOpsState));
-  (mockUseActorOpsStore as any).getState = jest.fn(() => ({
-    setLatestReceipt: mockSetLatestReceipt,
-    setLatestEvent: mockSetLatestEvent,
-    setCounts: mockSetCounts,
-  }));
 
-  return {
-    useActorOpsStore: mockUseActorOpsStore,
-  };
-});
 
-describe('Account Tab Dashboard Unit Tests', () => {
+
+
+
+describe('Account Tab Consequence Supervision Unit Tests', () => {
   let alertSpy: jest.SpyInstance;
   let mockFromSpy: jest.Mock;
   let mockUpsertSpy: jest.Mock;
@@ -113,6 +93,20 @@ describe('Account Tab Dashboard Unit Tests', () => {
     if (AsyncStorage.clear && (AsyncStorage.clear as any).mockClear) {
       (AsyncStorage.clear as any).mockClear();
     }
+
+    (global as any).mockNetworkOnline = true;
+    (global as any).mockRemoteRejectActive = false;
+    (global as any).mockSetNetworkOnline.mockReset();
+    (global as any).mockSetNetworkOnline.mockImplementation((val: boolean) => {
+      (global as any).mockNetworkOnline = val;
+    });
+    (global as any).mockSetRemoteRejectActive.mockReset();
+    (global as any).mockSetRemoteRejectActive.mockImplementation((val: boolean) => {
+      (global as any).mockRemoteRejectActive = val;
+    });
+    (global as any).mockSetLatestReceipt.mockReset();
+    (global as any).mockSetLatestEvent.mockReset();
+    (global as any).mockSetCounts.mockReset();
 
     // Retrieve database spy references from the mocked supabase instance
     mockFromSpy = supabase.from as jest.Mock;
@@ -210,6 +204,139 @@ describe('Account Tab Dashboard Unit Tests', () => {
     expect(alertSpy).toHaveBeenCalledWith('Success', 'Profile updated successfully!');
   });
 
+  test('should validate username (required, length, characters)', async () => {
+    const { getByTestId, queryByTestId } = render(<Account />);
+
+    await waitFor(() => {
+      expect(getByTestId('username-input').props.value).toBe('initialuser');
+    });
+
+    const usernameInput = getByTestId('username-input');
+
+    // 1. Test empty username
+    fireEvent.changeText(usernameInput, '');
+    expect(getByTestId('username-error').props.children).toBe('Username is required');
+
+    // 2. Test short username
+    fireEvent.changeText(usernameInput, 'ab');
+    expect(getByTestId('username-error').props.children).toBe('Username must be at least 3 characters');
+
+    // 3. Test long username
+    fireEvent.changeText(usernameInput, 'a'.repeat(21));
+    expect(getByTestId('username-error').props.children).toBe('Username must be at most 20 characters');
+
+    // 4. Test invalid characters
+    fireEvent.changeText(usernameInput, 'user name');
+    expect(getByTestId('username-error').props.children).toBe('Username can only contain alphanumeric characters, underscores, hyphens, and periods');
+
+    // 5. Test valid username clears error
+    fireEvent.changeText(usernameInput, 'valid_user.1');
+    expect(queryByTestId('username-error')).toBeNull();
+  });
+
+  test('should validate website URL format', async () => {
+    const { getByTestId, queryByTestId } = render(<Account />);
+
+    await waitFor(() => {
+      expect(getByTestId('website-input').props.value).toBe('https://initialwebsite.com');
+    });
+
+    const websiteInput = getByTestId('website-input');
+
+    // 1. Test invalid URL
+    fireEvent.changeText(websiteInput, 'not-a-url');
+    expect(getByTestId('website-error').props.children).toBe('Please enter a valid website URL');
+
+    // 2. Test empty URL is allowed (optional)
+    fireEvent.changeText(websiteInput, '');
+    expect(queryByTestId('website-error')).toBeNull();
+
+    // 3. Test valid URL
+    fireEvent.changeText(websiteInput, 'https://example.com');
+    expect(queryByTestId('website-error')).toBeNull();
+  });
+
+  test('should validate custom avatar URL format', async () => {
+    const { getByTestId, queryByTestId } = render(<Account />);
+
+    await waitFor(() => {
+      expect(getByTestId('camera-toggle')).toBeTruthy();
+    });
+
+    // Toggle camera picker to render custom avatar input
+    fireEvent.press(getByTestId('camera-toggle'));
+    const customAvatarInput = getByTestId('custom-avatar-input');
+
+    // 1. Test invalid URL
+    fireEvent.changeText(customAvatarInput, 'invalid-avatar-url');
+    expect(getByTestId('avatar-error').props.children).toBe('Please enter a valid image URL');
+
+    // 2. Test empty URL is allowed
+    fireEvent.changeText(customAvatarInput, '');
+    expect(queryByTestId('avatar-error')).toBeNull();
+
+    // 3. Test valid URL
+    fireEvent.changeText(customAvatarInput, 'https://placehold.co/150.jpg');
+    expect(queryByTestId('avatar-error')).toBeNull();
+  });
+
+  test('should block profile update and alert on validation errors', async () => {
+    const { getByTestId } = render(<Account />);
+
+    await waitFor(() => {
+      expect(getByTestId('username-input').props.value).toBe('initialuser');
+    });
+
+    // Enter invalid username and website
+    fireEvent.changeText(getByTestId('username-input'), 'ab');
+    fireEvent.changeText(getByTestId('website-input'), 'invalid-url');
+
+    const saveButton = getByTestId('save-profile-button');
+    await act(async () => {
+      fireEvent.press(saveButton);
+    });
+
+    // Verify Supabase upsert is NOT called
+    expect(mockUpsertSpy).not.toHaveBeenCalled();
+
+    // Verify warning alert is displayed
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Validation Error',
+      'Please correct the highlighted errors before saving.'
+    );
+  });
+
+  test('should handle focus/blur states styling for input fields', async () => {
+    const { getByTestId } = render(<Account />);
+
+    await waitFor(() => {
+      expect(getByTestId('username-input')).toBeTruthy();
+    });
+
+    const usernameInput = getByTestId('username-input');
+
+    // Focus username
+    fireEvent(usernameInput, 'focus');
+    expect(usernameInput.props.className).toContain('border-blue-500 bg-white');
+
+    // Blur username
+    fireEvent(usernameInput, 'blur');
+    expect(usernameInput.props.className).not.toContain('border-blue-500 bg-white');
+
+    // Enter invalid username to verify error styling
+    fireEvent.changeText(usernameInput, 'ab');
+    fireEvent(usernameInput, 'blur');
+    expect(usernameInput.props.className).toContain('border-red-400 bg-red-50/5');
+
+    // Toggle camera picker to render custom avatar input
+    fireEvent.press(getByTestId('camera-toggle'));
+    const customAvatarInput = getByTestId('custom-avatar-input');
+    fireEvent(customAvatarInput, 'focus');
+    expect(customAvatarInput.props.className).toContain('border-blue-500');
+    fireEvent(customAvatarInput, 'blur');
+    expect(customAvatarInput.props.className).not.toContain('border-blue-500');
+  });
+
   test('should handle avatar picker toggling, selecting presets, and custom URL edits', async () => {
     const { getByTestId, queryByTestId } = render(<Account />);
 
@@ -259,6 +386,9 @@ describe('Account Tab Dashboard Unit Tests', () => {
     // Retrieve state setter spies dynamically
     const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
     const mockSetRemoteRejectActive = useActorOpsStore((state: any) => state.setRemoteRejectActive);
+
+    console.log('DEBUG: mockSetNetworkOnline from store:', mockSetNetworkOnline);
+    console.log('DEBUG: global mockSetNetworkOnline:', (global as any).mockSetNetworkOnline);
 
     // Toggle network simulation switch
     const offlineToggle = getByTestId('toggle-offline');
@@ -414,6 +544,10 @@ describe('Account Tab Dashboard Unit Tests', () => {
     });
     
     await act(async () => {
+      fireEvent.changeText(getByTestId('username-input'), 'validuser');
+    });
+    
+    await act(async () => {
       fireEvent.press(getByTestId('save-profile-button'));
     });
     
@@ -475,11 +609,14 @@ describe('Account Tab Dashboard Unit Tests', () => {
     fireEvent.press(getByTestId('clear-mmkv-button'));
     expect(alertSpy).toHaveBeenCalledWith('Error', 'clearAll failed');
 
-    const mockSetNetworkOnline = useActorOpsStore((state: any) => state.setNetworkOnline);
+    const mockSetNetworkOnline = (global as any).mockSetNetworkOnline;
     mockSetNetworkOnline.mockImplementationOnce(() => {
       throw new Error('reset failed');
     });
     fireEvent.press(getByTestId('reset-zustand-button'));
+    
+
+    
     expect(alertSpy).toHaveBeenCalledWith('Error', 'reset failed');
 
     const clearSpy = jest.spyOn(AsyncStorage, 'clear').mockRejectedValueOnce(new Error('async clear failed'));

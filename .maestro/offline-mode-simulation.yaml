@@ -1,0 +1,54 @@
+appId: com.truex.membraneclient
+---
+- launchApp:
+    clearState: true
+- tapOn: "your@email.com"
+- inputText: "test@example.com"
+- tapOn: "Enter your password"
+- inputText: "password123"
+- tapOn: "Establish Secure Session"
+- assertVisible: "Truex Membrane"
+
+# Navigate to Account screen
+- tapOn: "Account"
+- assertVisible: "Account Settings"
+
+# Toggle simulated offline mode
+- tapOn:
+    id: "toggle-offline"
+
+# Verify offline banner states are active
+- assertVisible: "Device Offline — Using Pre-Admission Tension Queue"
+
+# Navigate to Hooks Cockpit
+- tapOn: "Hooks"
+- assertVisible: "Truex Hook Cockpit"
+
+# Trigger volunteer cancellation while simulated offline
+- tapOn: "Trigger Volunteer Cancellation"
+
+# Assert local optimistic VKG sync is processing and receipts are pending
+- assertVisible: "Processing local optimistic VKG sync..."
+- assertVisible: "Pending Receipts: 1"
+- assertVisible: "Confirmed Receipts: 0"
+
+# Verify that under offline simulation, the receipt remains pending and does not auto-reconcile
+- sleep: 3000
+- assertVisible: "Pending Receipts: 1"
+- assertVisible: "Confirmed Receipts: 0"
+
+# Reconnect using the reconnect button in the offline banner
+- tapOn:
+    id: "reconnect-button"
+
+# Verify restoration of network connection
+- assertVisible: "Connection Restored"
+
+# Wait for outbox propagation to remote edge and authority signing
+- extendedWaitUntil:
+    visible: "Evidence Reconciled & Authority Signed ✅"
+    timeout: 8000
+
+# Assert that pending receipts drop to 0 and confirmed receipt shows 1
+- assertVisible: "Confirmed Receipts: 1"
+- assertVisible: "Pending Receipts: 0"

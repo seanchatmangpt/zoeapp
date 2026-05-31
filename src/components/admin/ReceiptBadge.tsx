@@ -10,8 +10,9 @@ interface ReceiptBadgeProps {
 export function ReceiptBadge({ status, testID }: ReceiptBadgeProps) {
   let backgroundColor = '#334155'; // Slate 700
   let textColor = '#94A3B8'; // Slate 400
+  const safeStatus = status || 'accepted_pending';
 
-  switch (status) {
+  switch (safeStatus) {
     case 'accepted_pending':
       backgroundColor = 'rgba(217, 119, 6, 0.2)'; // amber-600/20
       textColor = '#FBBF24'; // amber-300
@@ -39,9 +40,14 @@ export function ReceiptBadge({ status, testID }: ReceiptBadgeProps) {
   }
 
   return (
-    <View style={[styles.badge, { backgroundColor }]} testID={testID}>
+    <View
+      style={[styles.badge, { backgroundColor }]}
+      testID={testID}
+      accessible={true}
+      accessibilityLabel={`Receipt status: ${safeStatus.replace('_', ' ')}`}
+    >
       <Text style={[styles.text, { color: textColor }]}>
-        {status.replace('_', ' ')}
+        {safeStatus.replace('_', ' ')}
       </Text>
     </View>
   );
