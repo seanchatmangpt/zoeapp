@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>22/22</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -255,26 +255,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">308x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">308x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">308x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">308x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">308x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -301,15 +301,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1232x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1232x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -340,7 +340,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -431,27 +431,27 @@ interface AdminShellProps {
   testID?: string;
 }
 &nbsp;
-export function AdminShell({ title, subtitle, children, scrollable = true, testID }: AdminShellProps) {
-  const router = useRouter();
+export function <span class="fstat-no" title="function not covered" >AdminShell(</span>{ title, subtitle, children, scrollable = <span class="branch-0 cbranch-no" title="branch not covered" >true,</span> testID }: AdminShellProps) {
+  const router = <span class="cstat-no" title="statement not covered" >useRouter();</span>
 &nbsp;
-  const handleBack = () =&gt; {
-    if (router.canGoBack()) {
-      router.back();
+  const handleBack = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    if (router.canGoBack()) {</span>
+<span class="cstat-no" title="statement not covered" >      router.back();</span>
     } else {
-      router.replace('/admin/consequence-supervision' as any);
+<span class="cstat-no" title="statement not covered" >      router.replace('/admin/consequence-supervision' as any);</span>
     }
   };
 &nbsp;
-  const ContentContainer = scrollable ? ScrollView : View;
+  const ContentContainer = <span class="cstat-no" title="statement not covered" >scrollable ? ScrollView : View;</span>
 &nbsp;
-  const navigationItems = [
+  const navigationItems = <span class="cstat-no" title="statement not covered" >[</span>
     { name: 'Consequence Supervision', route: '/admin/consequence-supervision' },
     { name: 'Actor Lab', route: '/admin/actor-lab' },
     { name: 'Sermons', route: '/admin/sermons' },
     { name: 'Process Intel', route: '/admin/intelligence' },
   ];
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;SafeAreaView style={styles.safeArea} testID={testID}&gt;
       &lt;View style={styles.container}&gt;
         &lt;OfflineBanner /&gt;
@@ -477,16 +477,16 @@ export function AdminShell({ title, subtitle, children, scrollable = true, testI
         {/* Quick Admin Navigation Bar */}
         &lt;View style={styles.navRow}&gt;
           &lt;ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navScroll}&gt;
-            {navigationItems.map((item) =&gt; {
-              const isActive = title === item.name || 
+            {navigationItems.map(<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; {
+              const isActive = <span class="cstat-no" title="statement not covered" >title === item.name || </span>
                 (item.name === 'Consequence Supervision' &amp;&amp; title === 'Developer Consequence Supervision') ||
                 (item.name === 'Process Intel' &amp;&amp; title === 'Process Intelligence') ||
                 (item.name === 'Actor Lab' &amp;&amp; title === 'Developer Actor Lab') ||
                 (item.name === 'Sermons' &amp;&amp; title === 'Sermons Directory');
-              return (
+<span class="cstat-no" title="statement not covered" >              return (</span>
                 &lt;TouchableOpacity
                   key={item.name}
-                  onPress={() =&gt; router.replace(item.route as any)}
+                  onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >router.replace(item.route as any)}</span>
                   style={[styles.navButton, isActive &amp;&amp; styles.navButtonActive]}
                   activeOpacity={0.7}
                   testID={`nav-${item.name.replace(/\s+/g, '-').toLowerCase()}`}
@@ -517,7 +517,7 @@ export function AdminShell({ title, subtitle, children, scrollable = true, testI
   );
 }
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   safeArea: {
     flex: 1,
     backgroundColor: '#0F172A', // slate-900 base background
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

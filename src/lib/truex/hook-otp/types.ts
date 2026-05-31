@@ -20,8 +20,8 @@ export interface HookMessage {
   id: string;
   type: HookMessageType;
   payload: any;
-  actorRef: HookActorRef;
-  timestamp: string;
+  actorRef?: HookActorRef;
+  timestamp?: string;
   causationId?: string;
   correlationId?: string;
 }

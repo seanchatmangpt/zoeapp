@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -160,17 +160,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -180,9 +178,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,11 +194,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -233,16 +233,16 @@ export interface OcelLog {
   events: OcelEvent[];
 }
 &nbsp;
-export function exportToOcel(receipts: HookReceipt[]): OcelLog {
-  const objects: Record&lt;string, OcelObject&gt; = {};
-  const events: OcelEvent[] = [];
+export function <span class="fstat-no" title="function not covered" >exportToOcel(</span>receipts: HookReceipt[]): OcelLog {
+  const objects: Record&lt;string, OcelObject&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
+  const events: OcelEvent[] = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-  for (const receipt of receipts) {
-    const actorKey = stringifyActorRef(receipt.actorRef);
+<span class="cstat-no" title="statement not covered" >  for (const receipt of receipts) {</span>
+    const actorKey = <span class="cstat-no" title="statement not covered" >stringifyActorRef(receipt.actorRef);</span>
     
     // Register the hook actor as an object if not present
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (!objects[actorKey]) {
-      objects[actorKey] = {
+<span class="cstat-no" title="statement not covered" >    if (!objects[actorKey]) {</span>
+<span class="cstat-no" title="statement not covered" >      objects[actorKey] = {</span>
         id: actorKey,
         type: 'TruexHookActor',
         attributes: {
@@ -254,7 +254,7 @@ export function exportToOcel(receipts: HookReceipt[]): OcelLog {
     }
 &nbsp;
     // Register each run as an event
-    events.push({
+<span class="cstat-no" title="statement not covered" >    events.push({</span>
       id: receipt.hookRunId,
       activity: 'HookRunEvaluated',
       timestamp: receipt.timestamp,
@@ -270,11 +270,11 @@ export function exportToOcel(receipts: HookReceipt[]): OcelLog {
     });
   }
 &nbsp;
-  return { objects, events };
+<span class="cstat-no" title="statement not covered" >  return { objects, events };</span>
 }
 &nbsp;
-export function importFromOcel(log: OcelLog): Partial&lt;HookReceipt&gt;[] {
-  return log.events.map((evt) =&gt; ({
+export function <span class="fstat-no" title="function not covered" >importFromOcel(</span>log: OcelLog): Partial&lt;HookReceipt&gt;[] {
+<span class="cstat-no" title="statement not covered" >  return log.events.map(<span class="fstat-no" title="function not covered" >(e</span>vt) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
     hookRunId: evt.id,
     timestamp: evt.timestamp,
     messageId: evt.vmap.messageId,
@@ -292,7 +292,7 @@ export function importFromOcel(log: OcelLog): Partial&lt;HookReceipt&gt;[] {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

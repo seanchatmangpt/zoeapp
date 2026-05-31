@@ -1,0 +1,60 @@
+{
+  "receiptId": "rec_intel_d4e0zbbla",
+  "capabilityId": "truex-receipt-verifier",
+  "timestamp": "2026-05-31T05:52:37.566Z",
+  "input": {
+    "session_id": "session-2030-prod",
+    "expected_path_hash": "9bf9bdfa89101030e2f9d854cfec56116ced11394c8e7e126bb67f781a0fa2e8",
+    "ocel2_batch_hash": "f4097f7ea93b57190d53beb530955c908632ea94132ece7678fdb6c9eb14d793",
+    "receipt_hash": "d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2",
+    "admission_status": "accepted",
+    "ocel2": {
+      "event_log": {
+        "events": [
+          {
+            "id": "e1",
+            "activity": "PublishSermon",
+            "timestamp": "2026-05-23T10:00:00Z",
+            "omap": [
+              "sermon-1"
+            ]
+          },
+          {
+            "id": "e2",
+            "activity": "SendNotification",
+            "timestamp": "2026-05-23T10:05:00Z",
+            "omap": [
+              "sermon-1"
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "id": "sermon-1",
+            "type": "CreativeWork",
+            "attributes": {
+              "title": "Vision 2030"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "output": {
+    "batchValid": true,
+    "receiptValid": true,
+    "verified": true,
+    "admission_status": "accepted",
+    "receipt_hash": "d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2"
+  },
+  "logs": [
+    "[Truex] Initializing receipt cryptographic audit...",
+    "[Truex] Computed batch hash: f4097f7ea93b57190d53beb530955c908632ea94132ece7678fdb6c9eb14d793",
+    "[Truex] Expected batch hash: f4097f7ea93b57190d53beb530955c908632ea94132ece7678fdb6c9eb14d793",
+    "[Truex] Batch hash match: YES",
+    "[Truex] Computed receipt hash: d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2",
+    "[Truex] Expected receipt hash: d62b9bc39a56bf467b98e729995dead46387fd44c0d16bdb046c02b129138cb2",
+    "[Truex] Receipt signature match: YES",
+    "[Truex] Audit verdict: VERIFIED"
+  ]
+}

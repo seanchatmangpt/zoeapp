@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -180,7 +180,7 @@
 <a name='L115'></a><a href='#L115'>115</a>
 <a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -198,7 +198,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -214,7 +214,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -230,7 +230,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -242,7 +242,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -265,7 +265,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -278,7 +278,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -295,7 +295,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
 &nbsp;
-export const syncQueue = sqliteTable('sync_queue', {
+export const syncQueue = <span class="cstat-no" title="statement not covered" >sqliteTable('sync_queue', {</span>
   id: integer('id').primaryKey({ autoIncrement: true }),
   jobType: text('job_type').notNull(),
   payload: text('payload').notNull(), // JSON stringified payload
@@ -313,7 +313,7 @@ export const syncQueue = sqliteTable('sync_queue', {
 export type SyncJob = typeof syncQueue.$inferSelect;
 export type NewSyncJob = typeof syncQueue.$inferInsert;
 &nbsp;
-export const quads = sqliteTable('quads', {
+export const quads = <span class="cstat-no" title="statement not covered" >sqliteTable('quads', {</span>
   id: integer('id').primaryKey({ autoIncrement: true }),
   subject: text('subject').notNull(),
   subjectTermType: text('subject_term_type').notNull(),
@@ -329,7 +329,7 @@ export const quads = sqliteTable('quads', {
 export type QuadRecord = typeof quads.$inferSelect;
 export type NewQuadRecord = typeof quads.$inferInsert;
 &nbsp;
-export const actorCommands = sqliteTable('actor_commands', {
+export const actorCommands = <span class="cstat-no" title="statement not covered" >sqliteTable('actor_commands', {</span>
   id: text('id').primaryKey(),
   actorRef: text('actor_ref').notNull(), // JSON string representing ActorRef
   command: text('command').notNull(),
@@ -345,7 +345,7 @@ export const actorCommands = sqliteTable('actor_commands', {
 export type ActorCommandRecord = typeof actorCommands.$inferSelect;
 export type NewActorCommandRecord = typeof actorCommands.$inferInsert;
 &nbsp;
-export const actorEvents = sqliteTable('actor_events', {
+export const actorEvents = <span class="cstat-no" title="statement not covered" >sqliteTable('actor_events', {</span>
   id: text('id').primaryKey(),
   commandId: text('command_id').notNull(),
   actorRef: text('actor_ref').notNull(), // JSON string representing ActorRef
@@ -357,7 +357,7 @@ export const actorEvents = sqliteTable('actor_events', {
 export type ActorEventRecord = typeof actorEvents.$inferSelect;
 export type NewActorEventRecord = typeof actorEvents.$inferInsert;
 &nbsp;
-export const actorReceipts = sqliteTable('actor_receipts', {
+export const actorReceipts = <span class="cstat-no" title="statement not covered" >sqliteTable('actor_receipts', {</span>
   id: text('id').primaryKey(),
   commandId: text('command_id').notNull(),
   actorRef: text('actor_ref').notNull(), // JSON string representing ActorRef
@@ -380,7 +380,7 @@ export const actorReceipts = sqliteTable('actor_receipts', {
 export type ActorReceiptRecord = typeof actorReceipts.$inferSelect;
 export type NewActorReceiptRecord = typeof actorReceipts.$inferInsert;
 &nbsp;
-export const actorOutbox = sqliteTable('actor_outbox', {
+export const actorOutbox = <span class="cstat-no" title="statement not covered" >sqliteTable('actor_outbox', {</span>
   id: text('id').primaryKey(),
   commandId: text('command_id').notNull(),
   jobType: text('job_type').notNull(), // e.g. 'DISPATCH_AUTHORITATIVE'
@@ -393,7 +393,7 @@ export const actorOutbox = sqliteTable('actor_outbox', {
 export type ActorOutboxRecord = typeof actorOutbox.$inferSelect;
 export type NewActorOutboxRecord = typeof actorOutbox.$inferInsert;
 &nbsp;
-export const actorQuarantine = sqliteTable('actor_quarantine', {
+export const actorQuarantine = <span class="cstat-no" title="statement not covered" >sqliteTable('actor_quarantine', {</span>
   id: text('id').primaryKey(),
   commandId: text('command_id').notNull(),
   actorRef: text('actor_ref').notNull(), // JSON string representing ActorRef
@@ -415,7 +415,7 @@ export type NewActorQuarantineRecord = typeof actorQuarantine.$inferInsert;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -89,47 +89,47 @@
 <a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">47x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">20x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { HookMessage, SupervisorAction } from '../hook-otp/types';
 &nbsp;
 export class FloodSupervisor {
-  private lastTimestamps: number[] = [];
+  private lastTimestamps: number[] = <span class="cstat-no" title="statement not covered" >[];</span>
   private limit: number;
   private windowMs: number;
 &nbsp;
-  constructor(limit = <span class="branch-0 cbranch-no" title="branch not covered" >5,</span> windowMs = <span class="branch-0 cbranch-no" title="branch not covered" >1000)</span> {
-    this.limit = limit;
-    this.windowMs = windowMs;
+<span class="fstat-no" title="function not covered" >  co</span>nstructor(limit = <span class="branch-0 cbranch-no" title="branch not covered" >5,</span> windowMs = <span class="branch-0 cbranch-no" title="branch not covered" >1000)</span> {
+<span class="cstat-no" title="statement not covered" >    this.limit = limit;</span>
+<span class="cstat-no" title="statement not covered" >    this.windowMs = windowMs;</span>
   }
 &nbsp;
-  public recordAndCheck(msg: HookMessage): SupervisorAction | 'allow' {
-    const now = Date.now();
-    this.lastTimestamps.push(now);
-    this.lastTimestamps = this.lastTimestamps.filter((t) =&gt; now - t &lt; this.windowMs);
+<span class="fstat-no" title="function not covered" >  pu</span>blic recordAndCheck(msg: HookMessage): SupervisorAction | 'allow' {
+    const now = <span class="cstat-no" title="statement not covered" >Date.now();</span>
+<span class="cstat-no" title="statement not covered" >    this.lastTimestamps.push(now);</span>
+<span class="cstat-no" title="statement not covered" >    this.lastTimestamps = this.lastTimestamps.filter(<span class="fstat-no" title="function not covered" >(t</span>) =&gt; <span class="cstat-no" title="statement not covered" >now - t &lt; this.windowMs)</span>;</span>
 &nbsp;
-    if (this.lastTimestamps.length &gt; this.limit) {
-      return 'suppress';
+<span class="cstat-no" title="statement not covered" >    if (this.lastTimestamps.length &gt; this.limit) {</span>
+<span class="cstat-no" title="statement not covered" >      return 'suppress';</span>
     }
-    return 'allow';
+<span class="cstat-no" title="statement not covered" >    return 'allow';</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -139,7 +139,7 @@ export class FloodSupervisor {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

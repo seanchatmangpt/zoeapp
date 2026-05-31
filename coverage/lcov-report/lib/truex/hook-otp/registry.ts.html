@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.72% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/6</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.72% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -125,21 +125,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">37x</span>
-<span class="cline-any cline-yes">37x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">72x</span>
-<span class="cline-any cline-yes">72x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">45x</span>
-<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -148,7 +138,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,21 +171,21 @@ export interface HookActorInstance {
 }
 &nbsp;
 export class HookRegistry {
-  private instances = new Map&lt;string, HookActorInstance&gt;();
+  private instances = <span class="cstat-no" title="statement not covered" >new Map&lt;string, HookActorInstance&gt;();</span>
 &nbsp;
-  public register(instance: HookActorInstance): void {
-    const key = stringifyActorRef(instance.ref);
-    this.instances.set(key, instance);
+<span class="fstat-no" title="function not covered" >  pu</span>blic register(instance: HookActorInstance): void {
+    const key = <span class="cstat-no" title="statement not covered" >stringifyActorRef(instance.ref);</span>
+<span class="cstat-no" title="statement not covered" >    this.instances.set(key, instance);</span>
   }
 &nbsp;
-  public get(ref: HookActorRef): HookActorInstance | undefined {
-    const key = stringifyActorRef(ref);
-    return this.instances.get(key);
+<span class="fstat-no" title="function not covered" >  pu</span>blic get(ref: HookActorRef): HookActorInstance | undefined {
+    const key = <span class="cstat-no" title="statement not covered" >stringifyActorRef(ref);</span>
+<span class="cstat-no" title="statement not covered" >    return this.instances.get(key);</span>
   }
 &nbsp;
-  public has(ref: HookActorRef): boolean {
-    const key = stringifyActorRef(ref);
-    return this.instances.has(key);
+<span class="fstat-no" title="function not covered" >  pu</span>blic has(ref: HookActorRef): boolean {
+    const key = <span class="cstat-no" title="statement not covered" >stringifyActorRef(ref);</span>
+<span class="cstat-no" title="statement not covered" >    return this.instances.has(key);</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  pu</span>blic remove(ref: HookActorRef): void {
@@ -193,8 +193,8 @@ export class HookRegistry {
 <span class="cstat-no" title="statement not covered" >    this.instances.delete(key);</span>
   }
 &nbsp;
-  public clear(): void {
-    this.instances.clear();
+<span class="fstat-no" title="function not covered" >  pu</span>blic clear(): void {
+<span class="cstat-no" title="statement not covered" >    this.instances.clear();</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  pu</span>blic getAll(): HookActorInstance[] {
@@ -208,7 +208,7 @@ export class HookRegistry {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

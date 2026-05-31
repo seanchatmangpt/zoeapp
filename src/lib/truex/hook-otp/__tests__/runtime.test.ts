@@ -8,7 +8,7 @@ jest.mock('../behavior', () => ({
 }));
 
 jest.mock('../actorRef', () => ({
-  stringifyActorRef: jest.fn((ref) => `${ref.tenantId}:${ref.type}:${ref.id}`),
+  stringifyActorRef: jest.fn((ref) => `${ref.tenantId}:${ref.packId}:${ref.hookId}:${ref.instanceId}`),
   sha256: jest.fn((str) => `hash_${str.substring(0, 5)}`),
 }));
 
@@ -31,7 +31,7 @@ describe('HookRuntime', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     runtime = new HookRuntime();
-    mockRef = { tenantId: 't1', type: 'test', id: '1' };
+    mockRef = { tenantId: 't1', packId: 'pack1', hookId: 'test', instanceId: '1' };
     mockBehavior = {
       init: jest.fn(),
       handleReceipt: jest.fn(),
@@ -83,7 +83,7 @@ describe('HookRuntime', () => {
     it('throws if actor is not registered', () => {
       expect(() => {
         runtime.send(mockRef, { id: 'm1', type: 'graph_delta', payload: {} });
-      }).toThrow('Actor not registered: t1:test:1');
+      }).toThrow('Actor not registered: t1:pack1:test:1');
     });
 
     it('sends a message to mailbox if actor is registered', async () => {
@@ -214,7 +214,7 @@ describe('HookRuntime', () => {
 
     it('processes unknown message type', async () => {
       const instance = await runtime.spawn(mockRef, mockBehavior, mockSupervisor);
-      const msg = { id: 'm1', type: 'unknown_type', payload: {} } as HookMessage;
+      const msg = { id: 'm1', type: 'unknown_type', payload: {} } as unknown as HookMessage;
       
       await (runtime as any).processMessage(mockRef, msg);
       
@@ -224,7 +224,7 @@ describe('HookRuntime', () => {
     it('processes send_message effects', async () => {
       const instance = await runtime.spawn(mockRef, mockBehavior, mockSupervisor);
       
-      const targetRef = { tenantId: 't1', type: 'target', id: '2' };
+      const targetRef: HookActorRef = { tenantId: 't1', packId: 'pack1', hookId: 'target', instanceId: '2' };
       const targetBehavior = { init: jest.fn(), handleReceipt: jest.fn() };
       await runtime.spawn(targetRef, targetBehavior, mockSupervisor);
       

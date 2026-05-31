@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -268,31 +268,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -336,12 +336,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -361,7 +361,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -460,32 +460,32 @@ import { db } from '../../lib/db/db';
 import { actorReceipts } from '../../lib/db/schema';
 import { desc } from 'drizzle-orm';
 &nbsp;
-export default function AdminReceipts() {
-  const [receiptsList, setReceiptsList] = useState&lt;any[]&gt;([]);
-  const [refreshing, setRefreshing] = useState(false);
+export default function <span class="fstat-no" title="function not covered" >AdminReceipts(</span>) {
+  const [receiptsList, setReceiptsList] = <span class="cstat-no" title="statement not covered" >useState&lt;any[]&gt;([]);</span>
+  const [refreshing, setRefreshing] = <span class="cstat-no" title="statement not covered" >useState(false);</span>
 &nbsp;
-  const fetchReceipts = async () =&gt; {
-    setRefreshing(true);
-    try {
-      const list = await db
+  const fetchReceipts = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    setRefreshing(true);</span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+      const list = <span class="cstat-no" title="statement not covered" >await db</span>
         .select()
         .from(actorReceipts)
         .orderBy(desc(actorReceipts.createdAt));
-      setReceiptsList(list);
+<span class="cstat-no" title="statement not covered" >      setReceiptsList(list);</span>
     } catch (e) {
-      console.error('Failed to load receipts:', e);
+<span class="cstat-no" title="statement not covered" >      console.error('Failed to load receipts:', e);</span>
     } finally {
-      setRefreshing(false);
+<span class="cstat-no" title="statement not covered" >      setRefreshing(false);</span>
     }
   };
 &nbsp;
-  useEffect(() =&gt; {
-    fetchReceipts();
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    fetchReceipts();</span>
   }, []);
 &nbsp;
-  const renderReceiptItem = ({ item }: { item: any }) =&gt; {
-    const isError = !!item.error;
-    return (
+  const renderReceiptItem = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> item }: { item: any }) =&gt; {</span>
+    const isError = <span class="cstat-no" title="statement not covered" >!!item.error;</span>
+<span class="cstat-no" title="statement not covered" >    return (</span>
       &lt;AdminCard 
         title={`Receipt: ${item.id.slice(0, 8)}...`} 
         subtitle={new Date(item.createdAt).toLocaleString()}
@@ -522,19 +522,19 @@ export default function AdminReceipts() {
           )}
           
           &lt;View style={styles.jsonWrapper}&gt;
-            &lt;JsonInspector data={{ eventIds: JSON.parse(item.eventIds || <span class="branch-1 cbranch-no" title="branch not covered" >'[]')</span> }} title="Event Payloads" /&gt;
+            &lt;JsonInspector data={{ eventIds: JSON.parse(item.eventIds || '[]') }} title="Event Payloads" /&gt;
           &lt;/View&gt;
         &lt;/View&gt;
       &lt;/AdminCard&gt;
     );
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;AdminShell title="Receipt Audit Logs" subtitle="Historical transaction log matching BEAM event receipts" scrollable={false}&gt;
       &lt;FlatList
         data={receiptsList}
         renderItem={renderReceiptItem}
-        keyExtractor={(item) =&gt; item.id}
+        keyExtractor={<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.id}</span>
         contentContainerStyle={styles.listContent}
         refreshControl={
           &lt;RefreshControl refreshing={refreshing} onRefresh={fetchReceipts} tintColor="#3B82F6" colors={['#3B82F6']} /&gt;
@@ -554,7 +554,7 @@ export default function AdminReceipts() {
   );
 }
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   listContent: {
     padding: 16,
     paddingBottom: 40,
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -111,8 +111,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -128,21 +128,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { sha256, canonicalStringify } from '../crypto/receipts';
@@ -151,15 +151,15 @@ export class SimulationContext {
   private baseState: any;
   private speculativeState: any;
 &nbsp;
-  constructor(initialState: any) {
-    this.baseState = JSON.parse(JSON.stringify(initialState));
-    this.speculativeState = JSON.parse(JSON.stringify(initialState));
+<span class="fstat-no" title="function not covered" >  co</span>nstructor(initialState: any) {
+<span class="cstat-no" title="statement not covered" >    this.baseState = JSON.parse(JSON.stringify(initialState));</span>
+<span class="cstat-no" title="statement not covered" >    this.speculativeState = JSON.parse(JSON.stringify(initialState));</span>
   }
 &nbsp;
   /**
    * Run speculative execution on the cloned state
    */
-  async simulateRun&lt;T&gt;(
+<span class="fstat-no" title="function not covered" >  as</span>ync simulateRun&lt;T&gt;(
     commandId: string,
     input: any,
     mutateBlock: (state: any, inp: any) =&gt; Promise&lt;T&gt;
@@ -169,12 +169,12 @@ export class SimulationContext {
     speculativeHash: string;
     drift: boolean;
   }&gt; {
-    const result = await mutateBlock(this.speculativeState, input);
-    const originalHash = sha256(canonicalStringify(this.baseState));
-    const speculativeHash = sha256(canonicalStringify(this.speculativeState));
-    const drift = originalHash !== speculativeHash;
+    const result = <span class="cstat-no" title="statement not covered" >await mutateBlock(this.speculativeState, input);</span>
+    const originalHash = <span class="cstat-no" title="statement not covered" >sha256(canonicalStringify(this.baseState));</span>
+    const speculativeHash = <span class="cstat-no" title="statement not covered" >sha256(canonicalStringify(this.speculativeState));</span>
+    const drift = <span class="cstat-no" title="statement not covered" >originalHash !== speculativeHash;</span>
 &nbsp;
-    return {
+<span class="cstat-no" title="statement not covered" >    return {</span>
       success: true,
       result,
       speculativeHash,
@@ -182,8 +182,8 @@ export class SimulationContext {
     };
   }
 &nbsp;
-  getSpeculativeState() {
-    return this.speculativeState;
+<span class="fstat-no" title="function not covered" >  ge</span>tSpeculativeState() {
+<span class="cstat-no" title="statement not covered" >    return this.speculativeState;</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -193,7 +193,7 @@ export class SimulationContext {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

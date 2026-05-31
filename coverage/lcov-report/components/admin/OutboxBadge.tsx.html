@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -131,31 +131,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -165,7 +163,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -189,30 +189,30 @@ interface OutboxBadgeProps {
   testID?: string;
 }
 &nbsp;
-export function OutboxBadge({ status, testID }: OutboxBadgeProps) {
-  let backgroundColor = '#334155'; // slate-700
-  let textColor = '#94A3B8'; // slate-400
+export function <span class="fstat-no" title="function not covered" >OutboxBadge(</span>{ status, testID }: OutboxBadgeProps) {
+  let backgroundColor = <span class="cstat-no" title="statement not covered" >'#334155';</span> // slate-700
+  let textColor = <span class="cstat-no" title="statement not covered" >'#94A3B8';</span> // slate-400
 &nbsp;
-  switch (status) {
+<span class="cstat-no" title="statement not covered" >  switch (status) {</span>
     case 'pending':
-      backgroundColor = 'rgba(245, 158, 11, 0.2)'; // amber-500/20
-      textColor = '#FCD34D'; // amber-300
-      break;
+<span class="cstat-no" title="statement not covered" >      backgroundColor = 'rgba(245, 158, 11, 0.2)'; </span>// amber-500/20
+<span class="cstat-no" title="statement not covered" >      textColor = '#FCD34D'; </span>// amber-300
+<span class="cstat-no" title="statement not covered" >      break;</span>
     case 'processing':
-      backgroundColor = 'rgba(59, 130, 246, 0.2)'; // blue-500/20
-      textColor = '#93C5FD'; // blue-300
-      break;
+<span class="cstat-no" title="statement not covered" >      backgroundColor = 'rgba(59, 130, 246, 0.2)'; </span>// blue-500/20
+<span class="cstat-no" title="statement not covered" >      textColor = '#93C5FD'; </span>// blue-300
+<span class="cstat-no" title="statement not covered" >      break;</span>
     case 'completed':
-      backgroundColor = 'rgba(16, 185, 129, 0.2)'; // emerald-500/20
-      textColor = '#6EE7B7'; // emerald-300
-      break;
+<span class="cstat-no" title="statement not covered" >      backgroundColor = 'rgba(16, 185, 129, 0.2)'; </span>// emerald-500/20
+<span class="cstat-no" title="statement not covered" >      textColor = '#6EE7B7'; </span>// emerald-300
+<span class="cstat-no" title="statement not covered" >      break;</span>
     case 'failed':
-      backgroundColor = 'rgba(239, 68, 68, 0.2)'; // red-500/20
-      textColor = '#FCA5A5'; // red-300
-      break;
+<span class="cstat-no" title="statement not covered" >      backgroundColor = 'rgba(239, 68, 68, 0.2)'; </span>// red-500/20
+<span class="cstat-no" title="statement not covered" >      textColor = '#FCA5A5'; </span>// red-300
+<span class="cstat-no" title="statement not covered" >      break;</span>
   }
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;View
       style={[styles.badge, { backgroundColor }]}
       testID={testID}
@@ -224,7 +224,7 @@ export function OutboxBadge({ status, testID }: OutboxBadgeProps) {
   );
 }
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   badge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

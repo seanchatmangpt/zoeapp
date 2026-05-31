@@ -22,7 +22,7 @@ export async function proveReplay(
     const ctx = {
       actorRef: ref,
       state: { ...state },
-      timestamp: msg.timestamp,
+      timestamp: msg.timestamp ?? new Date().toISOString(),
     };
 
     const effects = await runDelta(behavior, msg, ctx);

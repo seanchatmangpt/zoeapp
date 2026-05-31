@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>5/6</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -113,7 +113,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -126,7 +126,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -137,16 +137,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export interface SemanticTerm {
@@ -156,7 +156,7 @@
 }
 &nbsp;
 export class Ontology {
-  private static publicVocabularies = [
+  private static publicVocabularies = <span class="cstat-no" title="statement not covered" >[</span>
     'http://schema.org',
     'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
     'http://www.w3.org/ns/prov',
@@ -168,28 +168,28 @@ export class Ontology {
   /**
    * Check if a predicate URI starts with an approved public vocabulary prefix
    */
-  static isPredicateValid(predicate: string): boolean {
-    return this.publicVocabularies.some(vocab =&gt; predicate.startsWith(vocab));
+<span class="fstat-no" title="function not covered" >  st</span>atic isPredicateValid(predicate: string): boolean {
+<span class="cstat-no" title="statement not covered" >    return this.publicVocabularies.some(<span class="fstat-no" title="function not covered" >vo</span>cab =&gt; <span class="cstat-no" title="statement not covered" >predicate.startsWith(vocab))</span>;</span>
   }
 &nbsp;
   /**
    * Verify that semantic mappings preserve base properties after migration
    */
-  static verifyOntologyDrift(
+<span class="fstat-no" title="function not covered" >  st</span>atic verifyOntologyDrift(
     v1: Record&lt;string, string&gt;,
     v2: Record&lt;string, string&gt;,
     mappingRules: Record&lt;string, string&gt;
   ): { stable: boolean; driftDetails?: string } {
-    for (const key of Object.keys(v1)) {
-      const v2Key = mappingRules[key] || <span class="branch-1 cbranch-no" title="branch not covered" >key;</span>
-      if (!v2[v2Key] || v2[v2Key] !== v1[key]) {
-        return {
+<span class="cstat-no" title="statement not covered" >    for (const key of Object.keys(v1)) {</span>
+      const v2Key = <span class="cstat-no" title="statement not covered" >mappingRules[key] || key;</span>
+<span class="cstat-no" title="statement not covered" >      if (!v2[v2Key] || v2[v2Key] !== v1[key]) {</span>
+<span class="cstat-no" title="statement not covered" >        return {</span>
           stable: false,
           driftDetails: `Missing or drifted predicate mapping for key '${key}'. Expected equivalent value '${v1[key]}'.`
         };
       }
     }
-    return { stable: true };
+<span class="cstat-no" title="statement not covered" >    return { stable: true };</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -199,7 +199,7 @@ export class Ontology {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

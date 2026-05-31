@@ -9,7 +9,7 @@ export class OscillationSupervisor {
 
   public detectOscillation(msg: HookMessage): SupervisorAction | 'allow' {
     const trace = msg.payload?.trace || [];
-    const visits = trace.filter((t: string) => t === msg.actorRef.hookId);
+    const visits = trace.filter((t: string) => t === msg.actorRef?.hookId);
     if (visits.length > this.maxDepth) {
       return 'quarantine';
     }

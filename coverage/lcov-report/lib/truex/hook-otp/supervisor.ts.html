@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.3% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/13</span>
+                <span class='fraction'>0/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.77% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>7/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.66% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -113,26 +113,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,31 +146,31 @@ export class DefaultHookSupervisor implements HookSupervisor {
   public backoffMs: number;
   public quarantineOnErrorPattern: string[];
 &nbsp;
-  constructor(
-    maxRetries = 3,
-    backoffMs = 10,
-    quarantineOnErrorPattern: string[] = ['quarantine', 'fatal', 'divergence', 'validation']
+<span class="fstat-no" title="function not covered" >  co</span>nstructor(
+    maxRetries = <span class="branch-0 cbranch-no" title="branch not covered" >3,</span>
+    backoffMs = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span>
+    quarantineOnErrorPattern: string[] = <span class="branch-0 cbranch-no" title="branch not covered" >['quarantine', 'fatal', 'divergence', 'validation']</span>
   ) {
-    this.maxRetries = maxRetries;
-    this.backoffMs = backoffMs;
-    this.quarantineOnErrorPattern = quarantineOnErrorPattern;
+<span class="cstat-no" title="statement not covered" >    this.maxRetries = maxRetries;</span>
+<span class="cstat-no" title="statement not covered" >    this.backoffMs = backoffMs;</span>
+<span class="cstat-no" title="statement not covered" >    this.quarantineOnErrorPattern = quarantineOnErrorPattern;</span>
   }
 &nbsp;
-  public async onFailure(error: any, msg: HookMessage, attempts: number): Promise&lt;SupervisorAction&gt; {
-    const errorStr = (error?.message || <span class="branch-1 cbranch-no" title="branch not covered" >String(error))</span>.toLowerCase();
+<span class="fstat-no" title="function not covered" >  pu</span>blic async onFailure(error: any, msg: HookMessage, attempts: number): Promise&lt;SupervisorAction&gt; {
+    const errorStr = <span class="cstat-no" title="statement not covered" >(error?.message || String(error)).toLowerCase();</span>
 &nbsp;
     // Check if error matches quarantine patterns
-    for (const pattern of this.quarantineOnErrorPattern) {
-      if (errorStr.includes(pattern)) {
-        return 'quarantine';
+<span class="cstat-no" title="statement not covered" >    for (const pattern of this.quarantineOnErrorPattern) {</span>
+<span class="cstat-no" title="statement not covered" >      if (errorStr.includes(pattern)) {</span>
+<span class="cstat-no" title="statement not covered" >        return 'quarantine';</span>
       }
     }
 &nbsp;
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (attempts &lt; this.maxRetries) {
+<span class="cstat-no" title="statement not covered" >    if (attempts &lt; this.maxRetries) {</span>
       // Apply exponential backoff delay before restarting
-      const delay = this.backoffMs * Math.pow(2, attempts);
-      await new Promise((resolve) =&gt; setTimeout(resolve, delay));
-      return 'restart';
+      const delay = <span class="cstat-no" title="statement not covered" >this.backoffMs * Math.pow(2, attempts);</span>
+<span class="cstat-no" title="statement not covered" >      await new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve) =&gt; <span class="cstat-no" title="statement not covered" >setTimeout(resolve, delay))</span>;</span>
+<span class="cstat-no" title="statement not covered" >      return 'restart';</span>
     }
 &nbsp;
     // If we run out of retries, quarantine the actor to isolate failure
@@ -184,7 +184,7 @@ export class DefaultHookSupervisor implements HookSupervisor {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

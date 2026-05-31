@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.85% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>26/28</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -287,17 +287,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -349,7 +347,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -498,16 +498,16 @@ export interface ErrorBoundaryProps {
   retry: () =&gt; void;
 }
 &nbsp;
-export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
-  const theme = useColorScheme();
-  const router = useRouter();
-  const isDark = theme === 'dark';
+export function <span class="fstat-no" title="function not covered" >ErrorBoundary(</span>{ error, retry }: ErrorBoundaryProps) {
+  const theme = <span class="cstat-no" title="statement not covered" >useColorScheme();</span>
+  const router = <span class="cstat-no" title="statement not covered" >useRouter();</span>
+  const isDark = <span class="cstat-no" title="statement not covered" >theme === 'dark';</span>
 &nbsp;
-  const handleGoHome = () =&gt; {
-    router.replace('/(tabs)' as any);
+  const handleGoHome = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    router.replace('/(tabs)' as any);</span>
   };
 &nbsp;
-  return (
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}&gt;
       &lt;View style={styles.card}&gt;
         &lt;View style={styles.iconContainer}&gt;
@@ -523,7 +523,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
         &lt;View style={[styles.errorBox, isDark ? styles.errorBoxDark : styles.errorBoxLight]}&gt;
           &lt;ScrollView style={styles.errorScroll} nestedScrollEnabled&gt;
             &lt;Text style={[styles.errorText, isDark ? styles.errorTextDark : styles.errorTextLight]}&gt;
-              {error?.name || <span class="branch-1 cbranch-no" title="branch not covered" >'Error'}</span>: {error?.message || <span class="branch-1 cbranch-no" title="branch not covered" >'Unknown Exception'}</span>
+              {error?.name || 'Error'}: {error?.message || 'Unknown Exception'}
             &lt;/Text&gt;
             {error?.stack &amp;&amp; (
               &lt;Text style={[styles.stackText, isDark ? styles.stackTextDark : styles.stackTextLight]}&gt;
@@ -561,7 +561,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   );
 }
 &nbsp;
-const styles = StyleSheet.create({
+const styles = <span class="cstat-no" title="statement not covered" >StyleSheet.create({</span>
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T05:43:54.158Z
+                at 2026-05-31T05:53:22.824Z
             </div>
         <script src="../prettify.js"></script>
         <script>
