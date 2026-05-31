@@ -39,7 +39,7 @@ interface CodeToken {
   type: 'plain' | 'comment' | 'string' | 'keyword' | 'type' | 'value';
 }
 
-interface Segment {
+export interface Segment {
   type: 'text' | 'code';
   language?: string;
   code?: string;
@@ -49,7 +49,7 @@ interface Segment {
 /**
  * Parses markdown code blocks and segments
  */
-function parseMarkdown(text: string): Segment[] {
+export function parseMarkdown(text: string): Segment[] {
   const segments: Segment[] = [];
   const codeBlockRegex = /```([a-zA-Z0-9+#-]*)\n([\s\S]*?)```/g;
 
@@ -457,7 +457,7 @@ export default function OpenAIAvatarRelativeProjection() {
     if (session) {
       loadUserProfile();
     }
-  }, [session]);
+  }, [session?.user?.id]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -579,6 +579,7 @@ export default function OpenAIAvatarRelativeProjection() {
       {/* Message List */}
       <View className="flex-1 relative">
         <ScrollView
+          testID="message-scrollview"
           ref={scrollViewRef}
           className="flex-1 px-4"
           contentContainerStyle={{ paddingBottom: 24, paddingTop: 16 }}
@@ -601,6 +602,7 @@ export default function OpenAIAvatarRelativeProjection() {
         {/* Scroll to Bottom Button */}
         {showScrollBottomBtn && (
           <TouchableOpacity
+            testID="scroll-bottom-button"
             onPress={scrollToBottom}
             className="absolute bottom-4 right-4 bg-indigo-600 w-10 h-10 rounded-full items-center justify-center shadow-lg border border-indigo-500"
             activeOpacity={0.8}
@@ -623,6 +625,7 @@ export default function OpenAIAvatarRelativeProjection() {
             textAlignVertical="center"
           />
           <TouchableOpacity
+            testID="send-button"
             className={`rounded-xl p-2.5 items-center justify-center ${
               loading || !prompt.trim() ? 'bg-slate-100' : 'bg-indigo-600 shadow-sm'
             }`}

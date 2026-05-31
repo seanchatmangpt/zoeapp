@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated, TouchableOpacity, LayoutAnimation, Pl
 import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { AvatarRelativeProjectionMatrixView } from '../../components/AvatarRelativeProjection';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '@/lib/supabase';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 // Enable LayoutAnimation for Android

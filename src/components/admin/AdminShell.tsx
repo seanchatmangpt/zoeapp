@@ -28,7 +28,7 @@ export function AdminShell({ title, subtitle, children, scrollable = true }: Adm
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+          <TouchableOpacity onPress={handleBack} style={styles.backButton} testID="arrow-left">
             <FontAwesome name="arrow-left" size={16} color="#3B82F6" />
           </TouchableOpacity>
           <View style={styles.headerTitleContainer}>

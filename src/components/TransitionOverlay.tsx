@@ -10,24 +10,26 @@ export function TransitionOverlay() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const anim = Animated.timing(fadeAnim, {
+      toValue: isTransitioning ? 1 : 0,
+      duration: isTransitioning ? 250 : 350,
+      useNativeDriver: true,
+    });
+
     if (isTransitioning) {
       setVisible(true);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
+      anim.start();
     } else {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 350,
-        useNativeDriver: true,
-      }).start(({ finished }) => {
+      anim.start(({ finished }) => {
         if (finished) {
           setVisible(false);
         }
       });
     }
+
+    return () => {
+      anim.stop();
+    };
   }, [isTransitioning, fadeAnim]);
 
   if (!visible) return null;

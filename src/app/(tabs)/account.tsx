@@ -105,7 +105,7 @@ export default function Account() {
     } catch (e) {
       console.warn('Failed to read MMKV keys:', e);
     }
-  }, [session]);
+  }, [session?.user?.id]);
 
   const refreshMMKVKeyCount = () => {
     try {

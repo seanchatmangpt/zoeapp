@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AdminShell } from '../../components/admin/AdminShell';
 import { AdminCard } from '../../components/admin/AdminCard';
 import { useSession } from '../../../context/SessionProvider';
@@ -77,6 +78,28 @@ export default function AdminSettings() {
               mmkvInstance.clearAll();
               setMmkvKeysCount(0);
               Alert.alert('Success', 'MMKV Cache cleared.');
+            } catch (err) {
+              Alert.alert('Error', err instanceof Error ? err.message : 'Wipe failed');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClearAsyncStorage = () => {
+    Alert.alert(
+      'Wipe AsyncStorage Cache',
+      'Are you sure you want to clear all AsyncStorage keys? This deletes all traditional cache, session info, and indices.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              Alert.alert('Success', 'AsyncStorage cache cleared.');
             } catch (err) {
               Alert.alert('Error', err instanceof Error ? err.message : 'Wipe failed');
             }
@@ -235,6 +258,16 @@ export default function AdminSettings() {
               <Text className="text-blue-200 font-semibold text-sm">Reset Local Zustand Stores</Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color="#60A5FA" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleClearAsyncStorage}
+            className="w-full bg-red-500/10 active:bg-red-500/25 border border-red-500/30 rounded-xl py-3 px-4 flex-row items-center justify-between mb-3">
+            <View className="flex-row items-center">
+              <Ionicons name="trash-bin-outline" size={18} color="#EF4444" style={{ marginRight: 10 }} />
+              <Text className="text-red-300 font-semibold text-sm">Wipe AsyncStorage Cache</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color="#EF4444" />
           </TouchableOpacity>
 
           <TouchableOpacity

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Text } from 'react-native';
 import renderer, { act } from 'react-test-renderer';
-import { ProtectedRoute } from '../ProtectedRoute';
+import { render, fireEvent } from '@testing-library/react-native';
+import { ProtectedRoute, PremiumReceiptBlockingScreen } from '../ProtectedRoute';
 import { useRouteAdmission } from '../../hooks/useRouteAdmission';
 
 const mockUseSession = jest.fn();
@@ -514,6 +515,105 @@ describe('ProtectedRoute Component and useRouteAdmission Hook', () => {
       expect(hookResult.loading).toBe(false);
       expect(hookResult.refusal.code).toBe('MISSING_DISCLOSURE');
       expect(hookResult.refusal.missingDisclosures).toEqual(['accepted_privacy_policy']);
+    });
+  });
+
+  describe('PremiumReceiptBlockingScreen', () => {
+    const defaultProps = {
+      commandId: 'cmd-12345',
+      expectedHash: 'hash-abcde',
+      isChecking: false,
+      refusalReason: {
+        code: 'RECEIPT_NOT_FOUND',
+        message: 'BLAKE3 receipt not found in local storage.',
+      },
+      onRetry: jest.fn(),
+      onRedirect: jest.fn(),
+      redirectText: 'Return to Dashboard',
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test('renders verifying receipt overlay when isChecking is true', () => {
+      const { getByText, queryByText } = render(
+        <PremiumReceiptBlockingScreen {...defaultProps} isChecking={true} refusalReason={null} />
+      );
+
+      expect(getByText('Verifying Receipt')).toBeTruthy();
+      expect(getByText('Cryptographic Proof Gating')).toBeTruthy();
+      expect(getByText('BLAKE3 Verification')).toBeTruthy();
+      expect(getByText('Checking...')).toBeTruthy();
+
+      // Should show command ID
+      expect(getByText('cmd-12345')).toBeTruthy();
+      // Should show expected hash
+      expect(getByText('hash-abcde')).toBeTruthy();
+
+      // Refusal reason should not be shown
+      expect(queryByText('BLAKE3 receipt not found in local storage.')).toBeNull();
+      // Retry button should not be shown
+      expect(queryByText('Retry Verification')).toBeNull();
+      // Redirect/Cancel button should be shown with default text "Cancel & Return"
+      expect(getByText('Cancel & Return')).toBeTruthy();
+    });
+
+    test('renders admission refused overlay when isChecking is false', () => {
+      const { getByText, queryByText } = render(
+        <PremiumReceiptBlockingScreen {...defaultProps} isChecking={false} />
+      );
+
+      expect(getByText('Admission Refused')).toBeTruthy();
+      expect(getByText('Security Clearance Blocked')).toBeTruthy();
+      expect(getByText('Unverified ❌')).toBeTruthy();
+
+      // Should show command ID
+      expect(getByText('cmd-12345')).toBeTruthy();
+      // Should show expected hash
+      expect(getByText('hash-abcde')).toBeTruthy();
+
+      // Refusal reason should be shown
+      expect(getByText('BLAKE3 receipt not found in local storage.')).toBeTruthy();
+      expect(getByText('Refusal Reason (RECEIPT_NOT_FOUND)')).toBeTruthy();
+
+      // Retry button should be shown
+      expect(getByText('Retry Verification')).toBeTruthy();
+      // Redirect/Cancel button should be shown with custom redirect text
+      expect(getByText('Return to Dashboard')).toBeTruthy();
+    });
+
+    test('does not render expected hash row when expectedHash is not provided', () => {
+      const { queryByText } = render(
+        <PremiumReceiptBlockingScreen {...defaultProps} expectedHash={undefined} />
+      );
+
+      expect(queryByText('Required Delta Hash')).toBeNull();
+      expect(queryByText('hash-abcde')).toBeNull();
+    });
+
+    test('triggers onRetry callback when Retry Verification is pressed', () => {
+      const onRetryMock = jest.fn();
+      const { getByText } = render(
+        <PremiumReceiptBlockingScreen {...defaultProps} onRetry={onRetryMock} />
+      );
+
+      const retryBtn = getByText('Retry Verification');
+      fireEvent.press(retryBtn);
+
+      expect(onRetryMock).toHaveBeenCalledTimes(1);
+    });
+
+    test('triggers onRedirect callback when Redirect/Cancel button is pressed', () => {
+      const onRedirectMock = jest.fn();
+      const { getByText } = render(
+        <PremiumReceiptBlockingScreen {...defaultProps} onRedirect={onRedirectMock} />
+      );
+
+      const redirectBtn = getByText('Return to Dashboard');
+      fireEvent.press(redirectBtn);
+
+      expect(onRedirectMock).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -1,7 +1,15 @@
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import { Text } from 'react-native';
-import { Stack, Tabs } from '../AvatarRelativeProjection';
+import { Stack, Tabs, AvatarRelativeProjectionMatrixView } from '../AvatarRelativeProjection';
+
+jest.mock('@expo/vector-icons/FontAwesome', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const MockFontAwesome = (props: any) => React.createElement(View, { ...props, testID: props.name });
+  MockFontAwesome.displayName = 'MockFontAwesome';
+  return MockFontAwesome;
+});
 
 describe('AvatarRelativeProjection (Stack and Tabs Protected Gates)', () => {
   describe('Stack component and Stack.Protected', () => {
@@ -98,5 +106,126 @@ describe('AvatarRelativeProjection (Stack and Tabs Protected Gates)', () => {
 
       expect(queryByText('Valid Tab Child')).toBeTruthy();
     });
+  });
+});
+
+describe('AvatarRelativeProjectionMatrixView', () => {
+  test('renders with initialData and handles default layout values', () => {
+    const { getByText } = render(<AvatarRelativeProjectionMatrixView />);
+
+    expect(getByText('Interactive Projection Control')).toBeTruthy();
+    expect(getByText('Open Slots: 4')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.5')).toBeTruthy();
+    expect(getByText('Candidates (3)')).toBeTruthy();
+
+    // Check roles projections are rendered in the grid
+    expect(getByText('member')).toBeTruthy();
+    expect(getByText('volunteer')).toBeTruthy();
+    expect(getByText('teamLead')).toBeTruthy();
+    expect(getByText('pastor')).toBeTruthy();
+    expect(getByText('admin')).toBeTruthy();
+    expect(getByText('operator')).toBeTruthy();
+
+    // Check default payload projection values
+    expect(getByText('• Open slots count: 4')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.5')).toBeTruthy();
+    expect(getByText('• Candidates count: 3')).toBeTruthy();
+    expect(getByText('• State Hash: vkg_genesis_a4f9')).toBeTruthy();
+  });
+
+  test('renders with custom initialData', () => {
+    const customData = {
+      openSlots: 6,
+      candidates: ['Alice Smith', 'Bob Jones'],
+      stateHash: 'custom_hash_123',
+    };
+    const { getByText } = render(<AvatarRelativeProjectionMatrixView initialData={customData} />);
+
+    expect(getByText('Open Slots: 6')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.75')).toBeTruthy();
+    expect(getByText('Candidates (2)')).toBeTruthy();
+    expect(getByText('• Open slots count: 6')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.75')).toBeTruthy();
+    expect(getByText('• Candidates count: 2')).toBeTruthy();
+    expect(getByText('• State Hash: custom_hash_123')).toBeTruthy();
+  });
+
+  test('open slots increment/decrement trigger shortage ratio and projection recalculation', () => {
+    const { getByText } = render(<AvatarRelativeProjectionMatrixView initialData={{ openSlots: 4 }} />);
+
+    // Initial state: openSlots: 4, shortageRatio: 0.5
+    expect(getByText('Open Slots: 4')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.5')).toBeTruthy();
+    expect(getByText('• Open slots count: 4')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.5')).toBeTruthy();
+
+    const plusBtn = getByText('+');
+    const minusBtn = getByText('-');
+
+    // Increment open slots to 5
+    fireEvent.press(plusBtn);
+    expect(getByText('Open Slots: 5')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.63')).toBeTruthy(); // 5 / 8 = 0.625 -> 0.63
+    expect(getByText('• Open slots count: 5')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.63')).toBeTruthy();
+
+    // Decrement open slots to 3
+    fireEvent.press(minusBtn);
+    fireEvent.press(minusBtn);
+    expect(getByText('Open Slots: 3')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0.38')).toBeTruthy(); // 3 / 8 = 0.375 -> 0.38
+    expect(getByText('• Open slots count: 3')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0.38')).toBeTruthy();
+
+    // Test minimum boundary (0)
+    for (let i = 0; i < 5; i++) {
+      fireEvent.press(minusBtn);
+    }
+    expect(getByText('Open Slots: 0')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 0')).toBeTruthy();
+    expect(getByText('• Open slots count: 0')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 0')).toBeTruthy();
+
+    // Test maximum boundary (8)
+    for (let i = 0; i < 10; i++) {
+      fireEvent.press(plusBtn);
+    }
+    expect(getByText('Open Slots: 8')).toBeTruthy();
+    expect(getByText('Shortage Ratio: 1')).toBeTruthy();
+    expect(getByText('• Open slots count: 8')).toBeTruthy();
+    expect(getByText('• Shortage Ratio: 1')).toBeTruthy();
+  });
+
+  test('adding and removing candidates triggers projection recalculation for teamLead', () => {
+    const { getByText, getAllByTestId } = render(<AvatarRelativeProjectionMatrixView />);
+
+    expect(getByText('Candidates (3)')).toBeTruthy();
+    expect(getByText('• Candidates count: 3')).toBeTruthy();
+
+    // Add candidate
+    const addBtn = getByText('+ Add Candidate');
+    fireEvent.press(addBtn);
+
+    expect(getByText('Candidates (4)')).toBeTruthy();
+    expect(getByText('• Candidates count: 4')).toBeTruthy();
+
+    // Remove candidate
+    const removeBtns = getAllByTestId('times-circle');
+    // Remove the first candidate
+    fireEvent.press(removeBtns[0]);
+
+    expect(getByText('Candidates (3)')).toBeTruthy();
+    expect(getByText('• Candidates count: 3')).toBeTruthy();
+  });
+
+  test('state hash input updates state hash and triggers operator projection recalculation', () => {
+    const { getByPlaceholderText, getByText } = render(<AvatarRelativeProjectionMatrixView />);
+
+    expect(getByText('• State Hash: vkg_genesis_a4f9')).toBeTruthy();
+
+    const textInput = getByPlaceholderText('State hash (e.g. vkg_genesis_a4f9)');
+    fireEvent.changeText(textInput, 'vkg_genesis_new_hash');
+
+    expect(getByText('• State Hash: vkg_genesis_new_hash')).toBeTruthy();
   });
 });
