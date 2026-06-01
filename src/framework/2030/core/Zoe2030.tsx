@@ -45,7 +45,7 @@ export const Zoe2030: React.FC<Zoe2030Props> = ({ children, inferenceEngine, con
   const value = useMemo(() => ({
     genEx,
     predictive,
-    version: '2030.1.0-ultimate'
+    version: '2030.1.1-ultimate'
   }), [genEx, predictive]);
 
   return (

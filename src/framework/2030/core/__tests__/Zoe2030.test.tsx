@@ -18,7 +18,7 @@ describe('Zoe2030 Ultimate Wrapper', () => {
 
     expect(result.current.genEx).toBeDefined();
     expect(result.current.predictive).toBeDefined();
-    expect(result.current.version).toBe('2030.1.0-ultimate');
+    expect(result.current.version).toBe('2030.1.1-ultimate');
   });
 
   it('should throw error when used outside provider', () => {
