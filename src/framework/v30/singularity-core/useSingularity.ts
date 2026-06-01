@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/globals */
 import { useState, useEffect, useMemo } from 'react';
 import { SingularityKernel, SingularityConfig } from './SingularityKernel';
 

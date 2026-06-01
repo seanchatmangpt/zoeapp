@@ -141,10 +141,11 @@ describe('Non-Euclidean Data Structures: Observer', () => {
 
     const TestComponent = () => {
       const state = useQuantumState([{ value: 'A', probability: 1.0 }]);
-      return React.createElement(Observer, {
-        state: state,
-        children: (value) => React.createElement(Text, { testID: "observed-value" }, String(value))
-      });
+      return React.createElement(
+        Observer,
+        { state: state as any },
+        (value: any) => React.createElement(Text, { testID: "observed-value" }, String(value))
+      );
     };
 
     const { getByTestId } = render(React.createElement(TestComponent));
@@ -165,10 +166,11 @@ describe('Non-Euclidean Data Structures: Observer', () => {
       if (!state.isCollapsed) {
           state.collapse();
       }
-      return React.createElement(Observer, {
-        state: state,
-        children: (value) => React.createElement(Text, { testID: "observed-value" }, String(value))
-      });
+      return React.createElement(
+        Observer,
+        { state: state as any },
+        (value: any) => React.createElement(Text, { testID: "observed-value" }, String(value))
+      );
     };
 
     const { getByTestId } = render(React.createElement(TestComponent));

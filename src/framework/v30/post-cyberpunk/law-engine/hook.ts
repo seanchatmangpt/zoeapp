@@ -5,11 +5,11 @@ import { BlueRiverDam } from './engine';
 export function useLawEngine(config: LawEngineConfig) {
   const engineRef = useRef<BlueRiverDam | null>(null);
   
-  if (!engineRef.current) {
+  if (engineRef.current == null) {
     engineRef.current = new BlueRiverDam(config);
   }
 
-  const [projection, setProjection] = useState<BoardProjection>(engineRef.current.getProjection());
+  const [projection, setProjection] = useState<BoardProjection>(() => engineRef.current!.getProjection());
 
   const submitClaim = useCallback(async (claim: FutureClaim): Promise<Receipt> => {
     const receipt = await engineRef.current!.submitClaim(claim);

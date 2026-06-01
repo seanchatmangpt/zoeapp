@@ -83,18 +83,24 @@ const PostCyberpunkInnerProvider = ({ children, systemSecret, laws }: PostCyberp
       execute: async (artifact: TypedArtifact): Promise<Receipt> => {
         const decision = await agiCourt.proposeMutation({
           id: artifact.id,
-          description: `Executing law ${artifact.lawId}`,
-          impactScore: 50,
-          proposedChanges: artifact.approvedPayload
+          type: 'artifact-actuation',
+          payload: artifact.approvedPayload || {},
+          tensionLevel: 'high',
+          metadata: {
+            description: `Executing law ${artifact.lawId}`,
+            impactScore: 50
+          }
         });
 
-        if (decision.status === 'REJECTED') {
+        const approved = decision.approved !== false && decision.status !== 'REJECTED';
+        if (!approved) {
+          const rejectReason = decision.reasoning || decision.verdicts?.find((v: any) => !v.approved)?.reason || 'Rejected by AGI Court';
           return {
             id: `rcpt_${Date.now()}_rejected`,
             artifactId: artifact.id,
             executionTime: Date.now(),
             status: 'FAILURE',
-            error: `AGI Court Rejected: ${decision.reasoning}`
+            error: `AGI Court Rejected: ${rejectReason}`
           };
         }
 
