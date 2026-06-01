@@ -256,8 +256,8 @@ describe('emitRouteAdmissionSpan', () => {
 
   test('persists span to MMKV under otel: key prefix', () => {
     emitRouteAdmissionSpan('cmd_mmkv_test', 'hash_abc', 200, 'OK');
-    const storedValue = mockMmkvInstance.set.mock.calls.find(([key]: [string]) =>
-      key.startsWith('otel:route.admission.verified:cmd_mmkv_test')
+    const storedValue = mockMmkvInstance.set.mock.calls.find((args: [string, string]) =>
+      args[0].startsWith('otel:route.admission.verified:cmd_mmkv_test')
     );
     expect(storedValue).toBeDefined();
   });
