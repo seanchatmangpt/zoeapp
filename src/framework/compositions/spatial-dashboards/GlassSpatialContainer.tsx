@@ -46,7 +46,7 @@ export interface GlassSpatialContainerProps extends ViewProps, GlassBaseProps {
  *   }}
  *   intensity="high"
  * >
- *   <Text>Spatial Dashboard Content</Text>
+ *   <Text>Spatial Consequence Supervision Content</Text>
  * </GlassSpatialContainer>
  * ```
  */

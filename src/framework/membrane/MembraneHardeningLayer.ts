@@ -757,3 +757,17 @@ export function initGlobalHardeningLayer(config: MembraneConfig): MembraneHarden
 export function _resetGlobalHardeningLayer(): void {
   _globalHardeningLayer = null;
 }
+
+// ─── Standalone Compliance Exports ────────────────────────────────────────────
+
+/**
+ * Module-level verifyMembraneIntegrity() that operates against the global singleton
+ * MembraneHardeningLayer. Satisfies the architectural requirement that this function
+ * be directly exportable at module level for compliance validation tooling.
+ *
+ * Returns a fully typed `MembraneIntegrityReport` scanning the global hardeningLayer
+ * receipt ledger for unwitnessed transitions and hash chain violations.
+ */
+export function verifyMembraneIntegrity(): MembraneIntegrityReport {
+  return getGlobalHardeningLayer().verifyMembraneIntegrity();
+}

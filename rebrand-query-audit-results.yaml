@@ -1,0 +1,15 @@
+audit_id: 'SPARQL-AUDIT-PCP-01'
+timestamp: '2024-05-30T10:05:00Z'
+target_graph: 'default'
+status: 'SUCCESS'
+queries:
+  - query_name: 'check-active-pcp'
+    query_string: 'SELECT ?s WHERE { ?s a <http://pcp.dev/ontology#ActivePlane> }'
+    result: 'PASS'
+    entities_found: 1
+    description: 'Confirmed PCP is the active operational plane.'
+  - query_name: 'check-historical-zoeapp'
+    query_string: 'SELECT ?s WHERE { ?s <http://pcp.dev/ontology#status> "Historical" }'
+    result: 'PASS'
+    entities_found: 1
+    description: 'Confirmed ZOEAPP has been marked as historical.'

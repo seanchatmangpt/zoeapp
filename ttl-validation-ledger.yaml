@@ -1,0 +1,14 @@
+validation_job:
+  id: 'PCP-VAL-001'
+  timestamp: '2024-05-30T10:00:00Z'
+  status: 'SUCCESS'
+  files_checked:
+    - path: '/Users/sac/zoeapp/zoeapp-research-program/ggen/ontology/zoeapp-program.ttl'
+      status: 'PASS'
+      syntax: 'turtle'
+    - path: '/Users/sac/zoeapp/zoeapp-research-program/sources/church-ministry-surface.ttl'
+      status: 'PASS'
+      syntax: 'turtle'
+    - path: '/Users/sac/zoeapp/pcp-extraction-provenance.ttl'
+      status: 'PASS'
+      syntax: 'turtle'

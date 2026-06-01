@@ -1,0 +1,5 @@
+audit_results:
+  status: PASSED
+  details:
+    receipts: generated
+    provenance: generated

@@ -20,7 +20,7 @@ export interface FusionSpatialSceneProps {
    * Scene layout mode.
    * - 'grid': Standard 2D grid (fallback) or 3D panel grid.
    * - 'carousel': 3D immersive carousel surrounding the user.
-   * - 'dashboards': Multiple spatial dashboard panels at eye level.
+   * - 'dashboards': Multiple spatial Consequence Supervision panels at eye level.
    * @default 'grid'
    */
   layout?: 'grid' | 'carousel' | 'dashboards';

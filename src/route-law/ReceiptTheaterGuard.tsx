@@ -1265,3 +1265,5 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 });
+
+export default ReceiptTheaterGuard;

@@ -230,7 +230,7 @@ export const PROJECTION_MATRIX: Record<string, (data: any, role: AvatarRole) => 
         return {
           role,
           visible: true,
-          surface: 'incident coordinator dashboard',
+          surface: 'incident coordinator consequence supervision',
           allowedActions: ['escalate_incident', 'resolve_incident'],
           payload: {
             status: data.streamStatus,

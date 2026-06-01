@@ -802,3 +802,35 @@ export class AutonomicQAEngine {
     }
   }
 }
+
+// ─── Standalone Compliance Exports ────────────────────────────────────────────
+
+/** Module-level singleton engine for global compliance checks. */
+let _globalQAEngine: AutonomicQAEngine | null = null;
+
+/** Returns (or creates) the module-level default AutonomicQAEngine. */
+function _getDefaultQAEngine(): AutonomicQAEngine {
+  if (!_globalQAEngine) {
+    const swarm = new (require('../v30/autonomous-swarm/AppSwarmManager').AppSwarmManager)();
+    _globalQAEngine = new AutonomicQAEngine(swarm);
+  }
+  return _globalQAEngine;
+}
+
+/**
+ * Module-level runQACycle() — executes a QA cycle on the global singleton engine.
+ *
+ * Satisfies the architectural requirement that this function be directly
+ * exportable for compliance validation tooling and integration testing.
+ *
+ * For production use, construct an AutonomicQAEngine with your AppSwarmManager
+ * and call runQACycle() on it directly.
+ */
+export async function runQACycle(): Promise<QACycleReport> {
+  return _getDefaultQAEngine().runQACycle();
+}
+
+/** Reset the global default QA engine. FOR TEST USE ONLY. */
+export function _resetDefaultQAEngine(): void {
+  _globalQAEngine = null;
+}

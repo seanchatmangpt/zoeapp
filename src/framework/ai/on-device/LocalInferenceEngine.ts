@@ -695,3 +695,24 @@ export function buildInferenceRequest(
  * Uses the DefaultRulesAdapter. Override via setAdapter() if needed.
  */
 export const defaultLocalInferenceEngine = new LocalInferenceEngine();
+
+// ─── Standalone Compliance Exports ────────────────────────────────────────────
+
+/**
+ * Module-level verifyInferenceReceipt() — verifies a receipt against the default
+ * singleton engine instance's structural and chain-linkage checks.
+ *
+ * Satisfies the architectural requirement that this function be directly
+ * exportable for compliance validation tooling and integration testing.
+ *
+ * Performs:
+ *  1. Structural field presence validation (id, requestId, modelId, deltaHash, payloadHash)
+ *  2. onDevice flag assertion
+ *  3. Chain linkage: verifies deltaHash = blake3(previousHash + payloadHash)
+ *
+ * For full cryptographic verification (requiring original prompt + response),
+ * use LocalInferenceEngine.verifyInferenceReceiptFull() on an engine instance.
+ */
+export function verifyInferenceReceipt(receipt: InferenceReceipt): VerificationResult {
+  return defaultLocalInferenceEngine.verifyInferenceReceipt(receipt);
+}

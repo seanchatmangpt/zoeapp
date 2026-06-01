@@ -384,7 +384,7 @@ export default function AdminConsequenceSupervision() {
             { title: 'Quarantine Count', icon: 'bug', color: '#EF4444', value: `${quarantineCount} Poisoned`, sub: ['Failures isolated', 'Status: Secure'], route: '/admin/outbox' },
             { title: 'Latest Refusals', icon: 'warning', color: '#EC4899', value: latestRefusal ? latestRefusal.status : '0 logged', sub: latestRefusal ? [`${latestRefusal.commandId.slice(0, 15)}...`] : ['No active rejections'], valColor: latestRefusal ? '#F472B6' : undefined },
             { title: 'Reconcile Lag', icon: 'clock-o', color: '#06B6D4', value: reconciliationLag, sub: ['Replay delta: Auto', 'Authority check: OK'] },
-            { title: 'Receipt Integrity', icon: 'shield', color: '#3B82F6', value: receiptChainValid ? 'VERIFIED' : 'TAMPERED', sub: ['Alg: SHA-256 chain', 'Receipts verified: OK'] },
+            { title: 'Receipt Integrity', icon: 'shield', color: '#3B82F6', value: receiptChainValid ? 'VERIFIED' : 'TAMPERED', sub: ['Alg: BLAKE3 chain', 'Receipts verified: OK'] },
             { title: 'Projection Drift', icon: 'database', color: '#84CC16', value: '0% Drift (OK)', sub: [`Total Quads: ${totalQuads}`, 'SQLite tables: Match'] },
             { title: 'Realtime Channel', icon: 'wifi', color: '#A855F7', value: networkOnline ? 'ONLINE' : 'OFFLINE', sub: ['Supabase Broadcast', 'WebSockets: Active'], valColor: networkOnline ? '#34D399' : '#F87171' }
           ].map((item, idx) => (

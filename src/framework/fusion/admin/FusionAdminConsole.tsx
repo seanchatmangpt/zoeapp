@@ -14,7 +14,7 @@ const NAV_ITEMS: AdminNavigationItem[] = [
 
 /**
  * FusionAdminConsole fuses Mission Control, 3D Telemetry, and Auto-Fix
- * into a single cohesive developer dashboard.
+ * into a single cohesive Consequence Supervision console.
  */
 export const FusionAdminConsole: React.FC<FusionAdminConsoleProps> = ({
   topology,
