@@ -14,8 +14,34 @@ describe('ZKP Framework', () => {
 
   const mockProof: ZkProof = {
     claimId: 'over-18',
-    proofData: 'valid-proof-data',
-    publicSignals: ['18']
+    proofData: JSON.stringify({
+      pi_a: [
+        '11883344556677889900112233',
+        '22883344556677889900112233',
+        '1'
+      ],
+      pi_b: [
+        [
+          '33883344556677889900112233',
+          '44883344556677889900112233'
+        ],
+        [
+          '55883344556677889900112233',
+          '66883344556677889900112233'
+        ],
+        [
+          '1',
+          '0'
+        ]
+      ],
+      pi_c: [
+        '77883344556677889900112233',
+        '88883344556677889900112233',
+        '1'
+      ]
+    }),
+    publicSignals: ['18'],
+    enclaveSignature: 'valid-signature'
   };
 
   describe('ZkEngine', () => {
@@ -53,7 +79,7 @@ describe('ZKP Framework', () => {
 
     it('should handle errors gracefully with default message', async () => {
       // Force an error with no message
-      jest.spyOn(zkEngine as any, 'performCryptographicVerification').mockRejectedValueOnce({});
+      jest.spyOn(zkEngine as any, 'verifyEnclaveSignature').mockRejectedValueOnce({});
       const result = await zkEngine.verify(mockClaim, mockProof);
       expect(result.verified).toBe(false);
       expect(result.error).toBe('Verification failed');
@@ -63,6 +89,77 @@ describe('ZKP Framework', () => {
       const result = await zkEngine.verify(mockClaim, null as any);
       expect(result.verified).toBe(false);
       expect(result.error).toBeDefined();
+    });
+
+    it('should fail if proof structure contains trivial/zero values', async () => {
+      const zeroProof = {
+        ...mockProof,
+        proofData: JSON.stringify({
+          pi_a: ['0', '0', '1'],
+          pi_b: [['0', '0'], ['0', '0'], ['1', '0']],
+          pi_c: ['0', '0', '1']
+        })
+      };
+      const result = await zkEngine.verify(mockClaim, zeroProof);
+      expect(result.verified).toBe(false);
+    });
+
+    it('should fail if proof contains bypass or dummy keywords in fields', async () => {
+      const bypassProof = {
+        ...mockProof,
+        proofData: JSON.stringify({
+          pi_a: ['11883344556677889900112233', '22883344556677889900112233', '1'],
+          pi_b: [['33883344556677889900112233', '44883344556677889900112233'], ['55883344556677889900112233', '66883344556677889900112233'], ['1', '0']],
+          pi_c: ['77883344556677889900112233', '88883344556677889900112233', '1'],
+          bypass: true
+        })
+      };
+      const result = await zkEngine.verify(mockClaim, bypassProof);
+      expect(result.verified).toBe(false);
+    });
+
+    it('should fail if proof fields are too short or trivial', async () => {
+      const shortProof = {
+        ...mockProof,
+        proofData: JSON.stringify({
+          pi_a: ['123', '456', '1'],
+          pi_b: [['123', '456'], ['123', '456'], ['1', '0']],
+          pi_c: ['123', '456', '1']
+        })
+      };
+      const result = await zkEngine.verify(mockClaim, shortProof);
+      expect(result.verified).toBe(false);
+    });
+
+    it('should fail if proof fields contain repetitive/suspicious patterns', async () => {
+      const repetitiveProof = {
+        ...mockProof,
+        proofData: JSON.stringify({
+          pi_a: ['9999999999999999', '9999999999999999', '1'],
+          pi_b: [['9999999999999999', '9999999999999999'], ['9999999999999999', '9999999999999999'], ['1', '0']],
+          pi_c: ['9999999999999999', '9999999999999999', '1']
+        })
+      };
+      const result = await zkEngine.verify(mockClaim, repetitiveProof);
+      expect(result.verified).toBe(false);
+    });
+
+    it('should fail if public signals contain bypass words', async () => {
+      const bypassSignalProof = {
+        ...mockProof,
+        publicSignals: ['bypass']
+      };
+      const result = await zkEngine.verify(mockClaim, bypassSignalProof);
+      expect(result.verified).toBe(false);
+    });
+
+    it('should fail if public signals contain non-numeric value', async () => {
+      const invalidSignalProof = {
+        ...mockProof,
+        publicSignals: ['invalid-123']
+      };
+      const result = await zkEngine.verify(mockClaim, invalidSignalProof);
+      expect(result.verified).toBe(false);
     });
   });
 
