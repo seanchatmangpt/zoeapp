@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 export interface AalstEvent {
   id: string;
-  type: 'PETRI_NET' | 'ALIGNMENT' | 'OCEL_TELEMETRY';
+  type: 'PETRI_NET' | 'ALIGNMENT' | 'OCEL_TELEMETRY' | 'CONVERSATION_FEED';
   payload: string;
   timestamp: number;
 }
@@ -17,7 +17,7 @@ export function useAalstStream() {
     
     const interval = setInterval(() => {
       eventId++;
-      const types: AalstEvent['type'][] = ['PETRI_NET', 'ALIGNMENT', 'OCEL_TELEMETRY'];
+      const types: AalstEvent['type'][] = ['PETRI_NET', 'ALIGNMENT', 'OCEL_TELEMETRY', 'CONVERSATION_FEED'];
       const type = types[eventId % types.length];
       
       const newEvent: AalstEvent = {

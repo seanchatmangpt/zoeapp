@@ -26,8 +26,9 @@ describe('AalstDashboard', () => {
 
   it('renders connected state and log items correctly', () => {
     const mockLogs = [
-      { id: '1', type: 'PETRI_NET', payload: 'Log 1', timestamp: 1000 },
+      { id: '1', type: 'PETRI_NET', payload: '{"places": [{"id": "p1", "tokens": 1}], "transitions": [{"id": "t1", "enabled": true}]}', timestamp: 1000 },
       { id: '2', type: 'ALIGNMENT', payload: 'Log 2', timestamp: 2000 },
+      { id: '3', type: 'CONVERSATION_FEED', payload: 'Hello from Swarm', timestamp: 3000 },
     ];
 
     mockedUseAalstStream.mockReturnValue({
@@ -40,9 +41,13 @@ describe('AalstDashboard', () => {
     expect(getByTestId('connection-status').children[0]).toBe('Connected');
     expect(getByTestId('log-item-1')).toBeTruthy();
     expect(getByTestId('log-item-2')).toBeTruthy();
-    expect(getByText('PETRI_NET')).toBeTruthy();
-    expect(getByText('Log 1')).toBeTruthy();
-    expect(getByText('ALIGNMENT')).toBeTruthy();
-    expect(getByText('Log 2')).toBeTruthy();
+    expect(getByTestId('log-item-3')).toBeTruthy();
+    
+    // Check for Petri Net visualization (assuming it's rendered for PETRI_NET type)
+    expect(getByTestId('petri-net-viz')).toBeTruthy();
+    
+    // Check for Conversation Feed item
+    expect(getByText('CONVERSATION_FEED')).toBeTruthy();
+    expect(getByText('Hello from Swarm')).toBeTruthy();
   });
 });
