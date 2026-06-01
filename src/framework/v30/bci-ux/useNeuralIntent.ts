@@ -42,10 +42,10 @@ export function useNeuralIntent(config: UseNeuralIntentConfig = {}) {
     fnirsThreshold = 0.5,
     smoothingWindow = 5,
     artifactThreshold = 2.0, // Values above this are considered artifacts
-    stressThreshold = 0.6,
-    fatigueThreshold = 0.6,
-    extremeStressThreshold = 0.8,
-    extremeFatigueThreshold = 0.8,
+    stressThreshold = 0.8,
+    fatigueThreshold = 0.8,
+    extremeStressThreshold = 0.9,
+    extremeFatigueThreshold = 0.9,
     onAlarm,
   } = config;
 

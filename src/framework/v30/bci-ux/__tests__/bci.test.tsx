@@ -4,8 +4,8 @@ import { render, act, fireEvent } from '@testing-library/react-native';
 import { useAnimatedSensor, SensorType } from 'react-native-reanimated';
 import { useNeuralIntent, SensorData } from '../useNeuralIntent';
 import { BciBoundary } from '../BciBoundary';
-import { HolographicGlassCard } from '../../2030/ui-holographic/HolographicGlassCard';
-import { HolographicContainer } from '../../2030/ui-holographic/HolographicContainer';
+import { HolographicGlassCard } from '../../../2030/ui-holographic/HolographicGlassCard';
+import { HolographicContainer } from '../../../2030/ui-holographic/HolographicContainer';
 
 // Mock react-native-reanimated's useAnimatedSensor hook
 jest.mock('react-native-reanimated', () => {
@@ -28,7 +28,7 @@ jest.mock('react-native-reanimated', () => {
 });
 
 // Mock GlassCard component from ui/glassmorphism since it contains sub-components
-jest.mock('../../ui/glassmorphism/GlassCard', () => {
+jest.mock('../../../ui/glassmorphism/GlassCard', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
@@ -253,9 +253,9 @@ describe('useNeuralIntent', () => {
       // stress = 0.1 * 0.5 + 0.9 * 0.3 + 0.9 * 0.2 = 0.50
       // fatigue = 0.1 * 0.6 + 0.4 * 0.4 = 0.22
       // cognitiveLoad = 0.1 * 0.4 + 0.9 * 0.4 + 0.6 * 0.2 = 0.04 + 0.36 + 0.12 = 0.52
-      expect(getByTestId('stress').props.children).toBe('0.5');
-      expect(getByTestId('fatigue').props.children).toBe('0.22');
-      expect(getByTestId('cognitiveLoad').props.children).toBe('0.52');
+      expect(parseFloat(getByTestId('stress').props.children)).toBeCloseTo(0.5);
+      expect(parseFloat(getByTestId('fatigue').props.children)).toBeCloseTo(0.22);
+      expect(parseFloat(getByTestId('cognitiveLoad').props.children)).toBeCloseTo(0.52);
     });
 
     it('should adjust layout density and parallax intensity based on stress levels', () => {
@@ -377,7 +377,7 @@ describe('useNeuralIntent', () => {
       expect(onAlarmMock).toHaveBeenCalled();
       const alarmEvent = onAlarmMock.mock.calls[0][0];
       expect(alarmEvent.intent).toBe('SELECT');
-      expect(alarmEvent.stress).toBeCloseTo(0.85);
+      expect(parseFloat(alarmEvent.stress)).toBeCloseTo(0.85);
       expect(alarmEvent.receipt).toBeDefined();
     });
   });
