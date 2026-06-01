@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/179</span>
+                <span class='fraction'>0/174</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/106</span>
+                <span class='fraction'>0/108</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/176</span>
+                <span class='fraction'>0/172</span>
             </div>
         
             
@@ -730,8 +730,7 @@
 <a name='L665'></a><a href='#L665'>665</a>
 <a name='L666'></a><a href='#L666'>666</a>
 <a name='L667'></a><a href='#L667'>667</a>
-<a name='L668'></a><a href='#L668'>668</a>
-<a name='L669'></a><a href='#L669'>669</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L668'></a><a href='#L668'>668</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -758,6 +757,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1045,15 +1045,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1405,7 +1403,8 @@
 &nbsp;
 import { db } from '../db/db';
 import { actorCommands, actorEvents, actorReceipts, actorOutbox, actorQuarantine } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
+import { generateReceiptHash } from '../crypto/receipts';
 import { VirtualKnowledgeGraphClient } from '../vkg/client';
 import { ActorRegistry } from './registry';
 import { ActorSupervisor } from './supervision';
@@ -1712,17 +1711,15 @@ export class ActorDispatcher {
       });
     }
 &nbsp;
-    // Compute Delta Hash
-    const rawDeltaStr = <span class="cstat-no" title="statement not covered" >JSON.stringify(</span>
-      delta.add.map(<span class="fstat-no" title="function not covered" >(q</span>) =&gt; <span class="cstat-no" title="statement not covered" >[q.subject.value, q.predicate.value, q.object.value, q.graph.value])</span>
-        .concat(delta.remove.map(<span class="fstat-no" title="function not covered" >(q</span>) =&gt; <span class="cstat-no" title="statement not covered" >[q.subject.value, q.predicate.value, q.object.value, q.graph.value])</span>)
-    );
-    let hashVal = <span class="cstat-no" title="statement not covered" >0;</span>
-<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; rawDeltaStr.length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >      hashVal = (hashVal &lt;&lt; 5) - hashVal + rawDeltaStr.charCodeAt(i);</span>
-<span class="cstat-no" title="statement not covered" >      hashVal |= 0;</span>
-    }
-    const deltaHash = <span class="cstat-no" title="statement not covered" >`hash_${Math.abs(hashVal).toString(16)}`;</span>
+    // Retrieve previous receipt's hash from local DB to bind states cryptographically
+    const lastReceipts = <span class="cstat-no" title="statement not covered" >await db</span>
+      .select({ deltaHash: actorReceipts.deltaHash })
+      .from(actorReceipts)
+      .orderBy(desc(actorReceipts.createdAt))
+      .limit(1);
+    const prevHash = <span class="cstat-no" title="statement not covered" >lastReceipts[0]?.deltaHash || '';</span>
+    const hashData = <span class="cstat-no" title="statement not covered" >{ commandId: envelope.id, status: 'accepted_pending', error: undefined };</span>
+    const deltaHash = <span class="cstat-no" title="statement not covered" >generateReceiptHash(prevHash, hashData);</span>
 &nbsp;
     // 9. Save local receipt as accepted_pending
     const receiptId = <span class="cstat-no" title="statement not covered" >`rec_${Math.random().toString(36).substr(2, 9)}`;</span>
@@ -2074,7 +2071,7 @@ export class ActorDispatcher {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-01T05:09:44.286Z
+                at 2026-06-01T16:20:23.790Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

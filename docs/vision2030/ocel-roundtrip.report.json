@@ -1,7 +1,7 @@
 {
   "exported_receipt_id": "rec-ocel-roundtrip-101",
   "ocel_format_valid": true,
-  "canonical_export_hash": "e7139ba4434ce7ffa8d72263133864183b489d5fb725a32123f14905a3ff71b5",
+  "canonical_export_hash": "142896f32605bad4c3e7b31a56a699e7463ea0d82e875e8c169067bec92c0300",
   "imported_events_count": 1,
   "imported_objects_count": 1,
   "same_replay_outcome": true,

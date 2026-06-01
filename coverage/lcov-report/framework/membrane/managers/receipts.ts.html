@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -122,7 +122,14 @@
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -154,6 +161,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -167,12 +175,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -212,7 +226,8 @@ export class ReceiptManager {
   ): Promise&lt;MembraneReceipt&gt; {
     const timestamp = <span class="cstat-no" title="statement not covered" >new Date().toISOString();</span>
     const data = <span class="cstat-no" title="statement not covered" >{ commandId, capabilityId, error: errorMsg, success: false };</span>
-    const hash = <span class="cstat-no" title="statement not covered" >sha256(prevHash + canonicalStringify(data));</span>
+    const resultHash = <span class="cstat-no" title="statement not covered" >sha256(canonicalStringify(data));</span>
+    const hash = <span class="cstat-no" title="statement not covered" >sha256(prevHash + resultHash);</span>
 &nbsp;
     const receipt: MembraneReceipt = <span class="cstat-no" title="statement not covered" >{</span>
       id: `rec_refuse_${Math.random().toString(36).substring(2, 11)}`,
@@ -223,7 +238,8 @@ export class ReceiptManager {
       success: false,
       deltaHash: hash,
       previousHash: prevHash,
-      error: errorMsg
+      error: errorMsg,
+      resultHash
     };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    this.append(receipt);</span>
@@ -233,8 +249,13 @@ export class ReceiptManager {
 <span class="fstat-no" title="function not covered" >  pu</span>blic validateChain(): { valid: boolean; error?: string } {
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; this.chain.length; i++) {</span>
       const prevHash = <span class="cstat-no" title="statement not covered" >i === 0 ? '' : this.chain[i - 1].deltaHash;</span>
-<span class="cstat-no" title="statement not covered" >      if (this.chain[i].previousHash !== prevHash) {</span>
+      const rec = <span class="cstat-no" title="statement not covered" >this.chain[i];</span>
+<span class="cstat-no" title="statement not covered" >      if (rec.previousHash !== prevHash) {</span>
 <span class="cstat-no" title="statement not covered" >        return { valid: false, error: `Broken lineage at index ${i}` };</span>
+      }
+      const expectedHash = <span class="cstat-no" title="statement not covered" >sha256(prevHash + (rec.resultHash || ''));</span>
+<span class="cstat-no" title="statement not covered" >      if (rec.deltaHash !== expectedHash) {</span>
+<span class="cstat-no" title="statement not covered" >        return { valid: false, error: `Invalid hash signature at index ${i}` };</span>
       }
     }
 <span class="cstat-no" title="statement not covered" >    return { valid: true };</span>
@@ -247,7 +268,7 @@ export class ReceiptManager {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-01T05:09:44.286Z
+                at 2026-06-01T16:20:23.790Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

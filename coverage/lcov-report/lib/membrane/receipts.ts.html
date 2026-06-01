@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -134,7 +134,8 @@
 <a name='L69'></a><a href='#L69'>69</a>
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -169,6 +170,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -177,13 +179,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -192,14 +187,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -239,7 +241,8 @@ export class Receipts {
   ): Promise&lt;MembraneReceipt&gt; {
     const timestamp = <span class="cstat-no" title="statement not covered" >new Date().toISOString();</span>
     const data = <span class="cstat-no" title="statement not covered" >{ commandId, capabilityId, error: errorMsg, success: false };</span>
-    const hash = <span class="cstat-no" title="statement not covered" >sha256(prevHash + canonicalStringify(data));</span>
+    const resultHash = <span class="cstat-no" title="statement not covered" >sha256(canonicalStringify(data));</span>
+    const hash = <span class="cstat-no" title="statement not covered" >sha256(prevHash + resultHash);</span>
 &nbsp;
     const receipt: MembraneReceipt = <span class="cstat-no" title="statement not covered" >{</span>
       id: `rec_refuse_${Math.random().toString(36).substr(2, 9)}`,
@@ -250,7 +253,8 @@ export class Receipts {
       success: false,
       deltaHash: hash,
       previousHash: prevHash,
-      error: errorMsg
+      error: errorMsg,
+      resultHash
     };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    this.append(receipt);</span>
@@ -263,15 +267,14 @@ export class Receipts {
 <span class="fstat-no" title="function not covered" >  st</span>atic validateChain(c: MembraneReceipt[]): { valid: boolean; error?: string } {
 <span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; c.length; i++) {</span>
       const prevHash = <span class="cstat-no" title="statement not covered" >i === 0 ? '' : c[i - 1].deltaHash;</span>
-<span class="cstat-no" title="statement not covered" >      if (c[i].previousHash !== prevHash) {</span>
+      const rec = <span class="cstat-no" title="statement not covered" >c[i];</span>
+<span class="cstat-no" title="statement not covered" >      if (rec.previousHash !== prevHash) {</span>
 <span class="cstat-no" title="statement not covered" >        return { valid: false, error: `broken lineage at index ${i}` };</span>
       }
-      const data = <span class="cstat-no" title="statement not covered" >c[i].success </span>
-        ? c[i] // simplified or full state representation matching hash
-        : { commandId: c[i].commandId, capabilityId: c[i].capabilityId, error: c[i].error, success: false };
-      
-      // Verification hash check
-      // For testing stability: we check lineage prevHash mapping
+      const expectedHash = <span class="cstat-no" title="statement not covered" >sha256(prevHash + (rec.resultHash || ''));</span>
+<span class="cstat-no" title="statement not covered" >      if (rec.deltaHash !== expectedHash) {</span>
+<span class="cstat-no" title="statement not covered" >        return { valid: false, error: `invalid hash signature at index ${i}` };</span>
+      }
     }
 <span class="cstat-no" title="statement not covered" >    return { valid: true };</span>
   }
@@ -283,7 +286,7 @@ export class Receipts {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-01T05:09:44.286Z
+                at 2026-06-01T16:20:23.790Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
