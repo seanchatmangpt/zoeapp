@@ -45,6 +45,10 @@ export class AgentNativeInterface {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
+    // Do not clone class instances (e.g., LogGenerator, Membrane, etc.) to preserve methods
+    if (obj.constructor && obj.constructor !== Object && obj.constructor !== Array) {
+      return obj;
+    }
     if (Array.isArray(obj)) {
       return obj.map(item => this.deepClone(item));
     }
@@ -59,6 +63,7 @@ export class AgentNativeInterface {
     }
     return clone;
   }
+
 
   /**
    * Allows an agent to inspect the application state if authorized via ZKP.
@@ -93,6 +98,21 @@ export class AgentNativeInterface {
    * Dispatches a semantic command from an agent through the Operational Membrane.
    */
   public async dispatch<T = any>(command: SemanticCommand): Promise<AgentExecutionResult<T>> {
+    // Optionally emit EnqueueCommand event to the log generator.
+    // For schema definitions, see [process-mining.ts](file:///Users/sac/zoeapp/src/framework/2030/agent-native/process-mining.ts).
+    if (this.config.logGenerator) {
+      this.config.logGenerator.addObject(command.id, 'command', {
+        action: command.action,
+        params: this.deepClone(command.params),
+      });
+      this.config.logGenerator.addObject(this.config.membraneId, 'membrane', {
+        membraneId: this.config.membraneId,
+      });
+      this.config.logGenerator.addEvent('EnqueueCommand', [command.id, this.config.membraneId], {
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     return new Promise<AgentExecutionResult<T>>((resolve, reject) => {
       this.commandQueue = this.commandQueue.then(async () => {
         try {
@@ -110,6 +130,9 @@ export class AgentNativeInterface {
   private async executeDispatchInternal<T = any>(command: SemanticCommand): Promise<AgentExecutionResult<T>> {
     const { id, action, params, zkp } = command;
 
+    let verified = true;
+    let verificationError: string | undefined = undefined;
+
     // 1. ZKP Verification
     if (this.config.enforceZkp) {
       const claim: ZkClaim = {
@@ -123,19 +146,55 @@ export class AgentNativeInterface {
       // Leverage post-quantum ZK verification for Zoe 2030.1.1-ultimate.
       // Validates PqReceipt version constraints (2030.1/2030.1.1) in [PostQuantumZkEngine.ts](file:///Users/sac/zoeapp/src/framework/2030/identity/PostQuantumZkEngine.ts).
       const verification = await pqZkEngine.verify(claim, zkp);
-      if (!verification.verified) {
+      verified = verification.verified;
+      verificationError = verification.error;
+
+      if (this.config.logGenerator) {
+        this.config.logGenerator.addObject(zkp.claimId || 'unknown_claim', 'proof', {
+          claimId: zkp.claimId,
+          verified,
+        });
+        this.config.logGenerator.addEvent('VerifyZkp', [id, zkp.claimId || 'unknown_claim'], {
+          verified,
+          enforceZkp: true,
+          error: verificationError,
+        });
+        // 2. Attestation Check
+        this.config.logGenerator.addEvent('CheckAttestation', [id], {
+          hasEnclaveSignature: !!zkp.enclaveSignature,
+          isAttestationValid: verified,
+        });
+      }
+
+      if (!verified) {
         return {
           success: false,
           commandId: id,
           result: null,
           verdict: 'deny',
           receiptId: 'n/a',
-          error: `ZKP Authorization failed: ${verification.error}`,
+          error: `ZKP Authorization failed: ${verificationError}`,
         };
+      }
+    } else {
+      if (this.config.logGenerator) {
+        this.config.logGenerator.addObject(zkp.claimId || 'unknown_claim', 'proof', {
+          claimId: zkp.claimId,
+          verified: true,
+        });
+        this.config.logGenerator.addEvent('VerifyZkp', [id, zkp.claimId || 'unknown_claim'], {
+          verified: true,
+          enforceZkp: false,
+        });
+        // 2. Attestation Check
+        this.config.logGenerator.addEvent('CheckAttestation', [id], {
+          hasEnclaveSignature: !!zkp.enclaveSignature,
+          isAttestationValid: true,
+        });
       }
     }
 
-    // 2. Membrane Execution
+    // 3. Membrane Execution
     const executionBlock = async () => {
       return this.executeSemanticAction(action, this.deepClone(params));
     };
@@ -147,6 +206,19 @@ export class AgentNativeInterface {
       executionBlock
     );
 
+    // 4. Receipt Bound
+    if (this.config.logGenerator) {
+      this.config.logGenerator.addObject(membraneResult.receipt.id, 'receipt', {
+        receiptId: membraneResult.receipt.id,
+        verdict: membraneResult.receipt.verdict,
+      });
+      this.config.logGenerator.addEvent('BindReceipt', [id, membraneResult.receipt.id], {
+        success: membraneResult.success,
+        verdict: membraneResult.receipt.verdict,
+        error: membraneResult.error,
+      });
+    }
+
     return {
       success: membraneResult.success,
       commandId: id,
@@ -156,6 +228,7 @@ export class AgentNativeInterface {
       error: membraneResult.error,
     };
   }
+
 
   /**
    * Helper to resolve dot-notated paths in state object.

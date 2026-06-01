@@ -1,5 +1,6 @@
 import { ZkProof } from '../../auth/zkp/types';
 import { AdmissibilityVerdict } from '../../membrane/types';
+import { LogGenerator } from './process-mining';
 
 /**
  * Represents a semantic command sent by an AI agent.
@@ -60,7 +61,13 @@ export interface AgentNativeConfig {
    * The membrane instance used to govern command execution.
    */
   membraneId: string;
+
+  /**
+   * Optional log generator to emit OCEL 2.0 log events to.
+   */
+  logGenerator?: LogGenerator;
 }
+
 
 /**
  * Interface for inspecting application state.
