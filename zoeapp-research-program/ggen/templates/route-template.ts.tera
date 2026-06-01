@@ -1,0 +1,8 @@
+// Generated Route for {{ route_name }}
+export const {{ route_name }} = {
+  path: "{{ route_path }}",
+  method: "{{ method }}",
+  handler: (req, res) => {
+    // {{ description }}
+  }
+};

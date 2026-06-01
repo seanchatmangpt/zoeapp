@@ -1,0 +1,10 @@
+# Governance Checklist: {{ checklist_name }}
+
+## Requirements
+{% for req in requirements %}
+- [ ] {{ req }}
+{% endfor %}
+
+## Auditor Notes
+- Verified by: {{ auditor_name }}
+- Date: {{ audit_date }}

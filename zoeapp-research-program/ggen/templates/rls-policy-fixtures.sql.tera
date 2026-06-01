@@ -1,0 +1,7 @@
+-- Generated RLS Policy for {{ table_name }}
+ALTER TABLE {{ table_name }} ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY {{ policy_name }} ON {{ table_name }}
+    FOR {{ action }}
+    TO authenticated
+    USING ({{ condition }});

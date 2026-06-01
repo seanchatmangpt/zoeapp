@@ -1,0 +1,56 @@
+# RLS Policy Ledger
+# Records the state of RLS policies across the project
+
+tables:
+  profiles:
+    rls_enabled: true
+    policies:
+      - name: "Users can view own profile"
+        action: SELECT
+        using: "auth.uid() = id"
+      - name: "Users can update own profile"
+        action: UPDATE
+        using: "auth.uid() = id"
+      - name: "Users can insert own profile"
+        action: INSERT
+        with_check: "auth.uid() = id"
+  
+  actor_commands:
+    rls_enabled: true
+    policies:
+      - name: "Allow public read/write access for demonstration"
+        action: ALL
+        using: "true"
+        with_check: "true"
+
+  actor_events:
+    rls_enabled: true
+    policies:
+      - name: "Allow public read/write access for demonstration"
+        action: ALL
+        using: "true"
+        with_check: "true"
+
+  actor_receipts:
+    rls_enabled: true
+    policies:
+      - name: "Allow public read/write access for demonstration"
+        action: ALL
+        using: "true"
+        with_check: "true"
+
+  actor_outbox:
+    rls_enabled: true
+    policies:
+      - name: "Allow public read/write access for demonstration"
+        action: ALL
+        using: "true"
+        with_check: "true"
+
+  actor_quarantine:
+    rls_enabled: true
+    policies:
+      - name: "Allow public read/write access for demonstration"
+        action: ALL
+        using: "true"
+        with_check: "true"
