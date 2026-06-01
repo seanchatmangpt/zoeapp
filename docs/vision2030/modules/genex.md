@@ -266,7 +266,7 @@ it('should provide genEx and predictive engines', () => {
   const { result } = renderHook(() => useZoe2030(), { wrapper });
 
   expect(result.current.genEx).toBeDefined();
-  expect(result.current.version).toBe('2030.1.0-ultimate');
+  expect(result.current.version).toBe('2030.1.1-ultimate');
 });
 ```
 

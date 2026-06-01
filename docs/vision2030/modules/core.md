@@ -203,7 +203,7 @@ export const RootApp: React.FC = () => {
 The core module is verified using Jest and `@testing-library/react-native` to guarantee runtime stability:
 
 * **Engine Instantiation Verification:** Uses `renderHook` to verify that the `GenExEngine` and `PredictionEngine` are properly instantiated and available via context.
-* **Property Inspection:** Confirms the version string exports matching the canonical version `2030.1.0-ultimate`.
+* **Property Inspection:** Confirms the version string exports matching the canonical version `2030.1.1-ultimate`.
 * **Boundary Error Handling:** Assures that attempting to call `useZoe2030()` outside of a `<Zoe2030 />` provider parent raises a precise runtime Exception: `"useZoe2030 must be used within a Zoe2030 provider"`.
 
 To run the core test suite manually:
