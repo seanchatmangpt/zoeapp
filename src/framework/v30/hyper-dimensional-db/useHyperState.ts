@@ -18,8 +18,13 @@ export function useHyperState<T>(id: string, initialState: T) {
   const [state, setReactState] = useState<T>(() => {
     const existing = globalHyperDB.get(id);
     if (existing !== undefined) {
+      // If there is no base boundary yet for the existing state, establish it
+      if (!globalHyperDB.getBaseBoundary(id)) {
+        globalHyperDB.setBaseBoundary(id, existing);
+      }
       return existing;
     }
+    globalHyperDB.setBaseBoundary(id, initialState);
     globalHyperDB.insert(id, initialState);
     return initialState;
   });
@@ -27,7 +32,11 @@ export function useHyperState<T>(id: string, initialState: T) {
   const setState = useCallback((newState: T | ((prev: T) => T)) => {
     setReactState((prev) => {
       const nextState = typeof newState === 'function' ? (newState as Function)(prev) : newState;
-      globalHyperDB.update(id, nextState);
+      const result = globalHyperDB.update(id, nextState);
+      if (result.status === 'rejected') {
+        console.warn(`[HyperState] State mutation rejected for ID ${id}. Similarity: ${result.similarity}. Quarantined.`);
+        return prev;
+      }
       return nextState;
     });
   }, [id]);

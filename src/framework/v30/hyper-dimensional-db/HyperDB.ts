@@ -1,12 +1,27 @@
+import { generateBlake3ReceiptHash } from '../../../lib/crypto/receipts';
+
+/**
+ * Result of a state mutation operation.
+ */
+export interface MutationResult {
+  status: 'accepted' | 'rejected';
+  similarity: number;
+  receipt?: string;
+  reason?: string;
+}
+
 /**
  * Hyper-Dimensional Vector Database Abstraction
  * Projects JSON state into high-dimensional vectors for semantic similarity retrieval.
  */
-
 export class HyperDB {
   private dimensions: number;
   private vectors: Map<string, Float64Array> = new Map();
   private data: Map<string, any> = new Map();
+  private baseBoundaries: Map<string, Float64Array> = new Map();
+  private baseBoundaryStates: Map<string, any> = new Map();
+  private quarantined: Map<string, any> = new Map();
+  private receipts: Map<string, string> = new Map();
   private projectionMatrix: Float64Array[];
 
   /**
@@ -83,21 +98,96 @@ export class HyperDB {
   }
 
   /**
-   * Inserts or updates state in the database.
+   * Explicitly sets the ontology's base boundary for a specific ID.
+   * @param id Unique identifier
+   * @param state The baseline state representing the ontology boundary
+   */
+  public setBaseBoundary(id: string, state: any): void {
+    const vector = this.projectToVector(state);
+    this.baseBoundaries.set(id, vector);
+    this.baseBoundaryStates.set(id, state);
+  }
+
+  /**
+   * Retrieves the ontology's base boundary state for a specific ID.
+   */
+  public getBaseBoundary(id: string): any | undefined {
+    return this.baseBoundaryStates.get(id);
+  }
+
+  /**
+   * Retrieves the quarantined state for a specific ID.
+   */
+  public getQuarantined(id: string): any | undefined {
+    return this.quarantined.get(id);
+  }
+
+  /**
+   * Clears the quarantine for a specific ID.
+   */
+  public clearQuarantine(id: string): void {
+    this.quarantined.delete(id);
+  }
+
+  /**
+   * Retrieves the cryptographic receipt hash for a specific ID.
+   */
+  public getReceipt(id: string): string | undefined {
+    return this.receipts.get(id);
+  }
+
+  /**
+   * Inserts or updates state in the database, enforcing semantic similarity constraints.
    * @param id Unique identifier
    * @param state Any JSON-serializable state
+   * @returns MutationResult indicating if the mutation was accepted or rejected/quarantined
    */
-  public insert(id: string, state: any): void {
+  public insert(id: string, state: any): MutationResult {
     const vector = this.projectToVector(state);
+
+    // If there is no base boundary, the first insertion establishes it as the base boundary.
+    if (!this.baseBoundaries.has(id)) {
+      this.baseBoundaries.set(id, vector);
+      this.baseBoundaryStates.set(id, state);
+    }
+
+    const baseVector = this.baseBoundaries.get(id)!;
+    const similarity = this.cosineSimilarity(vector, baseVector);
+
+    // Semantic Quarantine Gate: Similarity must be >= 0.85
+    if (similarity < 0.85) {
+      this.quarantined.set(id, state);
+      return {
+        status: 'rejected',
+        similarity,
+        reason: `State mutation rejected. Cosine similarity (${similarity.toFixed(4)}) is below the ontology base boundary threshold of 0.85.`
+      };
+    }
+
+    // Accept mutation: update database state
     this.vectors.set(id, vector);
     this.data.set(id, state);
+
+    // Generate cryptographic receipt
+    const prevReceipt = this.receipts.get(id);
+    const nextReceipt = generateBlake3ReceiptHash(prevReceipt, state);
+    this.receipts.set(id, nextReceipt);
+
+    // Clear quarantine upon successful update
+    this.quarantined.delete(id);
+
+    return {
+      status: 'accepted',
+      similarity,
+      receipt: nextReceipt
+    };
   }
 
   /**
    * Alias for insert to update state.
    */
-  public update(id: string, state: any): void {
-    this.insert(id, state);
+  public update(id: string, state: any): MutationResult {
+    return this.insert(id, state);
   }
 
   /**
@@ -108,17 +198,30 @@ export class HyperDB {
   }
 
   /**
-   * Deletes state by ID.
+   * Deletes state by ID and cleans up boundary, quarantine, and receipt tracking.
    */
   public delete(id: string): void {
     this.vectors.delete(id);
     this.data.delete(id);
+    this.baseBoundaries.delete(id);
+    this.baseBoundaryStates.delete(id);
+    this.quarantined.delete(id);
+    this.receipts.delete(id);
   }
 
   /**
    * Computes cosine similarity between two L2-normalized vectors.
    */
   private cosineSimilarity(vecA: Float64Array, vecB: Float64Array): number {
+    let isZeroA = true;
+    let isZeroB = true;
+    for (let i = 0; i < this.dimensions; i++) {
+      if (vecA[i] !== 0) isZeroA = false;
+      if (vecB[i] !== 0) isZeroB = false;
+    }
+    if (isZeroA && isZeroB) return 1.0;
+    if (isZeroA || isZeroB) return 0.0;
+
     let dotProduct = 0;
     for (let i = 0; i < this.dimensions; i++) {
         dotProduct += vecA[i] * vecB[i];

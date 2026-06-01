@@ -107,6 +107,57 @@ describe('HyperDB', () => {
         // Just checking basic stability here.
         expect(() => new HyperDB(10)).not.toThrow();
     });
+
+    test('enforces semantic similarity boundaries, returns BLAKE3 receipts and quarantines out-of-bounds mutations', () => {
+        // 1. Establish base boundary explicitly
+        const baseState = { type: 'Document', category: 'financial', amount: 1000 };
+        db.setBaseBoundary('doc-x', baseState);
+        expect(db.getBaseBoundary('doc-x')).toEqual(baseState);
+
+        // 2. Perform a mutation that is very similar (should be accepted)
+        const similarState = { type: 'Document', category: 'financial', amount: 1050 };
+        const result1 = db.insert('doc-x', similarState);
+
+        expect(result1.status).toBe('accepted');
+        expect(result1.similarity).toBeGreaterThanOrEqual(0.85);
+        expect(result1.receipt).toBeDefined();
+        // The DB state is updated
+        expect(db.get('doc-x')).toEqual(similarState);
+        // The quarantine is empty
+        expect(db.getQuarantined('doc-x')).toBeUndefined();
+
+        // 3. Perform a mutation that is completely different (should be rejected and quarantined)
+        const wildState = { type: 'AlienSpacecraft', speed: 'warp-9', pilot: 'Zorblax' };
+        const result2 = db.update('doc-x', wildState);
+
+        expect(result2.status).toBe('rejected');
+        expect(result2.similarity).toBeLessThan(0.85);
+        expect(result2.reason).toContain('below the ontology base boundary threshold');
+        // The DB state remains at the previously accepted state
+        expect(db.get('doc-x')).toEqual(similarState);
+        // The wild state is quarantined
+        expect(db.getQuarantined('doc-x')).toEqual(wildState);
+
+        // 4. Retrieve receipt chain and check it is updated for accepted mutations
+        const firstReceipt = result1.receipt;
+        expect(db.getReceipt('doc-x')).toBe(firstReceipt);
+
+        // 5. If we insert another valid state, the receipt chain is updated
+        const anotherSimilarState = { type: 'Document', category: 'financial', amount: 1100 };
+        const result3 = db.insert('doc-x', anotherSimilarState);
+        expect(result3.status).toBe('accepted');
+        expect(result3.receipt).toBeDefined();
+        expect(result3.receipt).not.toBe(firstReceipt);
+
+        // 6. Clean up quarantine and delete
+        db.clearQuarantine('doc-x');
+        expect(db.getQuarantined('doc-x')).toBeUndefined();
+
+        db.delete('doc-x');
+        expect(db.get('doc-x')).toBeUndefined();
+        expect(db.getBaseBoundary('doc-x')).toBeUndefined();
+        expect(db.getReceipt('doc-x')).toBeUndefined();
+    });
 });
 
 let mockState: any;
@@ -167,5 +218,45 @@ describe('useHyperState', () => {
     setState((prev: any) => ({ val: prev.val + 1 }));
     expect(mockState).toEqual({ val: 3 });
     expect(globalHyperDB.get('test-id')).toEqual({ val: 3 });
+  });
+
+  test('quarantines out-of-bounds hook updates and prevents React state transition', () => {
+    // 1. Initialize hook with a stable base state string sequence
+    const [state, setState] = useHyperState('hook-quarantine-id', {
+      type: 'Profile',
+      displayName: 'Alice In Wonderland',
+      verified: true
+    });
+
+    expect(state).toEqual({
+      type: 'Profile',
+      displayName: 'Alice In Wonderland',
+      verified: true
+    });
+
+    // 2. Perform an out-of-bounds update
+    const wildState = {
+      type: 'CompletelyDifferentThing',
+      unrelatedField: 'some random gibberish that has nothing to do with profile'
+    };
+    
+    setState(wildState);
+
+    // 3. React state should NOT transition (retains previous state value to preserve invariant)
+    expect(mockState).toEqual({
+      type: 'Profile',
+      displayName: 'Alice In Wonderland',
+      verified: true
+    });
+
+    // 4. DB state should also remain untouched
+    expect(globalHyperDB.get('hook-quarantine-id')).toEqual({
+      type: 'Profile',
+      displayName: 'Alice In Wonderland',
+      verified: true
+    });
+
+    // 5. The rejected state is quarantined in the DB
+    expect(globalHyperDB.getQuarantined('hook-quarantine-id')).toEqual(wildState);
   });
 });

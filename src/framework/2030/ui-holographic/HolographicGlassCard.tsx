@@ -8,6 +8,7 @@ import { GlassCard } from '../../ui/glassmorphism/GlassCard';
 import { useHolographicContext } from './HolographicContainer';
 import { HolographicGlassCardProps } from './types';
 import { cn } from '../../../utils/cn';
+import { useBci } from '../../v30/bci-ux/BciBoundary';
 
 /**
  * HolographicGlassCard (Glassmorphism v2)
@@ -19,6 +20,7 @@ import { cn } from '../../../utils/cn';
  * Integration:
  * - Inherits from `ui/glassmorphism`
  * - Utilizes `xr/spatial` concepts for depth simulation
+ * - Integrates with BCI-UX Cognitive Parity to scale down motion and density during high stress
  */
 export const HolographicGlassCard: React.FC<HolographicGlassCardProps> = ({
   children,
@@ -30,24 +32,35 @@ export const HolographicGlassCard: React.FC<HolographicGlassCardProps> = ({
   ...props
 }) => {
   const sensor = useHolographicContext();
+  const bci = useBci();
+
+  // Use adjusted parallaxIntensity if BCI is active
+  const activeParallaxIntensity = bci ? bci.parallaxIntensity : parallaxIntensity;
+
+  // Adjust layout density (padding) dynamically based on BCI cognitive load state
+  const densityStyle = bci
+    ? {
+        padding: bci.layoutDensity === 'spacious' ? 24 : bci.layoutDensity === 'comfortable' ? 16 : 8,
+      }
+    : {};
 
   const animatedStyle = useAnimatedStyle(() => {
     if (!sensor) return {};
 
     const { roll, pitch } = sensor.sensor.value;
     
-    // Calculate parallax movement
+    // Calculate parallax movement using the BCI-adjusted or default intensity
     const translateX = interpolate(
       roll,
       [-Math.PI / 4, Math.PI / 4],
-      [parallaxIntensity, -parallaxIntensity],
+      [activeParallaxIntensity, -activeParallaxIntensity],
       Extrapolation.CLAMP
     );
     
     const translateY = interpolate(
       pitch,
       [-Math.PI / 4, Math.PI / 4],
-      [parallaxIntensity, -parallaxIntensity],
+      [activeParallaxIntensity, -activeParallaxIntensity],
       Extrapolation.CLAMP
     );
 
@@ -97,7 +110,7 @@ export const HolographicGlassCard: React.FC<HolographicGlassCardProps> = ({
   return (
     <GlassCard
       className={cn('relative overflow-hidden', className)}
-      style={style}
+      style={[densityStyle, style]}
       {...props}
     >
       {/* Dynamic Glare Layer */}
