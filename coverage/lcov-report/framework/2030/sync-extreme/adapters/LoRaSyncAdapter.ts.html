@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.81% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">71.42% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/10</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -111,29 +111,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,29 +151,29 @@
  * Limited to very small payload bursts.
  */
 export class LoRaSyncAdapter implements ExtremeSyncAdapter {
-  public readonly mode = SyncExtremeMode.LORA;
-  private listeners: ((workspaceId: string, payload: string) =&gt; void)[] = [];
+  public readonly mode = <span class="cstat-no" title="statement not covered" >SyncExtremeMode.LORA;</span>
+  private listeners: ((workspaceId: string, payload: string) =&gt; void)[] = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-  public async broadcast(workspaceId: string, payload: string): Promise&lt;void&gt; {
+<span class="fstat-no" title="function not covered" >  pu</span>blic async broadcast(workspaceId: string, payload: string): Promise&lt;void&gt; {
     // LoRa has extremely low bandwidth (bitrate)
     // We simulate a slow transmission of chunks
-    const transmitTime = payload.length * 2; // 2ms per byte simulation
+    const transmitTime = <span class="cstat-no" title="statement not covered" >payload.length * 2;</span> // 2ms per byte simulation
     
-    return new Promise((resolve) =&gt; {
-      setTimeout(() =&gt; {
-        console.log(`[LoRaSyncAdapter] Transmitted burst for ${workspaceId} over 868MHz/915MHz`);
-        resolve();
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        console.log(`[LoRaSyncAdapter] Transmitted burst for ${workspaceId} over 868MHz/915MHz`);</span>
+<span class="cstat-no" title="statement not covered" >        resolve();</span>
       }, transmitTime);
     });
   }
 &nbsp;
-  public onUpdate(callback: (workspaceId: string, payload: string) =&gt; void): void {
-    this.listeners.push(callback);
+<span class="fstat-no" title="function not covered" >  pu</span>blic onUpdate(callback: (workspaceId: string, payload: string) =&gt; void): void {
+<span class="cstat-no" title="statement not covered" >    this.listeners.push(callback);</span>
   }
 &nbsp;
-  public getStatus(): 'connected' | 'degraded' | 'disconnected' {
+<span class="fstat-no" title="function not covered" >  pu</span>blic getStatus(): 'connected' | 'degraded' | 'disconnected' {
     // LoRa is often 'degraded' due to high interference or distance
-    return 'degraded';
+<span class="cstat-no" title="statement not covered" >    return 'degraded';</span>
   }
 &nbsp;
   /**
@@ -190,7 +190,7 @@ export class LoRaSyncAdapter implements ExtremeSyncAdapter {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T10:42:46.478Z
+                at 2026-06-01T05:09:44.286Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

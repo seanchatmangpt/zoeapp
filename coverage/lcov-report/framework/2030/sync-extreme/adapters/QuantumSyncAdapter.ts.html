@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/5</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.71% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -108,24 +108,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -144,24 +144,24 @@
  * for the 2030 Zoe Quantum Layer.
  */
 export class QuantumSyncAdapter implements ExtremeSyncAdapter {
-  public readonly mode = SyncExtremeMode.QUANTUM;
-  private listeners: ((workspaceId: string, payload: string) =&gt; void)[] = [];
+  public readonly mode = <span class="cstat-no" title="statement not covered" >SyncExtremeMode.QUANTUM;</span>
+  private listeners: ((workspaceId: string, payload: string) =&gt; void)[] = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-  public async broadcast(workspaceId: string, payload: string): Promise&lt;void&gt; {
+<span class="fstat-no" title="function not covered" >  pu</span>blic async broadcast(workspaceId: string, payload: string): Promise&lt;void&gt; {
     // Quantum entanglement is "instantaneous" (modeled as &lt; 1ms)
-    console.log(`[QuantumSyncAdapter] State collapsed for ${workspaceId} across entangled pair`);
+<span class="cstat-no" title="statement not covered" >    console.log(`[QuantumSyncAdapter] State collapsed for ${workspaceId} across entangled pair`);</span>
     
     // In simulation, we might have a global registry of peers to "instantly" notify
-    return Promise.resolve();
+<span class="cstat-no" title="statement not covered" >    return Promise.resolve();</span>
   }
 &nbsp;
-  public onUpdate(callback: (workspaceId: string, payload: string) =&gt; void): void {
-    this.listeners.push(callback);
+<span class="fstat-no" title="function not covered" >  pu</span>blic onUpdate(callback: (workspaceId: string, payload: string) =&gt; void): void {
+<span class="cstat-no" title="statement not covered" >    this.listeners.push(callback);</span>
   }
 &nbsp;
-  public getStatus(): 'connected' | 'degraded' | 'disconnected' {
+<span class="fstat-no" title="function not covered" >  pu</span>blic getStatus(): 'connected' | 'degraded' | 'disconnected' {
     // Quantum state is either 'connected' or 'disconnected' (decoherence)
-    return 'connected';
+<span class="cstat-no" title="statement not covered" >    return 'connected';</span>
   }
 &nbsp;
   /**
@@ -178,7 +178,7 @@ export class QuantumSyncAdapter implements ExtremeSyncAdapter {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T10:42:46.478Z
+                at 2026-06-01T05:09:44.286Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -17,7 +17,10 @@ export const TemporalProvider: React.FC<{ children: React.ReactNode, chain?: Mem
   const [currentRoute, setCurrentRoute] = useState<TemporalRoute | null>(navigator.getCurrentRoute());
 
   useEffect(() => {
-    return navigator.subscribe(setCurrentRoute);
+    const unsubscribe = navigator.subscribe(setCurrentRoute);
+    return () => {
+      unsubscribe();
+    };
   }, [navigator]);
 
   const value = useMemo(() => ({

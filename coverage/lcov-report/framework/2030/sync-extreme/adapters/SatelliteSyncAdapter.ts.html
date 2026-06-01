@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -108,35 +108,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ExtremeSyncAdapter, SyncExtremeMode } from '../types';
@@ -146,35 +146,35 @@
  * satellite constellations. It features high latency but ubiquitous coverage.
  */
 export class SatelliteSyncAdapter implements ExtremeSyncAdapter {
-  public readonly mode = SyncExtremeMode.SATELLITE;
-  private listeners: ((workspaceId: string, payload: string) =&gt; void)[] = [];
+  public readonly mode = <span class="cstat-no" title="statement not covered" >SyncExtremeMode.SATELLITE;</span>
+  private listeners: ((workspaceId: string, payload: string) =&gt; void)[] = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-  public async broadcast(workspaceId: string, payload: string): Promise&lt;void&gt; {
+<span class="fstat-no" title="function not covered" >  pu</span>blic async broadcast(workspaceId: string, payload: string): Promise&lt;void&gt; {
     // Simulated satellite uplink with variable latency (25ms - 500ms)
-    const latency = Math.floor(Math.random() * 475) + 25;
+    const latency = <span class="cstat-no" title="statement not covered" >Math.floor(Math.random() * 475) + 25;</span>
     
-    return new Promise((resolve) =&gt; {
-      setTimeout(() =&gt; {
-        console.log(`[SatelliteSyncAdapter] Broadcasted ${payload.length} bytes for ${workspaceId} via Orbital Mesh`);
-        resolve();
+<span class="cstat-no" title="statement not covered" >    return new Promise(<span class="fstat-no" title="function not covered" >(r</span>esolve) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      setTimeout(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        console.log(`[SatelliteSyncAdapter] Broadcasted ${payload.length} bytes for ${workspaceId} via Orbital Mesh`);</span>
+<span class="cstat-no" title="statement not covered" >        resolve();</span>
       }, latency);
     });
   }
 &nbsp;
-  public onUpdate(callback: (workspaceId: string, payload: string) =&gt; void): void {
-    this.listeners.push(callback);
+<span class="fstat-no" title="function not covered" >  pu</span>blic onUpdate(callback: (workspaceId: string, payload: string) =&gt; void): void {
+<span class="cstat-no" title="statement not covered" >    this.listeners.push(callback);</span>
   }
 &nbsp;
-  public getStatus(): 'connected' | 'degraded' | 'disconnected' {
+<span class="fstat-no" title="function not covered" >  pu</span>blic getStatus(): 'connected' | 'degraded' | 'disconnected' {
     // In 2030, satellite is almost always connected unless in deep cavern
-    return 'connected';
+<span class="cstat-no" title="statement not covered" >    return 'connected';</span>
   }
 &nbsp;
   /**
    * Internal method to simulate receiving a satellite downlink update.
    */
-  public simulateIncomingUpdate(workspaceId: string, payload: string): void {
-    this.listeners.forEach(cb =&gt; cb(workspaceId, payload));
+<span class="fstat-no" title="function not covered" >  pu</span>blic simulateIncomingUpdate(workspaceId: string, payload: string): void {
+<span class="cstat-no" title="statement not covered" >    this.listeners.forEach(<span class="fstat-no" title="function not covered" >cb</span> =&gt; <span class="cstat-no" title="statement not covered" >cb(workspaceId, payload))</span>;</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -184,7 +184,7 @@ export class SatelliteSyncAdapter implements ExtremeSyncAdapter {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T10:42:46.478Z
+                at 2026-06-01T05:09:44.286Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

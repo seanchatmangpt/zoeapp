@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/38</span>
+                <span class='fraction'>0/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -165,7 +165,28 @@
 <a name='L100'></a><a href='#L100'>100</a>
 <a name='L101'></a><a href='#L101'>101</a>
 <a name='L102'></a><a href='#L102'>102</a>
-<a name='L103'></a><a href='#L103'>103</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -186,6 +207,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -266,9 +292,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useMemo } from 'react';
+import { View, Text, Image, Pressable, SafeAreaView } from 'react-native';
 import { GenerativeViewProps, LayoutNode } from './types';
 import { useGenerativeLayout } from './hooks/useGenerativeLayout';
 import { cn } from '../../../utils/cn';
@@ -287,6 +329,11 @@ export const GenerativeView: React.FC&lt;GenerativeViewProps&gt; = <span class="
 }) =&gt; {
   const { header, body, footer } = <span class="cstat-no" title="statement not covered" >useGenerativeLayout(schema, data);</span>
   const theme = <span class="cstat-no" title="statement not covered" >useTheme();</span>
+&nbsp;
+  // Iron Law Fallback: Always extract and render critical action intents deterministically
+  const criticalActions = <span class="cstat-no" title="statement not covered" >useMemo(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    return schema.fields.filter(<span class="fstat-no" title="function not covered" >f </span>=&gt; <span class="cstat-no" title="statement not covered" >f.predicate.includes('schema.org/Action') || f.required)</span>;</span>
+  }, [schema]);
 &nbsp;
   const renderNode = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(n</span>ode: LayoutNode) =&gt; {</span>
     const { field, value, hint, key } = <span class="cstat-no" title="statement not covered" >node;</span>
@@ -364,6 +411,22 @@ export const GenerativeView: React.FC&lt;GenerativeViewProps&gt; = <span class="
           {footer.map(renderNode)}
         &lt;/View&gt;
       )}
+&nbsp;
+      {/* Iron Law Enforcement Layer: Deterministic rendering of critical actions */}
+      {criticalActions.length &gt; 0 &amp;&amp; (
+        &lt;SafeAreaView className="p-4 border-t border-red-500/30 bg-card mt-auto" testID="iron-law-fallback"&gt;
+          &lt;Text className="text-xs font-bold text-red-500 mb-2 uppercase"&gt;Critical Actions&lt;/Text&gt;
+          {criticalActions.map(<span class="fstat-no" title="function not covered" >(a</span>ction) =&gt; (
+<span class="cstat-no" title="statement not covered" >             &lt;Pressable </span>
+               key={`fallback-${action.predicate}`}
+               className="p-3 bg-red-500/10 rounded-lg mb-2"
+               onPress={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >onAction?.(action.predicate, data[action.predicate])}</span>
+             &gt;
+               &lt;Text className="text-red-700 font-semibold"&gt;{action.label}&lt;/Text&gt;
+             &lt;/Pressable&gt;
+          ))}
+        &lt;/SafeAreaView&gt;
+      )}
     &lt;/View&gt;
   );
 };
@@ -376,7 +439,7 @@ export const GenerativeView: React.FC&lt;GenerativeViewProps&gt; = <span class="
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T10:42:46.478Z
+                at 2026-06-01T05:09:44.286Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

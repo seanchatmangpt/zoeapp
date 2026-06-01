@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">15.55% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/45</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.18% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/11</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">15.55% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/45</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -262,25 +262,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -437,25 +437,25 @@ export interface FusionSyncEngineConfig&lt;TJob extends SyncJobBase&gt; {
  * compression, and CRDT map resolution simultaneously.
  */
 export class FusionSyncEngine&lt;TJob extends SyncJobBase&gt; {
-  private workspaces = new Map&lt;string, CollaborativeWorkspace&lt;any&gt;&gt;();
+  private workspaces = <span class="cstat-no" title="statement not covered" >new Map&lt;string, CollaborativeWorkspace&lt;any&gt;&gt;();</span>
   private standardEngine: FrameworkSyncEngine&lt;TJob&gt;;
   private meshEngine: MeshSyncEngine;
   private compression: CompressionStrategy;
 &nbsp;
-  constructor(config: FusionSyncEngineConfig&lt;TJob&gt;) {
-    this.standardEngine = config.standardEngine;
-    this.meshEngine = config.meshEngine;
-    this.compression = config.compression;
+<span class="fstat-no" title="function not covered" >  co</span>nstructor(config: FusionSyncEngineConfig&lt;TJob&gt;) {
+<span class="cstat-no" title="statement not covered" >    this.standardEngine = config.standardEngine;</span>
+<span class="cstat-no" title="statement not covered" >    this.meshEngine = config.meshEngine;</span>
+<span class="cstat-no" title="statement not covered" >    this.compression = config.compression;</span>
     
-    this.setupMeshListener();
+<span class="cstat-no" title="statement not covered" >    this.setupMeshListener();</span>
   }
 &nbsp;
   /**
    * Sets up listeners for the P2P mesh network to handle incoming state updates.
    */
-  private setupMeshListener() {
-    const adapter = this.meshEngine.getAdapter();
-    adapter.onMessage(<span class="fstat-no" title="function not covered" >as</span>ync (message: MeshMessage) =&gt; {
+<span class="fstat-no" title="function not covered" >  pr</span>ivate setupMeshListener() {
+    const adapter = <span class="cstat-no" title="statement not covered" >this.meshEngine.getAdapter();</span>
+<span class="cstat-no" title="statement not covered" >    adapter.onMessage(<span class="fstat-no" title="function not covered" >as</span>ync (message: MeshMessage) =&gt; {</span>
       // Only handle sync_state messages with compressed payloads
 <span class="cstat-no" title="statement not covered" >      if (message.type === 'sync_state' &amp;&amp; typeof message.payload.state === 'string') {</span>
 <span class="cstat-no" title="statement not covered" >        try {</span>
@@ -595,7 +595,7 @@ export class FusionSyncEngine&lt;TJob extends SyncJobBase&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-31T10:42:46.478Z
+                at 2026-06-01T05:09:44.286Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
