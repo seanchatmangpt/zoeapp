@@ -1,12 +1,43 @@
 import { Membrane } from '../../../membrane/membrane';
 import { AgentNativeInterface } from '../interface';
 import { SemanticCommand, StateInspectionRequest } from '../types';
-import { zkEngine } from '../../../auth/zkp/engine';
 
 describe('AgentNativeInterface', () => {
   let membrane: Membrane;
   let agentInterface: AgentNativeInterface;
   let initialState: any;
+
+  const validZkp = {
+    claimId: '',
+    proofData: JSON.stringify({
+      pi_a: [
+        '11883344556677889900112233',
+        '22883344556677889900112233',
+        '1'
+      ],
+      pi_b: [
+        [
+          '33883344556677889900112233',
+          '44883344556677889900112233'
+        ],
+        [
+          '55883344556677889900112233',
+          '66883344556677889900112233'
+        ],
+        [
+          '1',
+          '0'
+        ]
+      ],
+      pi_c: [
+        '77883344556677889900112233',
+        '88883344556677889900112233',
+        '1'
+      ]
+    }),
+    publicSignals: ['1'],
+    enclaveSignature: 'valid-signature'
+  };
 
   beforeEach(() => {
     membrane = new Membrane({ mode: 'strict' });
@@ -33,9 +64,8 @@ describe('AgentNativeInterface', () => {
       const request: StateInspectionRequest = {
         path: 'user.profile.name',
         zkp: {
+          ...validZkp,
           claimId: 'claim_1',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -47,6 +77,7 @@ describe('AgentNativeInterface', () => {
       const request: StateInspectionRequest = {
         path: 'user.profile.name',
         zkp: {
+          ...validZkp,
           claimId: 'claim_1',
           proofData: '', // Empty proof data causes failure
           publicSignals: [],
@@ -62,9 +93,8 @@ describe('AgentNativeInterface', () => {
       const request: StateInspectionRequest = {
         path: 'settings.theme',
         zkp: {
+          ...validZkp,
           claimId: 'claim_2',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -76,9 +106,8 @@ describe('AgentNativeInterface', () => {
       const request: StateInspectionRequest = {
         path: 'non.existent.path',
         zkp: {
+          ...validZkp,
           claimId: 'claim_3',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -95,6 +124,7 @@ describe('AgentNativeInterface', () => {
       const request: StateInspectionRequest = {
         path: 'user.profile.name',
         zkp: {
+          ...validZkp,
           claimId: 'invalid_claim',
           proofData: '',
           publicSignals: [],
@@ -113,15 +143,17 @@ describe('AgentNativeInterface', () => {
         action: 'ping',
         params: {},
         zkp: {
+          ...validZkp,
           claimId: 'claim_4',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
       const result = await agentInterface.dispatch(command);
       expect(result.success).toBe(true);
-      expect(result.result).toEqual(expect.objectContaining({ pong: true }));
+      expect(result.result).toEqual(expect.objectContaining({ 
+        pong: true, 
+        version: '2030.1.1-ultimate' 
+      }));
       expect(result.verdict).toBe('allow');
     });
 
@@ -131,6 +163,7 @@ describe('AgentNativeInterface', () => {
         action: 'ping',
         params: {},
         zkp: {
+          ...validZkp,
           claimId: 'claim_4',
           proofData: '', // Invalid proof data
           publicSignals: [],
@@ -151,9 +184,8 @@ describe('AgentNativeInterface', () => {
           value: 'light',
         },
         zkp: {
+          ...validZkp,
           claimId: 'claim_5',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -164,7 +196,16 @@ describe('AgentNativeInterface', () => {
         path: 'settings.theme',
         value: 'light',
       });
-      expect(initialState.settings.theme).toBe('light');
+      
+      const checkRequest: StateInspectionRequest = {
+        path: 'settings.theme',
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_check_1',
+        },
+      };
+      const themeVal = await agentInterface.inspectState(checkRequest);
+      expect(themeVal).toBe('light');
     });
 
     it('should handle non-existent actions', async () => {
@@ -173,9 +214,8 @@ describe('AgentNativeInterface', () => {
         action: 'unknown_action',
         params: { foo: 'bar' },
         zkp: {
+          ...validZkp,
           claimId: 'claim_6',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -197,9 +237,8 @@ describe('AgentNativeInterface', () => {
           value: 'val',
         },
         zkp: {
+          ...validZkp,
           claimId: 'claim_7',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -222,9 +261,8 @@ describe('AgentNativeInterface', () => {
         action: 'ping',
         params: {},
         zkp: {
+          ...validZkp,
           claimId: 'claim_8',
-          proofData: 'valid_proof',
-          publicSignals: ['signal_1'],
         },
       };
 
@@ -232,6 +270,138 @@ describe('AgentNativeInterface', () => {
       expect(result.success).toBe(false);
       expect(result.verdict).toBe('deny');
       expect(result.error).toBe('Denied by membrane');
+    });
+  });
+
+  describe('Hardening and Security Regulations', () => {
+    it('verifies prototype pollution rejection on inspectState and update_state', async () => {
+      // Test inspectState pollution attempt
+      const inspectRequest: StateInspectionRequest = {
+        path: '__proto__.polluted',
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_pollute_inspect',
+        },
+      };
+      await expect(agentInterface.inspectState(inspectRequest)).rejects.toThrow(
+        /Access to prototype-modifying keys is forbidden/
+      );
+
+      // Test dispatch update_state pollution attempt
+      const command: SemanticCommand = {
+        id: 'cmd_pollute_dispatch',
+        action: 'update_state',
+        params: {
+          path: '__proto__.polluted',
+          value: 'INJECTED_VALUE',
+        },
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_pollute_dispatch',
+        },
+      };
+      const result = await agentInterface.dispatch(command);
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/Access to prototype-modifying keys is forbidden/);
+      expect((Object.prototype as any).polluted).toBeUndefined();
+    });
+
+    it('verifies deep clone isolation of input state, parameter, and inspect result', async () => {
+      // 1. Verify input state is cloned in constructor (initialState shouldn't be affected by updates)
+      const command: SemanticCommand = {
+        id: 'cmd_theme_update',
+        action: 'update_state',
+        params: {
+          path: 'settings.theme',
+          value: 'light',
+        },
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_theme_update',
+        },
+      };
+      await agentInterface.dispatch(command);
+      expect(initialState.settings.theme).toBe('dark'); // Initial state object remains untouched
+
+      // 2. Verify inspection result is a deep clone (mutating the returned reference doesn't affect internal state)
+      const inspectRequest: StateInspectionRequest = {
+        path: 'user.profile',
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_profile_inspect',
+        },
+      };
+      const profile = await agentInterface.inspectState(inspectRequest);
+      expect(profile.name).toBe('Zoe');
+      profile.name = 'compromised_value';
+
+      const verifyRequest: StateInspectionRequest = {
+        path: 'user.profile.name',
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_verify_name',
+        },
+      };
+      const verifyName = await agentInterface.inspectState(verifyRequest);
+      expect(verifyName).toBe('Zoe'); // Internal name is isolated and remains 'Zoe'
+    });
+
+    it('verifies sequential queue execution prevents out-of-order execution', async () => {
+      // We will register a membrane interceptor that delays the first command execution.
+      // With sequential execution, the first command must fully finish (including its delay)
+      // before the second command runs.
+      
+      const updateCommand1: SemanticCommand = {
+        id: 'cmd_slow',
+        action: 'update_state',
+        params: {
+          path: 'settings.theme',
+          value: 'blue',
+        },
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_slow',
+        },
+      };
+
+      const updateCommand2: SemanticCommand = {
+        id: 'cmd_fast',
+        action: 'update_state',
+        params: {
+          path: 'settings.theme',
+          value: 'green',
+        },
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_fast',
+        },
+      };
+
+      // Set up a dynamic delay in membrane interceptor
+      membrane.interceptors.register(async (ctx) => {
+        if (ctx.commandId === 'cmd_slow') {
+          await new Promise((r) => setTimeout(r, 50));
+        }
+        return true;
+      });
+
+      // Dispatch them concurrently
+      const promiseSlow = agentInterface.dispatch(updateCommand1);
+      const promiseFast = agentInterface.dispatch(updateCommand2);
+
+      await Promise.all([promiseSlow, promiseFast]);
+
+      // If they ran sequentially, cmd_slow executed first, then cmd_fast executed.
+      // Therefore, the final state must be 'green' (cmd_fast's value).
+      const verifyRequest: StateInspectionRequest = {
+        path: 'settings.theme',
+        zkp: {
+          ...validZkp,
+          claimId: 'claim_verify_theme',
+        },
+      };
+      const themeVal = await agentInterface.inspectState(verifyRequest);
+      expect(themeVal).toBe('green');
     });
   });
 });
