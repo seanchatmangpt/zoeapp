@@ -30,7 +30,7 @@ export interface PqZkProof extends ZkProof {
  * Post-Quantum Cryptographic Receipt.
  */
 export interface PqReceipt {
-  version: '2030.1';
+  version: '2030.1' | '2030.1.1';
   timestamp: number;
   claimId: string;
   zkProofHash: string; // Hash of the ZK proof

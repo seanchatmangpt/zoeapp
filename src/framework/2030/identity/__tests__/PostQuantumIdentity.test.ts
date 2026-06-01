@@ -1,7 +1,25 @@
+/**
+ * @fileoverview Test suite for the Post-Quantum Identity framework.
+ * 
+ * Clickable file references:
+ * - Source: [PostQuantumZkEngine.ts](file:///Users/sac/zoeapp/src/framework/2030/identity/PostQuantumZkEngine.ts)
+ * - Types: [types.ts](file:///Users/sac/zoeapp/src/framework/2030/identity/types.ts)
+ * - Test: [PostQuantumIdentity.test.ts](file:///Users/sac/zoeapp/src/framework/2030/identity/__tests__/PostQuantumIdentity.test.ts)
+ */
+
 import { PostQuantumZkEngine } from '../PostQuantumZkEngine';
 import { ZkClaim } from '../../../auth/zkp/types';
 import { PqZkProof, PqSignature, PqReceipt } from '../types';
 import { pqZkEngine } from '../index';
+
+const validSnarkProofData = JSON.stringify({
+  pi_a: ["12345678901", "12345678902"],
+  pi_b: [
+    ["12345678903", "12345678904"],
+    ["12345678905", "12345678906"]
+  ],
+  pi_c: ["12345678907", "12345678908"]
+});
 
 describe('PostQuantumZkEngine', () => {
   let engine: PostQuantumZkEngine;
@@ -23,8 +41,9 @@ describe('PostQuantumZkEngine', () => {
   it('should verify a standard ZK proof', async () => {
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
-      publicSignals: ['18']
+      proofData: validSnarkProofData,
+      publicSignals: ['18'],
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -42,9 +61,10 @@ describe('PostQuantumZkEngine', () => {
 
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      pqSignature
+      pqSignature,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -62,9 +82,10 @@ describe('PostQuantumZkEngine', () => {
 
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      pqSignature
+      pqSignature,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -80,9 +101,10 @@ describe('PostQuantumZkEngine', () => {
 
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      pqSignature
+      pqSignature,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -100,15 +122,45 @@ describe('PostQuantumZkEngine', () => {
       version: '2030.1',
       timestamp: Date.now(),
       claimId: 'claim-123',
-      zkProofHash: 'hash-123',
+      zkProofHash: 'c1f64477c049ca1d3d1dfdde3731fd29af149d105a09fe9529ac44e58f8f9f37',
       pqSignature
     };
 
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      receipt
+      receipt,
+      enclaveSignature: 'valid-signature'
+    };
+
+    const result = await engine.verify(mockClaim, proof);
+    expect(result.verified).toBe(true);
+    expect(result.receiptVerified).toBe(true);
+  });
+
+  it('should verify a proof with PQ receipt version 2030.1.1', async () => {
+    // See [PostQuantumZkEngine.ts](file:///Users/sac/zoeapp/src/framework/2030/identity/PostQuantumZkEngine.ts) for details.
+    const pqSignature: PqSignature = {
+      algorithm: 'Falcon-1024',
+      data: 'valid-signature',
+      publicKey: 'valid-pubkey'
+    };
+
+    const receipt: PqReceipt = {
+      version: '2030.1.1',
+      timestamp: Date.now(),
+      claimId: 'claim-123',
+      zkProofHash: 'c1f64477c049ca1d3d1dfdde3731fd29af149d105a09fe9529ac44e58f8f9f37',
+      pqSignature
+    };
+
+    const proof: PqZkProof = {
+      claimId: 'claim-123',
+      proofData: validSnarkProofData,
+      publicSignals: ['18'],
+      receipt,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -128,9 +180,10 @@ describe('PostQuantumZkEngine', () => {
 
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      receipt
+      receipt,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -140,8 +193,9 @@ describe('PostQuantumZkEngine', () => {
   it('should fail standard verification if claimId mismatch', async () => {
     const proof: PqZkProof = {
       claimId: 'wrong-claim',
-      proofData: 'mock-proof-data',
-      publicSignals: ['18']
+      proofData: validSnarkProofData,
+      publicSignals: ['18'],
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -158,9 +212,10 @@ describe('PostQuantumZkEngine', () => {
 
     const proof: PqZkProof = {
       claimId: 'wrong-claim',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      pqSignature
+      pqSignature,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -179,15 +234,16 @@ describe('PostQuantumZkEngine', () => {
       version: '2030.1',
       timestamp: Date.now(),
       claimId: 'claim-123',
-      zkProofHash: 'hash-123',
+      zkProofHash: 'c1f64477c049ca1d3d1dfdde3731fd29af149d105a09fe9529ac44e58f8f9f37',
       pqSignature
     };
 
     const proof: PqZkProof = {
       claimId: 'claim-123',
-      proofData: 'mock-proof-data',
+      proofData: validSnarkProofData,
       publicSignals: ['18'],
-      receipt
+      receipt,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
@@ -207,7 +263,34 @@ describe('PostQuantumZkEngine', () => {
       version: '2030.1',
       timestamp: Date.now(),
       claimId: 'claim-123',
-      zkProofHash: 'hash-123',
+      zkProofHash: 'c1f64477c049ca1d3d1dfdde3731fd29af149d105a09fe9529ac44e58f8f9f37',
+      pqSignature
+    };
+
+    const proof: PqZkProof = {
+      claimId: 'claim-123',
+      proofData: validSnarkProofData,
+      publicSignals: ['18'],
+      receipt,
+      enclaveSignature: 'valid-signature'
+    };
+
+    const result = await engine.verify(mockClaim, proof);
+    expect(result.receiptVerified).toBe(false);
+  });
+
+  it('should fail if PQ receipt has mismatched zkProofHash', async () => {
+    const pqSignature: PqSignature = {
+      algorithm: 'Falcon-1024',
+      data: 'valid-signature',
+      publicKey: 'valid-pubkey'
+    };
+
+    const receipt: PqReceipt = {
+      version: '2030.1',
+      timestamp: Date.now(),
+      claimId: 'claim-123',
+      zkProofHash: 'mismatched-hash-value',
       pqSignature
     };
 
@@ -215,7 +298,8 @@ describe('PostQuantumZkEngine', () => {
       claimId: 'claim-123',
       proofData: 'mock-proof-data',
       publicSignals: ['18'],
-      receipt
+      receipt,
+      enclaveSignature: 'valid-signature'
     };
 
     const result = await engine.verify(mockClaim, proof);
