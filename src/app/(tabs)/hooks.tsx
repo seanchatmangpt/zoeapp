@@ -18,6 +18,9 @@ export default function HooksProjection() {
     projection,
     triggerHook,
     repairLastQuarantine,
+    activeHookId,
+    setActiveHookId,
+    triggerLivestream,
   } = useVkgEngine();
 
   const isQuarantined = quarantinedHooks.length > 0;
@@ -55,6 +58,47 @@ export default function HooksProjection() {
               </Text>
             </TouchableOpacity>
           ))}
+        </View>
+      </View>
+
+      {/* Switch Hook Control */}
+      <View className="mb-8">
+        <Text className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
+          Select Hook Scenario
+        </Text>
+        <View className="flex-row flex-wrap gap-2">
+          <TouchableOpacity
+            className={`py-2 px-4 rounded-full border ${
+              activeHookId === 'volunteer_shortage'
+                ? 'bg-sky-500 border-sky-400'
+                : 'bg-slate-800 border-slate-700 active:bg-slate-700'
+            }`}
+            onPress={() => setActiveHookId('volunteer_shortage')}
+          >
+            <Text
+              className={`text-sm font-bold ${
+                activeHookId === 'volunteer_shortage' ? 'text-slate-950' : 'text-slate-300'
+              }`}
+            >
+              Volunteer Shortage
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`py-2 px-4 rounded-full border ${
+              activeHookId === 'livestream_degradation'
+                ? 'bg-sky-500 border-sky-400'
+                : 'bg-slate-800 border-slate-700 active:bg-slate-700'
+            }`}
+            onPress={() => setActiveHookId('livestream_degradation')}
+          >
+            <Text
+              className={`text-sm font-bold ${
+                activeHookId === 'livestream_degradation' ? 'text-slate-950' : 'text-slate-300'
+              }`}
+            >
+              Livestream Incident
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -155,17 +199,57 @@ export default function HooksProjection() {
 
       {/* Command Triggers */}
       <View className="mb-8">
-        <TouchableOpacity
-          className={`py-4 rounded-xl flex-row justify-center items-center shadow-sm ${
-            isQuarantined ? 'bg-slate-700' : 'bg-sky-500 active:bg-sky-600'
-          }`}
-          disabled={isQuarantined}
-          onPress={() => triggerHook('volunteer_123', 'volunteer_cancel', 'shift_abc')}
-        >
-          <Text className={`text-base font-bold ${isQuarantined ? 'text-slate-500' : 'text-slate-950'}`}>
-            Trigger Volunteer Cancellation
-          </Text>
-        </TouchableOpacity>
+        {activeHookId === 'volunteer_shortage' ? (
+          <TouchableOpacity
+            className={`py-4 rounded-xl flex-row justify-center items-center shadow-sm ${
+              isQuarantined ? 'bg-slate-700' : 'bg-sky-500 active:bg-sky-600'
+            }`}
+            disabled={isQuarantined}
+            onPress={() => triggerHook('volunteer_123', 'volunteer_cancel', 'shift_abc')}
+          >
+            <Text className={`text-base font-bold ${isQuarantined ? 'text-slate-500' : 'text-slate-950'}`}>
+              Trigger Volunteer Cancellation
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <View className="gap-3">
+            <TouchableOpacity
+              className={`py-4 rounded-xl flex-row justify-center items-center shadow-sm ${
+                isQuarantined ? 'bg-slate-700' : 'bg-amber-600 active:bg-amber-700'
+              }`}
+              disabled={isQuarantined}
+              onPress={() => triggerLivestream('degrade', 1200, 0.10)}
+            >
+              <Text className="text-base font-bold text-white">
+                Trigger Bitrate Degradation (1200kbps, 10% loss)
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className={`py-4 rounded-xl flex-row justify-center items-center shadow-sm ${
+                isQuarantined ? 'bg-slate-700' : 'bg-rose-600 active:bg-rose-700'
+              }`}
+              disabled={isQuarantined}
+              onPress={() => triggerLivestream('escalate')}
+            >
+              <Text className="text-base font-bold text-white">
+                Escalate Incident (High Priority)
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className={`py-4 rounded-xl flex-row justify-center items-center shadow-sm ${
+                isQuarantined ? 'bg-slate-700' : 'bg-emerald-600 active:bg-emerald-700'
+              }`}
+              disabled={isQuarantined}
+              onPress={() => triggerLivestream('resolve')}
+            >
+              <Text className="text-base font-bold text-white">
+                Resolve Livestream Incident
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Audit Log / Receipt Details */}

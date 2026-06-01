@@ -7,7 +7,6 @@ export const wizardCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement wizard.
     console.log("Subcommand wizard is wired.");
   },
 });

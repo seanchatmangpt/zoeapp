@@ -2,7 +2,7 @@ import { ErrorAnalysis, SuggestedFix } from './types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MMKV } from 'react-native-mmkv';
 
-const storage = new MMKV();
+const storage = new (MMKV as any)();
 
 /**
  * Analyzes an error and its stack trace to suggest potential fixes.
@@ -37,8 +37,12 @@ export function analyzeError(error: Error): ErrorAnalysis {
       action: async () => {
         await AsyncStorage.clear();
         storage.clearAll();
-        // In a real app, we might want to trigger a full reload
-        // DevSettings.reload() if available, or just reset state
+        try {
+          const { DevSettings } = require('react-native');
+          DevSettings.reload();
+        } catch (e) {
+          console.warn('Reload not supported in this environment:', e);
+        }
       }
     });
   }
@@ -52,8 +56,13 @@ export function analyzeError(error: Error): ErrorAnalysis {
       description: 'Clears your current session and takes you back to login.',
       impact: 'medium',
       action: async () => {
-        await AsyncStorage.removeItem('supabase.auth.token'); // Example key
-        // Navigation logic would go here
+        await AsyncStorage.removeItem('supabase.auth.token');
+        try {
+          const { router } = require('expo-router');
+          router.replace('/(auth)');
+        } catch (e) {
+          console.warn('Failed to redirect to auth screen:', e);
+        }
       }
     });
   }
@@ -65,7 +74,14 @@ export function analyzeError(error: Error): ErrorAnalysis {
     description: 'Attempts to return to the previous known stable screen.',
     impact: 'low',
     action: () => {
-      // Logic to go back in navigation history
+      try {
+        const { router } = require('expo-router');
+        if (router.canGoBack()) {
+          router.back();
+        }
+      } catch (e) {
+        console.warn('Failed to rollback navigation:', e);
+      }
     }
   });
 

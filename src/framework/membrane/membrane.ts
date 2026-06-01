@@ -36,7 +36,6 @@ export class Membrane {
     executionBlock: () => Promise<T>
   ): Promise<ExecutionResult<T>> {
     const timestamp = new Date().toISOString();
-    const prevHash = this.receipts.getLastHash();
     
     // Start trace for membrane execution
     const traceId = `trace_cmd_${commandId}`;
@@ -45,6 +44,7 @@ export class Membrane {
     // 1. Run Interceptor chain (Gate Admissibility)
     const interceptCtx = { commandId, capabilityId, input, config: this.config };
     const verdict = await this.interceptors.evaluate(interceptCtx);
+    let prevHash = this.receipts.getLastHash();
 
     if (verdict === 'deny') {
       const receipt = await this.receipts.emitRefusal(
@@ -87,7 +87,8 @@ export class Membrane {
         verdict,
         success: true,
         deltaHash: receiptHash,
-        previousHash: prevHash
+        previousHash: prevHash,
+        resultHash
       };
 
       this.receipts.append(receipt);

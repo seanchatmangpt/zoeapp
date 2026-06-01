@@ -192,11 +192,97 @@ export const PROJECTION_MATRIX: Record<string, (data: any, role: AvatarRole) => 
         };
     }
   },
+
+  // Use Case 4: Livestream Incident / Degradation
+  livestream_degradation: (data, role) => {
+    switch (role) {
+      case 'guest':
+        return {
+          role,
+          visible: false,
+          surface: 'hidden',
+          allowedActions: [],
+          payload: null,
+        };
+      case 'member':
+        return {
+          role,
+          visible: data.streamStatus !== 'healthy',
+          surface: 'stream banner',
+          allowedActions: data.streamStatus !== 'healthy' ? ['switch_audio_only'] : [],
+          payload: {
+            message: 'We are experiencing connection issues with the video feed. Audio-only options are available.',
+            status: data.streamStatus,
+          },
+        };
+      case 'volunteer':
+        return {
+          role,
+          visible: true,
+          surface: 'support status',
+          allowedActions: ['report_stream_issue'],
+          payload: {
+            message: `Livestream is currently ${data.streamStatus}.`,
+            status: data.streamStatus,
+          },
+        };
+      case 'teamLead':
+        return {
+          role,
+          visible: true,
+          surface: 'incident coordinator dashboard',
+          allowedActions: ['escalate_incident', 'resolve_incident'],
+          payload: {
+            status: data.streamStatus,
+            incidentCount: data.incidentCount,
+            escalated: data.escalated,
+          },
+        };
+      case 'pastor':
+        return {
+          role,
+          visible: true,
+          surface: 'service telemetry overview',
+          allowedActions: [],
+          payload: {
+            message: `Service quality check: Livestream has status ${data.streamStatus}.`,
+            status: data.streamStatus,
+          },
+        };
+      case 'admin':
+        return {
+          role,
+          visible: true,
+          surface: 'infrastructure console',
+          allowedActions: ['audit_runs', 'force_failover'],
+          payload: {
+            status: data.streamStatus,
+            details: data,
+          },
+        };
+      case 'operator':
+        return {
+          role,
+          visible: true,
+          surface: 'ops direct telemetry',
+          allowedActions: ['escalate_incident', 'resolve_incident', 'trigger_replay'],
+          payload: {
+            status: data.streamStatus,
+            bitrateKbps: data.bitrateKbps,
+            packetLossRatio: data.packetLossRatio,
+            operatorAlerted: data.operatorAlerted,
+            escalated: data.escalated,
+          },
+        };
+    }
+  },
 };
 
 // Alias mappings for hook compatibility
 PROJECTION_MATRIX['content_validation_failed'] = PROJECTION_MATRIX['sermon_publish_failed'];
 PROJECTION_MATRIX['concept_drift'] = PROJECTION_MATRIX['concept_drift_detected'];
+PROJECTION_MATRIX['livestream_incident'] = PROJECTION_MATRIX['livestream_degradation'];
+PROJECTION_MATRIX['tech_incident'] = PROJECTION_MATRIX['livestream_degradation'];
 
 /**
  * Projects a single hook output to a specific avatar role.

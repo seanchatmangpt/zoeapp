@@ -17,6 +17,7 @@ export interface MembraneReceipt {
   deltaHash: string;
   previousHash: string;
   error?: string;
+  resultHash?: string;
 }
 
 export interface InterceptorContext<TInput = any> {

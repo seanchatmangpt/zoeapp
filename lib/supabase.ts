@@ -12,10 +12,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 
 /** Supabase project URL from environment variables */
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://placeholder-co.supabase.co';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://missing-env-url.supabase.co';
 
 /** Supabase anonymous key from environment variables */
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'missing-env-anon-key';
 
 /**
  * Configured Supabase client instance

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { Text, TextProps } from 'react-native';
 import { useTranslation } from '../../core/i18n/useTranslation';
 import { useA11y } from '../../ui/a11y/hooks/useA11y';
@@ -67,15 +67,25 @@ export const VoiceAccessibleText: React.FC<VoiceAccessibleTextProps> = ({
   });
 
   // 3. Voice Intent Integration
-  const { registerIntents } = useVoiceIntent();
+  const { registerIntents, unregisterIntents } = useVoiceIntent();
+
+  const memoizedExtraCommands = useMemo(() => {
+    return extraVoiceCommands;
+  }, [JSON.stringify(extraVoiceCommands)]);
+
+  const onVoiceFocusRef = useRef(onVoiceFocus);
+  useEffect(() => {
+    onVoiceFocusRef.current = onVoiceFocus;
+  }, [onVoiceFocus]);
 
   useEffect(() => {
+    let registeredId: string | null = null;
     if (typeof content === 'string' && content.length > 0) {
       const intentId = `voice-text-${content.replace(/\s+/g, '-').toLowerCase()}`;
       const commands = [
         `${voiceCommandPrefix} ${content}`,
         content,
-        ...extraVoiceCommands
+        ...memoizedExtraCommands
       ];
 
       registerIntents([
@@ -83,13 +93,19 @@ export const VoiceAccessibleText: React.FC<VoiceAccessibleTextProps> = ({
           id: intentId,
           commands,
           action: () => {
-            onVoiceFocus?.();
+            onVoiceFocusRef.current?.();
           },
           description: `Focuses on the text: ${content}`,
         },
       ]);
+      registeredId = intentId;
     }
-  }, [content, voiceCommandPrefix, onVoiceFocus, extraVoiceCommands, registerIntents]);
+    return () => {
+      if (registeredId) {
+        unregisterIntents([registeredId]);
+      }
+    };
+  }, [content, voiceCommandPrefix, memoizedExtraCommands, registerIntents, unregisterIntents]);
 
   return (
     <Text {...textProps} {...a11yProps}>

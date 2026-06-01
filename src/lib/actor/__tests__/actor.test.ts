@@ -101,22 +101,32 @@ jest.mock('../../db/db', () => {
     const tableName = getTableName(table);
     const tableStore = mockStore.filter(x => x._tableName === tableName);
     
-    const promise = Promise.resolve(tableStore);
-    (promise as any).where = jest.fn().mockImplementation((condition) => {
-      let results = [...tableStore];
-      if (condition && condition.queryChunks) {
-        const flatChunks = flattenChunks(condition.queryChunks);
-        const columnChunk = flatChunks.find((c: any) => c && c.name && c.value === undefined);
-        const paramChunk = flatChunks.find((c: any) => c && c.value !== undefined && !Array.isArray(c.value));
-        if (columnChunk && paramChunk) {
-          const columnName = columnChunk.name;
-          const jsKey = sqlToJsMap[columnName] || columnName;
-          results = results.filter((x) => x[jsKey] === paramChunk.value);
+    const prepareChain = (results: any[]): any => {
+      const p = Promise.resolve(results);
+      (p as any).where = jest.fn().mockImplementation((condition) => {
+        let filtered = [...results];
+        if (condition && condition.queryChunks) {
+          const flatChunks = flattenChunks(condition.queryChunks);
+          const columnChunk = flatChunks.find((c: any) => c && c.name && c.value === undefined);
+          const paramChunk = flatChunks.find((c: any) => c && c.value !== undefined && !Array.isArray(c.value));
+          if (columnChunk && paramChunk) {
+            const columnName = columnChunk.name;
+            const jsKey = sqlToJsMap[columnName] || columnName;
+            filtered = filtered.filter((x) => x[jsKey] === paramChunk.value);
+          }
         }
-      }
-      return Promise.resolve(results);
-    });
-    return promise;
+        return prepareChain(filtered);
+      });
+      (p as any).orderBy = jest.fn().mockImplementation(() => {
+        return prepareChain(results);
+      });
+      (p as any).limit = jest.fn().mockImplementation((n: number) => {
+        return prepareChain(results.slice(0, n));
+      });
+      return p;
+    };
+
+    return prepareChain(tableStore);
   });
   
   const mockSelectFn = jest.fn().mockImplementation(() => ({ from: mockFromFn }));

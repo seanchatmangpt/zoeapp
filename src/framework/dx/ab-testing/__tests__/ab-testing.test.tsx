@@ -38,7 +38,7 @@ describe('A/B Testing Framework', () => {
     it('should assign variants from storage if available', () => {
       mockGetString.mockImplementation((id: string) => {
         if (id === 'test-experiment') return 'B';
-        return null;
+        return undefined;
       });
 
       const TestComponent = () => {
@@ -57,7 +57,7 @@ describe('A/B Testing Framework', () => {
     });
 
     it('should assign new variants and persist them if not in storage', () => {
-      mockGetString.mockReturnValue(null);
+      mockGetString.mockReturnValue(undefined);
       // Mock Math.random to get predictable results
       const spy = jest.spyOn(Math, 'random').mockReturnValue(0.7);
 
@@ -80,7 +80,7 @@ describe('A/B Testing Framework', () => {
     });
 
     it('should honor weighted distribution', () => {
-      mockGetString.mockReturnValue(null);
+      mockGetString.mockReturnValue(undefined);
 
       const TestComponent = () => {
         const { variant } = useExperiment('weighted-experiment');
@@ -99,7 +99,7 @@ describe('A/B Testing Framework', () => {
     });
 
     it('should not persist non-sticky experiments', () => {
-      mockGetString.mockReturnValue(null);
+      mockGetString.mockReturnValue(undefined);
 
       render(
         <ExperimentProvider configs={testConfigs}>

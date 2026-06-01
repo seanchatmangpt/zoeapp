@@ -39,12 +39,6 @@ export class AutoFixErrorBoundary extends Component<AutoFixErrorBoundaryProps, A
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // If the error happens while already in error state, the AutoFixer or fallback crashed
-    if (this.state.hasError) {
-      this.setState({ autoFixerCrashed: true });
-      return;
-    }
-
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }

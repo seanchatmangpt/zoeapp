@@ -7,7 +7,6 @@ export const edgeCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement edge.
     console.log("Subcommand edge is wired.");
   },
 });

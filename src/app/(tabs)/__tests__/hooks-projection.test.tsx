@@ -25,6 +25,9 @@ describe('Truex Hooks Projection View', () => {
       projection: null,
       triggerHook: jest.fn(),
       repairLastQuarantine: jest.fn(),
+      activeHookId: 'volunteer_shortage',
+      setActiveHookId: jest.fn(),
+      triggerLivestream: jest.fn(),
     };
     (VkgProviderModule.useVkgEngine as jest.Mock).mockReturnValue(mockEngine);
   });
@@ -128,5 +131,30 @@ describe('Truex Hooks Projection View', () => {
     const triggerBtn = getByText('Trigger Volunteer Cancellation');
     fireEvent.press(triggerBtn);
     expect(mockEngine.triggerHook).toHaveBeenCalledWith('volunteer_123', 'volunteer_cancel', 'shift_abc');
+  });
+
+  test('should allow switching to livestream scenario and triggering livestream actions', () => {
+    const { getByText } = render(<HooksProjection />);
+
+    // Try clicking the toggle button
+    const liveScenarioBtn = getByText('Livestream Incident');
+    fireEvent.press(liveScenarioBtn);
+    expect(mockEngine.setActiveHookId).toHaveBeenCalledWith('livestream_degradation');
+
+    // Manually switch activeHookId in mockEngine for UI update test
+    mockEngine.activeHookId = 'livestream_degradation';
+    const { getByText: getByTextLive } = render(<HooksProjection />);
+
+    const degradeBtn = getByTextLive('Trigger Bitrate Degradation (1200kbps, 10% loss)');
+    fireEvent.press(degradeBtn);
+    expect(mockEngine.triggerLivestream).toHaveBeenCalledWith('degrade', 1200, 0.10);
+
+    const escalateBtn = getByTextLive('Escalate Incident (High Priority)');
+    fireEvent.press(escalateBtn);
+    expect(mockEngine.triggerLivestream).toHaveBeenCalledWith('escalate');
+
+    const resolveBtn = getByTextLive('Resolve Livestream Incident');
+    fireEvent.press(resolveBtn);
+    expect(mockEngine.triggerLivestream).toHaveBeenCalledWith('resolve');
   });
 });

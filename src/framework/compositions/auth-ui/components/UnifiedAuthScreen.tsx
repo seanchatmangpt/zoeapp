@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useAuth } from '../../auth/hooks';
-import { useBiometricAuth } from '../../auth/biometric/useBiometricAuth';
-import { useMfaVerification } from '../../auth/mfa/useMfaVerification';
-import { Button } from '../../ui/Button';
+import { useAuth } from '../../../auth/hooks';
+import { useBiometricAuth } from '../../../auth/biometric/useBiometricAuth';
+import { useMfaVerification } from '../../../auth/mfa/useMfaVerification';
+import { Button } from '../../../ui/Button';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 /**

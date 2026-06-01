@@ -5,6 +5,7 @@ import { AvatarRole, AvatarProjection } from '../lib/truex/avatar/types';
 import { projectHookOutput } from '../lib/truex/avatar/projector';
 import { DefaultHookSupervisor } from '../lib/truex/hook-otp/supervisor';
 import { stringifyActorRef } from '../lib/truex/hook-otp/actorRef';
+import { livestreamIncidentBehavior } from '../lib/truex/packs/livestream/hooks';
 
 interface VkgContextType {
   pendingReceipts: number;
@@ -16,6 +17,13 @@ interface VkgContextType {
   projection: AvatarProjection | null;
   triggerHook: (subject: string, predicate: string, object: string) => Promise<void>;
   repairLastQuarantine: () => Promise<void>;
+  activeHookId: 'volunteer_shortage' | 'livestream_degradation';
+  setActiveHookId: (hookId: 'volunteer_shortage' | 'livestream_degradation') => void;
+  triggerLivestream: (
+    action: 'degrade' | 'escalate' | 'resolve',
+    bitrateKbps?: number,
+    packetLossRatio?: number
+  ) => Promise<void>;
 }
 
 const VkgContext = createContext<VkgContextType | undefined>(undefined);
@@ -38,10 +46,17 @@ const volunteerShortageBehavior: HookBehavior = {
   },
 };
 
-const actorRef: HookActorRef = {
+const volunteerActorRef: HookActorRef = {
   tenantId: 'tenant-123',
   packId: 'volunteer',
   hookId: 'volunteer_shortage',
+  instanceId: 'default-instance',
+};
+
+const livestreamActorRef: HookActorRef = {
+  tenantId: 'tenant-123',
+  packId: 'livestream',
+  hookId: 'livestream_degradation',
   instanceId: 'default-instance',
 };
 
@@ -55,37 +70,59 @@ export function VkgProvider({ children }: { children: ReactNode }) {
   const [avatar, setAvatar] = useState<AvatarRole>('member');
   const [projection, setProjection] = useState<AvatarProjection | null>(null);
   const [actorState, setActorState] = useState<any>(null);
+  const [activeHookId, setActiveHookId] = useState<'volunteer_shortage' | 'livestream_degradation'>(
+    'volunteer_shortage'
+  );
 
-  // Initialize runtime actor
+  // Initialize runtime actors
   useEffect(() => {
-    const initActor = async () => {
-      const instance = await runtime.spawn(
-        actorRef,
+    const initActors = async () => {
+      const volInstance = await runtime.spawn(
+        volunteerActorRef,
         volunteerShortageBehavior,
         new DefaultHookSupervisor(3, 10)
       );
-      setActorState(instance.state);
-      setProjection(projectHookOutput('volunteer_shortage', instance.state, avatar));
+
+      const liveInstance = await runtime.spawn(
+        livestreamActorRef,
+        livestreamIncidentBehavior,
+        new DefaultHookSupervisor(5, 20)
+      );
+
+      // Set initial state
+      if (activeHookId === 'volunteer_shortage') {
+        setActorState({ ...volInstance.state });
+        setProjection(projectHookOutput('volunteer_shortage', volInstance.state, avatar));
+      } else {
+        setActorState({ ...liveInstance.state });
+        setProjection(projectHookOutput('livestream_degradation', liveInstance.state, avatar));
+      }
     };
-    initActor();
+    initActors();
   }, []);
 
-  // Update projection whenever avatar or actor state changes
+  // Update state/projection when activeHookId or avatar changes
   useEffect(() => {
-    if (actorState) {
-      setProjection(projectHookOutput('volunteer_shortage', actorState, avatar));
+    const registry = runtime.getRegistry();
+    const currentRef = activeHookId === 'volunteer_shortage' ? volunteerActorRef : livestreamActorRef;
+    const instance = registry.get(currentRef);
+    if (instance) {
+      setActorState({ ...instance.state });
+      setProjection(projectHookOutput(activeHookId, instance.state, avatar));
     }
-  }, [avatar, actorState]);
+  }, [activeHookId, avatar]);
 
   // Telemetry listener to catch runtime events
   useEffect(() => {
     const handleTelemetry = (evt: any) => {
+      const registry = runtime.getRegistry();
       if (evt.type === 'message_processed') {
         setLastReceipt(evt.receipt);
-        const registry = runtime.getRegistry();
-        const instance = registry.get(actorRef);
-        if (instance) {
-          setActorState({ ...instance.state });
+        if (evt.actorRef.hookId === activeHookId) {
+          const instance = registry.get(evt.actorRef);
+          if (instance) {
+            setActorState({ ...instance.state });
+          }
         }
       } else if (evt.type === 'supervisor_intervention' && evt.action === 'quarantine') {
         setQuarantinedHooks((prev) => [...prev, stringifyActorRef(evt.actorRef)]);
@@ -93,100 +130,160 @@ export function VkgProvider({ children }: { children: ReactNode }) {
     };
     runtime.registerTelemetry(handleTelemetry);
     return () => runtime.unregisterTelemetry(handleTelemetry);
-  }, []);
+  }, [activeHookId]);
 
   /**
-   * Triggers a hook mutation optimistically.
-   * Updates local state immediately, then asynchronously pushes the delta to the Supabase Edge function.
-   * If the Edge function is unreachable or fails, state gracefully falls back to local tracking.
+   * Triggers a volunteer shortage hook mutation optimistically.
    */
-  const triggerHook = useCallback(async (subject: string, predicate: string, object: string) => {
-    // 1. Optimistic pending UI updates
-    setPendingReceipts((prev) => prev + 1);
+  const triggerHook = useCallback(
+    async (subject: string, predicate: string, object: string) => {
+      setPendingReceipts((prev) => prev + 1);
 
-    const msg: HookMessage = {
-      id: 'msg_' + Math.random().toString(36).substring(2, 11),
-      type: 'graph_delta',
-      payload: { action: 'cancel', subject, predicate, object },
-      actorRef,
-      timestamp: new Date().toISOString(),
-    };
+      const msg: HookMessage = {
+        id: 'msg_' + Math.random().toString(36).substring(2, 11),
+        type: 'graph_delta',
+        payload: { action: 'cancel', subject, predicate, object },
+        actorRef: volunteerActorRef,
+        timestamp: new Date().toISOString(),
+      };
 
-    // Evaluate locally
-    try {
-      runtime.send(actorRef, msg);
-    } catch (err) {
-      // In a production app, we would route this to a structured error tracking service (e.g. Sentry)
-      console.error('Local evaluation error:', err instanceof Error ? err.message : err);
-    }
-
-    // 2. Simulate Outbox Sync to Supabase Edge function
-    try {
-      // In local testing, if Supabase is not running, we fallback gracefully
-      const response = await fetch('http://127.0.0.1:54321/functions/v1/vkg-hooks-apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ delta: msg.payload }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        // Server returned Confirmed/Authoritative receipt
-        setPendingReceipts((prev) => Math.max(0, prev - 1));
-        setProcessedReceipts((prev) => prev + 1);
-        if (result.receipt) {
-          setLastReceipt({
-            receiptHash: result.receipt,
-            previousReceiptHash: lastReceipt?.receiptHash || 'init_chain_hash',
-            hookRunId: 'run_authoritative',
-            tenantId: actorRef.tenantId,
-            actorRef,
-            messageId: msg.id,
-            inputHash: 'input_hash',
-            outputHash: 'output_hash',
-            deltaHash: 'delta_hash',
-            status: 'Confirmed',
-            avatarProjectionHashes: {},
-            supervisorEvents: [],
-            timestamp: new Date().toISOString(),
-          });
-        }
-      } else {
-        throw new Error('Supabase Edge offline or returned error');
+      try {
+        runtime.send(volunteerActorRef, msg);
+      } catch (err) {
+        console.error('Local evaluation error:', err instanceof Error ? err.message : err);
       }
-    } catch (err) {
-      // Local fallback in case local supabase is offline/not started
+
+      // Simulate Outbox Sync to Supabase Edge function
+      try {
+        const response = await fetch('http://127.0.0.1:54321/functions/v1/vkg-hooks-apply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ delta: msg.payload }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setPendingReceipts((prev) => Math.max(0, prev - 1));
+          setProcessedReceipts((prev) => prev + 1);
+          if (result.receipt) {
+            setLastReceipt({
+              receiptHash: result.receipt,
+              previousReceiptHash: lastReceipt?.receiptHash || 'init_chain_hash',
+              hookRunId: 'run_authoritative',
+              tenantId: volunteerActorRef.tenantId,
+              actorRef: volunteerActorRef,
+              messageId: msg.id,
+              inputHash: 'input_hash',
+              outputHash: 'output_hash',
+              deltaHash: 'delta_hash',
+              status: 'Confirmed',
+              avatarProjectionHashes: {},
+              supervisorEvents: [],
+              timestamp: new Date().toISOString(),
+            });
+          }
+        } else {
+          throw new Error('Supabase Edge offline or returned error');
+        }
+      } catch (err) {
+        // Local fallback
+        setTimeout(() => {
+          setPendingReceipts((prev) => Math.max(0, prev - 1));
+          setProcessedReceipts((prev) => prev + 1);
+        }, 1500);
+      }
+    },
+    [lastReceipt]
+  );
+
+  /**
+   * Triggers a livestream incident hook mutation.
+   */
+  const triggerLivestream = useCallback(
+    async (
+      action: 'degrade' | 'escalate' | 'resolve',
+      bitrateKbps?: number,
+      packetLossRatio?: number
+    ) => {
+      setPendingReceipts((prev) => prev + 1);
+
+      const msg: HookMessage = {
+        id: 'msg_' + Math.random().toString(36).substring(2, 11),
+        type: 'graph_delta',
+        payload: { action, bitrateKbps, packetLossRatio },
+        actorRef: livestreamActorRef,
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        runtime.send(livestreamActorRef, msg);
+      } catch (err) {
+        console.error('Local evaluation error:', err instanceof Error ? err.message : err);
+      }
+
+      // Simulate Outbox Sync fallback
       setTimeout(() => {
         setPendingReceipts((prev) => Math.max(0, prev - 1));
         setProcessedReceipts((prev) => prev + 1);
-      }, 1500);
-    }
-  }, [lastReceipt]);
+
+        setLastReceipt({
+          receiptHash: 'auth_' + Math.random().toString(36).substring(2, 11),
+          previousReceiptHash: lastReceipt?.receiptHash || 'init_chain_hash',
+          hookRunId: 'run_authoritative_livestream',
+          tenantId: livestreamActorRef.tenantId,
+          actorRef: livestreamActorRef,
+          messageId: msg.id,
+          inputHash: 'input_hash',
+          outputHash: 'output_hash',
+          deltaHash: 'delta_hash',
+          status: 'Confirmed',
+          avatarProjectionHashes: {},
+          supervisorEvents: [],
+          timestamp: new Date().toISOString(),
+        });
+      }, 1000);
+    },
+    [lastReceipt]
+  );
 
   const repairLastQuarantine = useCallback(async () => {
     const registry = runtime.getRegistry();
-    const instance = registry.get(actorRef);
+    const currentRef = activeHookId === 'volunteer_shortage' ? volunteerActorRef : livestreamActorRef;
+    const instance = registry.get(currentRef);
     if (instance) {
       const repairMsg: HookMessage = {
         id: 'msg_repair_' + Date.now(),
         type: 'supervisor_signal',
         payload: {
           action: 'repair',
-          state: {
-            openSlots: 4,
-            candidates: ['Sarah Brown', 'Michael Green'],
-            shortageRatio: 0.5,
-            serviceDate: '2026-05-24',
-          },
+          state:
+            activeHookId === 'volunteer_shortage'
+              ? {
+                  openSlots: 4,
+                  candidates: ['Sarah Brown', 'Michael Green'],
+                  shortageRatio: 0.5,
+                  serviceDate: '2026-05-24',
+                }
+              : {
+                  streamStatus: 'healthy',
+                  bitrateKbps: 4500,
+                  packetLossRatio: 0.0,
+                  incidentCount: 0,
+                  operatorAlerted: false,
+                  memberNotified: false,
+                  escalated: false,
+                  resolved: true,
+                  history: ['Incident repaired by supervisor intervention.'],
+                },
         },
-        actorRef,
+        actorRef: currentRef,
         timestamp: new Date().toISOString(),
       };
       instance.quarantined = false;
       setQuarantinedHooks([]);
-      runtime.send(actorRef, repairMsg);
+      runtime.send(currentRef, repairMsg);
     }
-  }, []);
+  }, [activeHookId]);
 
   return (
     <VkgContext.Provider
@@ -200,6 +297,9 @@ export function VkgProvider({ children }: { children: ReactNode }) {
         projection,
         triggerHook,
         repairLastQuarantine,
+        activeHookId,
+        setActiveHookId,
+        triggerLivestream,
       }}
     >
       {children}
@@ -214,3 +314,4 @@ export function useVkgEngine() {
   }
   return context;
 }
+

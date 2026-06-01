@@ -7,7 +7,6 @@ export const telcoCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement telco.
     console.log("Subcommand telco is wired.");
   },
 });

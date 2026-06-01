@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent, act, screen } from '@testing-library/react-native';
+import { View } from 'react-native';
 import { FusionDevTools } from '../FusionDevTools';
 
 // Mock blueprints
@@ -14,9 +15,13 @@ jest.mock('../../../compositions/blueprints', () => ({
 }));
 
 // Mock DocExplorer
-jest.mock('../../../core/docs/DocExplorer', () => ({
-  DocExplorer: () => <mock-doc-explorer testID="mock-doc-explorer" />,
-}));
+jest.mock('../../../core/docs/DocExplorer', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    DocExplorer: () => <View testID="mock-doc-explorer" />,
+  };
+});
 
 // Mock @expo/vector-icons
 jest.mock('@expo/vector-icons', () => ({
@@ -24,20 +29,20 @@ jest.mock('@expo/vector-icons', () => ({
 }));
 
 describe('FusionDevTools', () => {
-  const originalDev = global.__DEV__;
+  const originalDev = (global as any).__DEV__;
 
   beforeEach(() => {
     jest.useFakeTimers();
-    global.__DEV__ = true;
+    (global as any).__DEV__ = true;
   });
 
   afterEach(() => {
-    global.__DEV__ = originalDev;
+    (global as any).__DEV__ = originalDev;
     jest.useRealTimers();
   });
 
   it('does not render when __DEV__ is false', () => {
-    global.__DEV__ = false;
+    (global as any).__DEV__ = false;
     render(<FusionDevTools />);
     expect(screen.queryByTestId('fusion-devtools-fab')).toBeNull();
   });

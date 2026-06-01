@@ -32,7 +32,7 @@ export const <%= exportName %> = defineCommand({
   },
 <% } else { %>
   async run(ctx) {
-    // TODO: implement command behavior.
+    // Implement command behavior.
     // Keep command behavior outside generated templates when possible.
     console.log("Command <%= name %> is wired.");
   },

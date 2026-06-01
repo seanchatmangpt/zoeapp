@@ -1,0 +1,32 @@
+wasm4pm:
+  root: /Users/sac/wasm4pm
+  crates:
+    - /Users/sac/wasm4pm/crates/wasm4pm-types
+    - /Users/sac/wasm4pm/crates/prolog8
+    - /Users/sac/wasm4pm/crates/wasm4pm-utils
+    - /Users/sac/wasm4pm/crates/wasm4pm-algos
+    - /Users/sac/wasm4pm/crates/ocel-core
+    - /Users/sac/wasm4pm/crates/miniml-core
+    - /Users/sac/wasm4pm/crates/ocpq
+    - /Users/sac/wasm4pm/crates/wasm4pm-cli
+    - /Users/sac/wasm4pm/crates/pm-core
+    - /Users/sac/wasm4pm/crates/wasm4pm-cognition
+    - /Users/sac/wasm4pm/crates/wasm4pm-macros
+  apps:
+    - /Users/sac/wasm4pm/apps/wasm4pm
+  packages:
+    - /Users/sac/wasm4pm/packages/swarm
+    - /Users/sac/wasm4pm/packages/config
+    - /Users/sac/wasm4pm/packages/cognition
+    - /Users/sac/wasm4pm/packages/planner
+    - /Users/sac/wasm4pm/packages/contracts
+    - /Users/sac/wasm4pm/packages/agents
+    - /Users/sac/wasm4pm/packages/observability
+    - /Users/sac/wasm4pm/packages/testing
+    - /Users/sac/wasm4pm/packages/ml
+    - /Users/sac/wasm4pm/packages/engine
+    - /Users/sac/wasm4pm/packages/kernel
+wasm4pm-compat:
+  root: /Users/sac/wasm4pm-compat
+  packages:
+    - /Users/sac/wasm4pm-compat/pkg

@@ -1,6 +1,7 @@
 import { Membrane } from '../membrane';
 import { ProxyFactory } from '../proxy';
 import { MembraneTelemetryEvent } from '../types';
+import { sha256 } from '../../../lib/crypto/receipts';
 
 describe('Membrane Framework', () => {
   let membrane: Membrane;
@@ -284,25 +285,35 @@ describe('Membrane Framework', () => {
     });
 
     it('should validate valid receipt chains', () => {
+      const rHash1 = sha256('result1');
+      const dHash1 = sha256('' + rHash1);
+      const rHash2 = sha256('result2');
+      const dHash2 = sha256(dHash1 + rHash2);
+
       membrane.receipts.append({
         id: '1', commandId: 'c', capabilityId: 'c', timestamp: 't',
-        verdict: 'allow', success: true, deltaHash: 'hash1', previousHash: ''
+        verdict: 'allow', success: true, deltaHash: dHash1, previousHash: '', resultHash: rHash1
       });
       membrane.receipts.append({
         id: '2', commandId: 'c', capabilityId: 'c', timestamp: 't',
-        verdict: 'allow', success: true, deltaHash: 'hash2', previousHash: 'hash1'
+        verdict: 'allow', success: true, deltaHash: dHash2, previousHash: dHash1, resultHash: rHash2
       });
       expect(membrane.receipts.validateChain().valid).toBe(true);
     });
 
     it('should invalidate broken receipt chains', () => {
+      const rHash1 = sha256('result1');
+      const dHash1 = sha256('' + rHash1);
+      const rHash2 = sha256('result2');
+      const dHash2 = sha256(dHash1 + rHash2);
+
       membrane.receipts.append({
         id: '1', commandId: 'c', capabilityId: 'c', timestamp: 't',
-        verdict: 'allow', success: true, deltaHash: 'hash1', previousHash: ''
+        verdict: 'allow', success: true, deltaHash: dHash1, previousHash: '', resultHash: rHash1
       });
       membrane.receipts.append({
         id: '2', commandId: 'c', capabilityId: 'c', timestamp: 't',
-        verdict: 'allow', success: true, deltaHash: 'hash3', previousHash: 'hash2'
+        verdict: 'allow', success: true, deltaHash: dHash2, previousHash: 'wrong_prev_hash', resultHash: rHash2
       });
       expect(membrane.receipts.validateChain().valid).toBe(false);
     });

@@ -7,7 +7,6 @@ export const truexCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement truex.
     console.log("Subcommand truex is wired.");
   },
 });

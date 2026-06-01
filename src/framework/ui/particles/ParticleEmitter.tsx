@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 import React, { useMemo, useEffect } from 'react';
 import { StyleSheet, View, ColorValue } from 'react-native';
 import Animated, {
@@ -7,6 +8,7 @@ import Animated, {
   Easing,
   runOnJS,
   useDerivedValue,
+  SharedValue,
 } from 'react-native-reanimated';
 import { ParticleEmitterProps } from './types';
 
@@ -24,7 +26,7 @@ interface ParticleConfig {
 
 const ParticleItem: React.FC<{
   config: ParticleConfig;
-  progress: Animated.SharedValue<number>;
+  progress: SharedValue<number>;
   gravity: number;
 }> = ({ config, progress, gravity }) => {
   const animatedStyle = useAnimatedStyle(() => {

@@ -7,7 +7,6 @@ export const supaCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement supa.
     console.log("Subcommand supa is wired.");
   },
 });

@@ -97,7 +97,7 @@ describe('GlassSpatialContainer', () => {
         transform={transform}
         depth={5}
         intensity="high"
-        tint="white"
+        tint="light"
         withBorder={false}
         delay={500}
         entryDirection="left"
@@ -114,7 +114,7 @@ describe('GlassSpatialContainer', () => {
     expect(spatialView.props['data-transform']).toBe(JSON.stringify(transform));
     expect(spatialView.props['data-depth']).toBe(5);
     expect(glassCard.props['data-intensity']).toBe('high');
-    expect(glassCard.props['data-tint']).toBe('white');
+    expect(glassCard.props['data-tint']).toBe('light');
     expect(glassCard.props['data-with-border']).toBe(false);
     expect(glassCard.props.style).toEqual(style);
     expect(slideTransition.props['data-direction']).toBe('left');

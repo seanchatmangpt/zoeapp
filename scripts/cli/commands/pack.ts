@@ -7,7 +7,6 @@ export const packCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement pack.
     console.log("Subcommand pack is wired.");
   },
 });

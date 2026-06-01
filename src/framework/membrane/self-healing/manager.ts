@@ -1,6 +1,7 @@
 import { Membrane } from '../membrane';
 import { MembraneReceipt } from '../types';
 import { SelfHealingConfig, HealingResult, SelfHealingState } from './types';
+import { sha256 } from '../../../lib/crypto/receipts';
 
 /**
  * SelfHealingManager provides autonomous state recovery for the Zoe Membrane.
@@ -168,6 +169,8 @@ export class SelfHealingManager {
     for (let i = 0; i < chain.length; i++) {
       const prevHash = i === 0 ? '' : chain[i - 1].deltaHash;
       if (chain[i].previousHash !== prevHash) return false;
+      const expectedHash = sha256(prevHash + (chain[i].resultHash || ''));
+      if (chain[i].deltaHash !== expectedHash) return false;
     }
     return true;
   }

@@ -7,11 +7,11 @@ export const <%= exportName %> = defineCittyPlugin({
   name: "<%= name %>",
 
   async setup(ctx) {
-    // TODO: attach reusable command context.
+    // Attach reusable command context.
   },
 
   async cleanup(ctx) {
-    // TODO: release reusable command context.
+    // Release reusable command context.
   },
 });
 

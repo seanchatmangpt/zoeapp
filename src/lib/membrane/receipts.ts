@@ -32,7 +32,8 @@ export class Receipts {
   ): Promise<MembraneReceipt> {
     const timestamp = new Date().toISOString();
     const data = { commandId, capabilityId, error: errorMsg, success: false };
-    const hash = sha256(prevHash + canonicalStringify(data));
+    const resultHash = sha256(canonicalStringify(data));
+    const hash = sha256(prevHash + resultHash);
 
     const receipt: MembraneReceipt = {
       id: `rec_refuse_${Math.random().toString(36).substr(2, 9)}`,
@@ -43,7 +44,8 @@ export class Receipts {
       success: false,
       deltaHash: hash,
       previousHash: prevHash,
-      error: errorMsg
+      error: errorMsg,
+      resultHash
     };
 
     this.append(receipt);
@@ -56,15 +58,14 @@ export class Receipts {
   static validateChain(c: MembraneReceipt[]): { valid: boolean; error?: string } {
     for (let i = 0; i < c.length; i++) {
       const prevHash = i === 0 ? '' : c[i - 1].deltaHash;
-      if (c[i].previousHash !== prevHash) {
+      const rec = c[i];
+      if (rec.previousHash !== prevHash) {
         return { valid: false, error: `broken lineage at index ${i}` };
       }
-      const data = c[i].success 
-        ? c[i] // simplified or full state representation matching hash
-        : { commandId: c[i].commandId, capabilityId: c[i].capabilityId, error: c[i].error, success: false };
-      
-      // Verification hash check
-      // For testing stability: we check lineage prevHash mapping
+      const expectedHash = sha256(prevHash + (rec.resultHash || ''));
+      if (rec.deltaHash !== expectedHash) {
+        return { valid: false, error: `invalid hash signature at index ${i}` };
+      }
     }
     return { valid: true };
   }

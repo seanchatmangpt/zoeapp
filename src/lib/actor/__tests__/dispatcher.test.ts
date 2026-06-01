@@ -110,27 +110,37 @@ jest.mock('../../db/db', () => {
       const tableName = getTableName(table);
       const tableStore = mockStore.filter(x => x._tableName === tableName).map(x => ({ ...x }));
       
-      const promise = Promise.resolve(tableStore);
-      (promise as any).where = jest.fn().mockImplementation((condition) => {
-        try {
-          let results = tableStore.map(x => ({ ...x }));
-          if (condition && condition.queryChunks) {
-            const flatChunks = flattenChunks(condition.queryChunks);
-            const columnChunk = flatChunks.find((c: any) => c && c.name && c.value === undefined);
-            const paramChunk = flatChunks.find((c: any) => c && c.value !== undefined && !Array.isArray(c.value));
-            if (columnChunk && paramChunk) {
-              const columnName = columnChunk.name;
-              const jsKey = sqlToJsMap[columnName] || columnName;
-              results = results.filter((x) => x[jsKey] === paramChunk.value);
+      const prepareChain = (results: any[]): any => {
+        const p = Promise.resolve(results);
+        (p as any).where = jest.fn().mockImplementation((condition) => {
+          try {
+            let filtered = results.map(x => ({ ...x }));
+            if (condition && condition.queryChunks) {
+              const flatChunks = flattenChunks(condition.queryChunks);
+              const columnChunk = flatChunks.find((c: any) => c && c.name && c.value === undefined);
+              const paramChunk = flatChunks.find((c: any) => c && c.value !== undefined && !Array.isArray(c.value));
+              if (columnChunk && paramChunk) {
+                const columnName = columnChunk.name;
+                const jsKey = sqlToJsMap[columnName] || columnName;
+                filtered = filtered.filter((x) => x[jsKey] === paramChunk.value);
+              }
             }
+            return prepareChain(filtered);
+          } catch (e: any) {
+            console.error('ERROR IN where:', e.stack);
+            throw e;
           }
-          return Promise.resolve(results);
-        } catch (e: any) {
-          console.error('ERROR IN where:', e.stack);
-          throw e;
-        }
-      });
-      return promise;
+        });
+        (p as any).orderBy = jest.fn().mockImplementation(() => {
+          return prepareChain(results);
+        });
+        (p as any).limit = jest.fn().mockImplementation((n: number) => {
+          return prepareChain(results.slice(0, n));
+        });
+        return p;
+      };
+
+      return prepareChain(tableStore);
     } catch (e: any) {
       console.error('ERROR IN mockFromFn:', e.stack);
       throw e;

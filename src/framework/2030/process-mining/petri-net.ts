@@ -268,7 +268,10 @@ export class TokenReplayEngine {
 
     for (const transition of trace) {
       if (!TRANSITIONS.includes(transition)) {
-        logs.push(formatLog(`Invalid transition '${transition}' skipped during replay.`));
+        logs.push(formatLog(`[CONFORMANCE DEVIATION] Invalid transition '${transition}' skipped during replay.`));
+        missing += 1;
+        produced += 1;
+        consumed += 1;
         continue;
       }
 

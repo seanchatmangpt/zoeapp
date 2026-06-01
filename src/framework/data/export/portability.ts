@@ -1,5 +1,5 @@
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import { documentDirectory, cacheDirectory, readAsStringAsync, writeAsStringAsync, EncodingType } from 'expo-file-system';
+import { Share } from 'react-native';
 import { mmkvInstance } from '../../../lib/store/mmkvStorage';
 import { DATABASE_NAME } from '../../../lib/db/db';
 import { blake3, canonicalStringify } from '../../../lib/crypto/receipts';
@@ -14,10 +14,10 @@ export interface ExportPackage {
 
 export const Portability = {
   async exportData(): Promise<string> {
-    const dbPath = `${FileSystem.documentDirectory}SQLite/${DATABASE_NAME}`;
+    const dbPath = `${documentDirectory}SQLite/${DATABASE_NAME}`;
     let sqliteBase64 = '';
     try {
-      sqliteBase64 = await FileSystem.readAsStringAsync(dbPath, { encoding: FileSystem.EncodingType.Base64 });
+      sqliteBase64 = await readAsStringAsync(dbPath, { encoding: EncodingType.Base64 });
     } catch(e) {
       sqliteBase64 = ''; // Test fallback
     }
@@ -39,8 +39,8 @@ export const Portability = {
     const signature = blake3(canonicalStringify(pkg));
     const finalPackage: ExportPackage = { ...pkg, signature };
     
-    const exportUri = `${FileSystem.cacheDirectory}zoe_backup_${pkg.timestamp}.json`;
-    await FileSystem.writeAsStringAsync(exportUri, JSON.stringify(finalPackage));
+    const exportUri = `${cacheDirectory}zoe_backup_${pkg.timestamp}.json`;
+    await writeAsStringAsync(exportUri, JSON.stringify(finalPackage));
     
     try {
       await Share.share({ url: exportUri });
@@ -52,7 +52,7 @@ export const Portability = {
   },
 
   async importData(fileUri: string): Promise<void> {
-    const content = await FileSystem.readAsStringAsync(fileUri);
+    const content = await readAsStringAsync(fileUri);
     const pkg: ExportPackage = JSON.parse(content);
 
     const { signature, ...data } = pkg;
@@ -66,7 +66,7 @@ export const Portability = {
       mmkvInstance.set(key, val);
     });
 
-    const dbPath = `${FileSystem.documentDirectory}SQLite/${DATABASE_NAME}`;
-    await FileSystem.writeAsStringAsync(dbPath, pkg.sqliteBase64, { encoding: FileSystem.EncodingType.Base64 });
+    const dbPath = `${documentDirectory}SQLite/${DATABASE_NAME}`;
+    await writeAsStringAsync(dbPath, pkg.sqliteBase64, { encoding: EncodingType.Base64 });
   }
 };

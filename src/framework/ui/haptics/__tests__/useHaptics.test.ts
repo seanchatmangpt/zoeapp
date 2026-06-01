@@ -72,7 +72,7 @@ describe('useHaptics hooks', () => {
   describe('useHapticEffect', () => {
     it('should trigger haptics when dependency changes', () => {
       const { rerender } = renderHook(
-        ({ dep }) => useHapticEffect(dep, HapticFeedbackPattern.SUCCESS, { skipFirst: false }),
+        (props: any) => useHapticEffect(props.dep, HapticFeedbackPattern.SUCCESS, { skipFirst: false }),
         { initialProps: { dep: 0 } }
       );
 
@@ -85,7 +85,7 @@ describe('useHaptics hooks', () => {
 
     it('should skip first trigger by default', () => {
       renderHook(
-        ({ dep }) => useHapticEffect(dep, HapticFeedbackPattern.SUCCESS),
+        (props: any) => useHapticEffect(props.dep, HapticFeedbackPattern.SUCCESS),
         { initialProps: { dep: 0 } }
       );
 

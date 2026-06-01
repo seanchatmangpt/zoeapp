@@ -4,6 +4,8 @@ import { HookPackUpgrade } from '../upgrade';
 import { HookPackRollback } from '../rollback';
 import { VolunteerPackManifest } from '../volunteer/manifest';
 import { volunteerShortageBehavior } from '../volunteer/hooks';
+import { LivestreamPackManifest } from '../livestream/manifest';
+import { livestreamIncidentBehavior } from '../livestream/hooks';
 import { HookRuntime } from '../../hook-otp/runtime';
 import { HookActorRef } from '../../hook-otp/types';
 import { TensionQueueMapper } from '../packs';
@@ -107,6 +109,91 @@ describe('Truex Hook Pack Runtime', () => {
 
     expect(instance.state.openSlots).toBe(4);
     expect(instance.state.shortageRatio).toBe(4 / 9);
+  });
+
+  test('should spawn and execute livestream degradation behavior with proper state transitions and duplicate suppression', async () => {
+    const runtime = new HookRuntime();
+    const ref: HookActorRef = {
+      tenantId: 'tenant-123',
+      packId: 'livestream',
+      hookId: 'livestream_degradation',
+      instanceId: 'inst-livestream-1',
+    };
+
+    const instance = await runtime.spawn(ref, livestreamIncidentBehavior);
+    expect(instance.state.streamStatus).toBe('healthy');
+    expect(instance.state.resolved).toBe(true);
+
+    let telemetryEvents: any[] = [];
+    runtime.registerTelemetry((evt) => {
+      telemetryEvents.push(evt);
+    });
+
+    // 1. Trigger degrade message
+    runtime.send(ref, {
+      id: 'msg-degrade-1',
+      type: 'graph_delta',
+      payload: { action: 'degrade', bitrateKbps: 1800, packetLossRatio: 0.06 },
+      actorRef: ref,
+      timestamp: new Date().toISOString(),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(instance.state.streamStatus).toBe('degraded');
+    expect(instance.state.resolved).toBe(false);
+    expect(instance.state.operatorAlerted).toBe(true);
+    expect(instance.state.memberNotified).toBe(true);
+    expect(instance.state.incidentCount).toBe(1);
+
+    // Verify effects emitted (operator_alert and member_status_projection)
+    const event1 = telemetryEvents.find((e) => e.messageId === 'msg-degrade-1');
+    expect(event1).toBeDefined();
+    expect(event1.receipt.status).toBe('Pending');
+
+    // 2. Trigger second degrade message (duplicate suppression check)
+    telemetryEvents = [];
+    runtime.send(ref, {
+      id: 'msg-degrade-2',
+      type: 'graph_delta',
+      payload: { action: 'degrade', bitrateKbps: 1200, packetLossRatio: 0.10 },
+      actorRef: ref,
+      timestamp: new Date().toISOString(),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(instance.state.bitrateKbps).toBe(1200);
+    expect(instance.state.packetLossRatio).toBe(0.10);
+    expect(instance.state.incidentCount).toBe(1); // should remain 1 as it didn't transition from healthy
+
+    // 3. Trigger escalate message
+    runtime.send(ref, {
+      id: 'msg-escalate',
+      type: 'graph_delta',
+      payload: { action: 'escalate' },
+      actorRef: ref,
+      timestamp: new Date().toISOString(),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(instance.state.streamStatus).toBe('escalated');
+    expect(instance.state.escalated).toBe(true);
+
+    // 4. Trigger resolve message
+    runtime.send(ref, {
+      id: 'msg-resolve',
+      type: 'graph_delta',
+      payload: { action: 'resolve' },
+      actorRef: ref,
+      timestamp: new Date().toISOString(),
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(instance.state.streamStatus).toBe('healthy');
+    expect(instance.state.resolved).toBe(true);
+    expect(instance.state.escalated).toBe(false);
+    expect(instance.state.operatorAlerted).toBe(false);
+    expect(instance.state.memberNotified).toBe(false);
   });
 
   describe('TensionQueueMapper', () => {

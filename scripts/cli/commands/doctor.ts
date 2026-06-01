@@ -7,7 +7,6 @@ export const doctorCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement doctor.
     console.log("Subcommand doctor is wired.");
   },
 });

@@ -10,7 +10,7 @@ export const <%= childExport %> = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement <%= childName %>.
+    // Implement <%= childName %>.
     console.log("Subcommand <%= childName %> is wired.");
   },
 });

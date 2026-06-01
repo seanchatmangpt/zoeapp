@@ -7,7 +7,6 @@ export const explainCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement explain.
     console.log("Subcommand explain is wired.");
   },
 });

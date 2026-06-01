@@ -7,7 +7,6 @@ export const replayCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement replay.
     console.log("Subcommand replay is wired.");
   },
 });

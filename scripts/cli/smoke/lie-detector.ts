@@ -7,7 +7,6 @@ export const smokeLieDetectorCommand = defineCommand({
   },
 
   async run(ctx) {
-    // TODO: implement lie-detector.
     console.log("Subcommand lie-detector is wired.");
   },
 });

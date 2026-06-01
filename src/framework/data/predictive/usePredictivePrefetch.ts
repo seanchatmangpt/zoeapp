@@ -19,7 +19,7 @@ export function usePredictivePrefetch(currentPredicateUri: string, options: Pred
       
       // Simulate proximity parsing - fetching related nodes in the graph
       try {
-        await vkg.match(undefined, { value: currentPredicateUri, termType: 'NamedNode' } as any, undefined);
+        await (vkg as any).match?.(undefined, { value: currentPredicateUri, termType: 'NamedNode' } as any, undefined);
       } catch (e) {
         // fail silently in predictive
       }

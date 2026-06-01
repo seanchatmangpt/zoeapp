@@ -2,7 +2,7 @@
  * @fileoverview SQLite FTS5 Search Engine for Offline Graph Data
  */
 
-import { expoDb } from '../../lib/db/db';
+import { expoDb } from '../../../lib/db/db';
 import { SearchOptions, SearchResult } from './types';
 
 export class SearchEngine {
@@ -128,7 +128,7 @@ export class SearchEngine {
 
     try {
       const results = expoDb.getAllSync<SearchResult & { snippet: string }>(sql, ...params);
-      return results.map(r => ({
+      return results.map((r: SearchResult & { snippet: string }) => ({
         subject: r.subject,
         predicate: r.predicate,
         objectValue: r.objectValue,

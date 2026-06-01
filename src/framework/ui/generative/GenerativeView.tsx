@@ -21,7 +21,7 @@ export const GenerativeView: React.FC<GenerativeViewProps> = ({
 
   // Iron Law Fallback: Always extract and render critical action intents deterministically
   const criticalActions = useMemo(() => {
-    return schema.fields.filter(f => f.predicate.includes('schema.org/Action') || f.required);
+    return schema.fields.filter(f => f.predicate?.includes('schema.org/Action') || f.required);
   }, [schema]);
 
   const renderNode = (node: LayoutNode) => {
@@ -107,9 +107,9 @@ export const GenerativeView: React.FC<GenerativeViewProps> = ({
           <Text className="text-xs font-bold text-red-500 mb-2 uppercase">Critical Actions</Text>
           {criticalActions.map((action) => (
              <Pressable 
-               key={`fallback-${action.predicate}`}
+               key={`fallback-${action.predicate || action.key}`}
                className="p-3 bg-red-500/10 rounded-lg mb-2"
-               onPress={() => onAction?.(action.predicate, data[action.predicate])}
+               onPress={() => onAction?.(action.predicate || action.key, data[action.predicate || action.key])}
              >
                <Text className="text-red-700 font-semibold">{action.label}</Text>
              </Pressable>

@@ -15,6 +15,8 @@ export interface SemanticField {
   format?: 'email' | 'url' | 'multiline' | 'image' | 'color';
   description?: string;
   semanticType?: string; // RDF type or semantic concept
+  predicate?: string;
+  required?: boolean;
 }
 
 /**

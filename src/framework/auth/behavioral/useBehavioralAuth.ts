@@ -19,7 +19,7 @@ import { BehavioralAuthState, BehavioralAuthOptions, BehavioralMetrics } from '.
 export function useBehavioralAuth(options: BehavioralAuthOptions = {}): BehavioralAuthState {
   const { updateInterval = 5000, sensitivity = 0.5 } = options;
 
-  const [state, setState] = useState<BehavioralAuthState>({
+  const [state, setState] = useState<Omit<BehavioralAuthState, 'recordKeystroke' | 'recordInteraction'>>({
     trustScore: 1.0,
     metrics: {
       typingSpeed: 0,

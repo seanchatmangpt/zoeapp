@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from '../../core/i18n/useTranslation';
 import { useA11y } from '../../ui/a11y/hooks/useA11y';
 import { useVoiceIntent } from '../../ui/voice/useVoiceIntent';
@@ -59,23 +59,38 @@ export function useInclusiveInteraction(
   });
 
   // 3. Integrate Voice Intents
-  const { registerIntents } = useVoiceIntent();
+  const { registerIntents, unregisterIntents } = useVoiceIntent();
+
+  const memoizedVoiceCommands = useMemo(() => {
+    return options.voiceCommands;
+  }, [JSON.stringify(options.voiceCommands)]);
+
+  const actionRef = useRef(options.action);
+  useEffect(() => {
+    actionRef.current = options.action;
+  }, [options.action]);
 
   useEffect(() => {
-    const commands = options.voiceCommands || (label ? [label] : []);
+    const commands = memoizedVoiceCommands || (label ? [label] : []);
+    const intentId = `inclusive-${options.id}`;
     
     if (commands.length > 0) {
       registerIntents([
         {
-          id: `inclusive-${options.id}`,
+          id: intentId,
           commands,
-          action: options.action,
+          action: () => actionRef.current(),
           priority: options.priority,
           description: options.a11yOptions?.hint || label,
         },
       ]);
     }
-  }, [options.id, label, options.voiceCommands, options.action, options.priority, options.a11yOptions?.hint, registerIntents]);
+    return () => {
+      if (commands.length > 0) {
+        unregisterIntents([intentId]);
+      }
+    };
+  }, [options.id, label, memoizedVoiceCommands, options.priority, options.a11yOptions?.hint, registerIntents, unregisterIntents]);
 
   return {
     a11yProps,

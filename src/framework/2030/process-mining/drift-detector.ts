@@ -6,6 +6,7 @@
  * - Implementation Plan: [drift_detector_implementation_plan.md](file:///Users/sac/.gemini/antigravity-cli/brain/bc47b56b-8374-43ff-9417-73010490fc44/drift_detector_implementation_plan.md)
  * - Source File: [drift-detector.ts](file:///Users/sac/zoeapp/src/framework/2030/process-mining/drift-detector.ts)
  */
+import { computeOptimalAlignment } from './conformance';
 
 // ----------------------------------------------------
 // 1. OCEL 2.0 Compliant JSON Formats
@@ -280,9 +281,20 @@ export class TokenReplayChecker {
       }
     }
 
-    const part1 = consumed > 0 ? 1 - missing / consumed : 0;
-    const part2 = produced > 0 ? 1 - remaining / produced : 0;
-    const fitness = 0.5 * part1 + 0.5 * part2;
+    // Ensure all conformance metrics use genuine mathematical alignments (A*)
+    const alignmentInitialMarking: Record<string, number> = {};
+    for (const src of this.sourcePlaces) {
+      alignmentInitialMarking[src] = 1;
+    }
+    const mappedTrace = activities.map(act => this.activityMap[act] || act);
+    const alignment = computeOptimalAlignment(
+      this.net as any,
+      mappedTrace,
+      alignmentInitialMarking,
+      this.sinkPlaces
+    );
+    const fitness = alignment.fitness;
+    const isConforming = alignment.isConforming;
 
     return {
       fitness: Math.max(0, Math.min(1, fitness)),
@@ -290,7 +302,7 @@ export class TokenReplayChecker {
       consumed,
       missing,
       remaining,
-      isConforming: missing === 0 && remaining === 0,
+      isConforming,
       firedTransitions,
       missingTokensDetail,
       remainingTokensDetail

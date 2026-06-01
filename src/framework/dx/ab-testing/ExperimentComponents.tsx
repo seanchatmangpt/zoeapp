@@ -40,7 +40,7 @@ export const Experiment: React.FC<ExperimentProps> = ({ id, children }) => {
 
   const matchedVariants = React.Children.toArray(children).filter((child) => {
     if (React.isValidElement(child) && child.type === Variant) {
-      return child.props.name === variant;
+      return (child as React.ReactElement<{ name: string }>).props.name === variant;
     }
     return false;
   });

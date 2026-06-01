@@ -4,7 +4,8 @@
 
 import { db } from '../db/db';
 import { actorCommands, actorEvents, actorReceipts, actorOutbox, actorQuarantine } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
+import { generateReceiptHash } from '../crypto/receipts';
 import { VirtualKnowledgeGraphClient } from '../vkg/client';
 import { ActorRegistry } from './registry';
 import { ActorSupervisor } from './supervision';
@@ -311,17 +312,15 @@ export class ActorDispatcher {
       });
     }
 
-    // Compute Delta Hash
-    const rawDeltaStr = JSON.stringify(
-      delta.add.map((q) => [q.subject.value, q.predicate.value, q.object.value, q.graph.value])
-        .concat(delta.remove.map((q) => [q.subject.value, q.predicate.value, q.object.value, q.graph.value]))
-    );
-    let hashVal = 0;
-    for (let i = 0; i < rawDeltaStr.length; i++) {
-      hashVal = (hashVal << 5) - hashVal + rawDeltaStr.charCodeAt(i);
-      hashVal |= 0;
-    }
-    const deltaHash = `hash_${Math.abs(hashVal).toString(16)}`;
+    // Retrieve previous receipt's hash from local DB to bind states cryptographically
+    const lastReceipts = await db
+      .select({ deltaHash: actorReceipts.deltaHash })
+      .from(actorReceipts)
+      .orderBy(desc(actorReceipts.createdAt))
+      .limit(1);
+    const prevHash = lastReceipts[0]?.deltaHash || '';
+    const hashData = { commandId: envelope.id, status: 'accepted_pending', error: undefined };
+    const deltaHash = generateReceiptHash(prevHash, hashData);
 
     // 9. Save local receipt as accepted_pending
     const receiptId = `rec_${Math.random().toString(36).substr(2, 9)}`;

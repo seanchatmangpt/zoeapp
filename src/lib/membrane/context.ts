@@ -59,7 +59,8 @@ export class MembraneContext {
         verdict,
         success: true,
         deltaHash: receiptHash,
-        previousHash: prevHash
+        previousHash: prevHash,
+        resultHash
       };
 
       Receipts.append(receipt);
