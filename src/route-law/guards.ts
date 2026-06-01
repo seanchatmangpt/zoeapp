@@ -1,9 +1,11 @@
 /**
  * @fileoverview Pure guard checking functions for the Typestate Gating framework.
- * Houses the core business rules for route admission.
+ * Houses the core business rules for route admission, including BLAKE3 receipt
+ * enforcement via the Receipt Theater defense model.
  */
 
 import { ParticipantBasis, RouteDefinition, RefusalReason, IdentityBoundary } from './types';
+import { mmkvInstance } from '../lib/store/mmkvStorage';
 
 /**
  * Default hierarchy of identity boundaries, from least verified/trusted to most verified/trusted.
@@ -24,6 +26,197 @@ export interface AdmitRouteResult {
   /** Detailed reason if the participant is refused, otherwise undefined */
   refusal?: RefusalReason;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// requireReceiptBeforeRender — Receipt Theater integration
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The result of a receipt pre-admission check.
+ */
+export interface ReceiptGuardResult {
+  /** True only when a valid BLAKE3 receipt was confirmed in local storage */
+  receiptConfirmed: boolean;
+  /**
+   * The confirmed BLAKE3 hash of the receipt if found.
+   * Empty string when not found.
+   */
+  confirmedBlake3Hash: string;
+  /**
+   * The specific reason the receipt was rejected, or null when confirmed.
+   * Aligned with `ReceiptMissingReason` from ReceiptTheaterGuard.
+   */
+  rejectionReason:
+    | 'RECEIPT_NOT_FOUND'
+    | 'RECEIPT_HASH_MISMATCH'
+    | 'VERIFICATION_ERROR'
+    | null;
+  /** Human-readable explanation of the rejection, or null when confirmed */
+  rejectionMessage: string | null;
+}
+
+/**
+ * Synchronous receipt pre-admission guard that enforces the Receipt Theater invariant.
+ *
+ * Performs a 2-tier synchronous lookup (MMKV receipt JSON → MMKV raw hash key)
+ * before allowing access to a route.  SQLite (async) lookup is intentionally
+ * excluded from this synchronous path — for the full 3-tier async lookup see
+ * `lookupReceiptForRoute` in `ReceiptTheaterGuard.tsx`.
+ *
+ * This function is designed to be used as a `customGuard` inside `RouteDefinition`
+ * or called imperatively as a pre-flight admission check before navigation.
+ *
+ * Typestate contract:
+ *   - Returns `receiptConfirmed: true`  → Witnessed<ReceiptGuardResult>
+ *   - Returns `receiptConfirmed: false` → Claimed<ReceiptGuardResult>  (never trusted)
+ *
+ * @param routeKey The route key (commandId) to look up the receipt for.
+ *                 Must match the key used when the receipt was stored.
+ * @param expectedBlake3Hash Optional BLAKE3 hash that must match the stored receipt's deltaHash.
+ *                           When omitted, any receipt for the routeKey is accepted.
+ * @returns A `ReceiptGuardResult` describing whether the receipt was confirmed.
+ *
+ * @example
+ * // As a customGuard in RouteDefinition:
+ * const route: RouteDefinition = {
+ *   customGuard: (participant) => {
+ *     const result = requireReceiptBeforeRender('cmd_onboarding_complete');
+ *     if (!result.receiptConfirmed) {
+ *       return {
+ *         code: result.rejectionReason ?? 'RECEIPT_NOT_FOUND',
+ *         message: result.rejectionMessage ?? 'Receipt missing.',
+ *       };
+ *     }
+ *     return null;
+ *   },
+ * };
+ *
+ * @example
+ * // Imperative pre-flight check:
+ * const result = requireReceiptBeforeRender('cmd_payment_authorized', expectedHash);
+ * if (!result.receiptConfirmed) {
+ *   router.replace('/(auth)/missing-receipt');
+ * }
+ */
+export function requireReceiptBeforeRender(
+  routeKey: string,
+  expectedBlake3Hash?: string
+): ReceiptGuardResult {
+  if (!routeKey || routeKey.trim() === '') {
+    return {
+      receiptConfirmed: false,
+      confirmedBlake3Hash: '',
+      rejectionReason: 'VERIFICATION_ERROR',
+      rejectionMessage:
+        'requireReceiptBeforeRender: routeKey must be a non-empty string.',
+    };
+  }
+
+  // ── Tier 1: MMKV receipt JSON ──────────────────────────────────────────────
+  try {
+    const mmkvReceiptJson = mmkvInstance.getString(`receipt_${routeKey}`);
+    if (mmkvReceiptJson) {
+      let receipt: Record<string, unknown>;
+      try {
+        receipt = JSON.parse(mmkvReceiptJson);
+      } catch {
+        // Corrupt JSON in MMKV — treat as not found, fall through
+        receipt = {};
+      }
+
+      const actualHash = String(
+        (receipt.deltaHash as string) ?? (receipt.blake3Hash as string) ?? ''
+      );
+
+      if (expectedBlake3Hash) {
+        if (actualHash === expectedBlake3Hash) {
+          return {
+            receiptConfirmed: true,
+            confirmedBlake3Hash: actualHash,
+            rejectionReason: null,
+            rejectionMessage: null,
+          };
+        }
+        // Hash mismatch — do NOT fall through; this is an explicit security failure
+        return {
+          receiptConfirmed: false,
+          confirmedBlake3Hash: actualHash,
+          rejectionReason: 'RECEIPT_HASH_MISMATCH',
+          rejectionMessage:
+            `BLAKE3 receipt for route '${routeKey}' was found in MMKV but its ` +
+            `hash does not match. Expected: ${expectedBlake3Hash}, Actual: ${actualHash}. ` +
+            `This may indicate tampered state.`,
+        };
+      }
+
+      // No hash constraint — receipt presence is sufficient
+      if (actualHash) {
+        return {
+          receiptConfirmed: true,
+          confirmedBlake3Hash: actualHash,
+          rejectionReason: null,
+          rejectionMessage: null,
+        };
+      }
+    }
+  } catch (mmkvErr: any) {
+    // MMKV access error — fall through to tier 2
+  }
+
+  // ── Tier 2: MMKV raw hash key ─────────────────────────────────────────────
+  try {
+    const rawHash = mmkvInstance.getString(`receipt_hash_${routeKey}`);
+    if (rawHash) {
+      if (expectedBlake3Hash) {
+        if (rawHash === expectedBlake3Hash) {
+          return {
+            receiptConfirmed: true,
+            confirmedBlake3Hash: rawHash,
+            rejectionReason: null,
+            rejectionMessage: null,
+          };
+        }
+        return {
+          receiptConfirmed: false,
+          confirmedBlake3Hash: rawHash,
+          rejectionReason: 'RECEIPT_HASH_MISMATCH',
+          rejectionMessage:
+            `BLAKE3 receipt hash for route '${routeKey}' was found in MMKV (raw key) ` +
+            `but does not match. Expected: ${expectedBlake3Hash}, Actual: ${rawHash}.`,
+        };
+      }
+      return {
+        receiptConfirmed: true,
+        confirmedBlake3Hash: rawHash,
+        rejectionReason: null,
+        rejectionMessage: null,
+      };
+    }
+  } catch (mmkvErr2: any) {
+    return {
+      receiptConfirmed: false,
+      confirmedBlake3Hash: '',
+      rejectionReason: 'VERIFICATION_ERROR',
+      rejectionMessage:
+        `MMKV storage access failed during receipt guard check for route '${routeKey}': ` +
+        `${mmkvErr2?.message ?? String(mmkvErr2)}`,
+    };
+  }
+
+  // ── Not found in any synchronous tier ─────────────────────────────────────
+  return {
+    receiptConfirmed: false,
+    confirmedBlake3Hash: '',
+    rejectionReason: 'RECEIPT_NOT_FOUND',
+    rejectionMessage:
+      `No BLAKE3 receipt found for route '${routeKey}' in synchronous storage ` +
+      `(MMKV). Use ReceiptTheaterGuard for the full 3-tier async lookup including SQLite.`,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// admitRoute — primary participant typestate admission check
+// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Pure checking function that evaluates whether a participant meets a route's gating requirements.
