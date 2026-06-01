@@ -1,0 +1,18 @@
+ledger:
+  version: 1.0
+  types:
+    - name: Evidence
+      crate: wasm4pm_compat
+      is_law: false
+    - name: ConditionCell
+      crate: wasm4pm_compat
+      is_law: true
+    - name: Between01
+      crate: wasm4pm_compat
+      is_law: true
+    - name: PredictionProblem
+      crate: wasm4pm
+      is_law: false
+    - name: DeclareConstraint
+      crate: wasm4pm
+      is_law: true

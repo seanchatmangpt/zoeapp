@@ -1,0 +1,17 @@
+# Ostar Generative Pipeline: TS Projection Law
+version: 1.0.0
+projection_rules:
+  specta_typescript_enforcement:
+    - rule: "All exported Rust structs MUST be tagged with #[specta::specta]."
+    - rule: "Enum variants MUST be flattened unless annotated with #[specta(tag = '...')]."
+    - rule: "Option types MUST be nullable in TypeScript."
+  rust_to_specta_mapping:
+    - rust: "String" -> ts: "string"
+    - rust: "u32 | i32 | u64 | i64" -> ts: "number"
+    - rust: "bool" -> ts: "boolean"
+    - rust: "Vec<T>" -> ts: "T[]"
+    - rust: "HashMap<K, V>" -> ts: "{ [key: K]: V }"
+  audit_protocol:
+    - detector: "Compare emitted `types.ts` checksum against `spec.ttl` signature."
+    - failure_mode: "Halt build on discrepancy. Trigger `ostar-doctor` for automated remediation."
+    - frequency: "Every `ggen sync` iteration."

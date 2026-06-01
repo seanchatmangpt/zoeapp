@@ -1,0 +1,48 @@
+{
+  "crates": {
+    "wasm4pm_compat": {
+      "law_tags": [
+        "EvidenceMode",
+        "ProjectionLaw",
+        "AdmissionLaw",
+        "FormatKindConst",
+        "EndpointKind",
+        "ArcDirectionConst",
+        "SoundnessState",
+        "PowlProjectionState",
+        "QualityMetricKind",
+        "BoundaryClaimKind",
+        "ObjectCentricity",
+        "RelationLaw",
+        "ProcessShapeKind",
+        "ProcessTreeOperatorKind",
+        "WorkflowPattern"
+      ],
+      "machinery": [
+        "Assert",
+        "IsTrue",
+        "Require",
+        "ConditionCell",
+        "Between01",
+        "Evidence",
+        "ExportBoundaryConst",
+        "HasRoundTripFixture"
+      ]
+    },
+    "wasm4pm": {
+      "law_tags": [
+        "DeclareTemplate",
+        "DeclareScope",
+        "PredictionHorizon",
+        "ComplianceKind"
+      ],
+      "machinery": [
+        "Activity",
+        "DeclareConstraint",
+        "OcDeclareConstraint",
+        "PredictionProblem",
+        "CompatDiagnostic"
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+---
+version: 1.0
+description: "Component Boundary Law for Ostar Pipeline"
+boundary:
+  scope: "WASM_COMPONENT_MODEL"
+  enforcement: "STRICT_WIT_COMPLIANCE"
+contract_types:
+  stable:
+    - "u8"
+    - "u16"
+    - "u32"
+    - "u64"
+    - "s8"
+    - "s16"
+    - "s32"
+    - "s64"
+    - "float32"
+    - "float64"
+    - "bool"
+    - "char"
+    - "string"
+    - "list"
+    - "record"
+    - "variant"
+    - "enum"
+    - "flags"
+refusal_law:
+  non_component_ready_rust:
+    on_violation: "HALT_AND_REPORT"
+    severity: "CRITICAL"
+    action: "TERMINATE_COMPONENT_INSTANCE"
+    enforcement_strategy: "COMPILE_TIME_TYPE_SAFETY"
+...

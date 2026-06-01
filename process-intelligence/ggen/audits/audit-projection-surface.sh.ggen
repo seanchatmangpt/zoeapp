@@ -1,0 +1,40 @@
+#!/bin/bash
+# GGEN_ECOSYSTEM_INTEL: Audit Projection Surface
+# Compares the generated artifact against the projectable-type-ledger.yaml.
+# Exits 1 if drift is detected.
+
+LEDGER_FILE="/Users/sac/zoeapp/process-intelligence/ggen/intel/projectable-type-ledger.yaml"
+ARTIFACT_FILE=$1
+
+if [ -z "$ARTIFACT_FILE" ]; then
+  echo "Usage: $0 <artifact_file>"
+  exit 1
+fi
+
+if [ ! -f "$LEDGER_FILE" ]; then
+  echo "Error: Ledger file not found at $LEDGER_FILE"
+  exit 1
+fi
+
+if [ ! -f "$ARTIFACT_FILE" ]; then
+  echo "Error: Artifact file not found at $ARTIFACT_FILE"
+  exit 1
+fi
+
+# Strategy: Extract types from ledger and compare against the artifact.
+# This is a template. The specific implementation depends on the artifact format.
+# Assuming artifact lists the types.
+
+# Extract types from ledger:
+LEDGER_TYPES=$(grep -E '^\s+- name:' "$LEDGER_FILE" | sed 's/.*name: //')
+
+# Check for each type in the artifact:
+for type in $LEDGER_TYPES; do
+  if ! grep -q "$type" "$ARTIFACT_FILE"; then
+    echo "Drift detected: Type $type missing in $ARTIFACT_FILE"
+    exit 1
+  fi
+done
+
+echo "Audit successful: No drift detected."
+exit 0

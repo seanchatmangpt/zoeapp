@@ -1,0 +1,17 @@
+# Dependency Boundary Map
+boundaries:
+  wasm4pm:
+    scope: "wasm4pm-compat"
+    allowed_ingress: ["/api/v1/process-mining"]
+    denied_egress: ["/fs/root", "/sys/exec"]
+    refusal_rules:
+      - rule_id: "RS-001"
+        pattern: "tool-smuggling"
+        description: "Detection of unauthorized tooling injection into wasm4pm-compat layer."
+        action: "REJECT_AND_LOG"
+        message: "Tool-smuggling into wasm4pm-compat is strictly prohibited. All interop must traverse the approved declarative boundary."
+      - rule_id: "RS-002"
+        pattern: "unauthorized-ffi"
+        description: "Detection of unmanaged FFI calls."
+        action: "DENY"
+        message: "Direct FFI is forbidden in wasm4pm-compat. Use defined bridge traits."

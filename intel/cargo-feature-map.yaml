@@ -1,0 +1,20 @@
+# Feature Gating Manifest for wasm4pm
+features:
+  default: 
+    - ts
+    - component
+  ts:
+    description: "TypeScript interop support for runtime integration"
+    dependencies: ["wasm4pm-compat"]
+  wasm:
+    description: "WebAssembly execution engine for high-performance process mining"
+    dependencies: []
+  component:
+    description: "Component model bindings for modular architecture"
+    dependencies: []
+
+# Gating Policy
+gating_policy:
+  strict: true
+  allow_missing: false
+  enforce_types: true
