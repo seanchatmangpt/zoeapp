@@ -1,4 +1,5 @@
-import crypto from 'crypto';
+// NOTE: No raw Node.js crypto import — all receipt hashing uses BLAKE3 3-tier fallback
+import { blake3 as _blake3, sha256 as _sha256, canonicalStringify } from '../../../lib/crypto/receipts';
 import { LWWRegister } from '../crdt/register';
 import { LWWMap } from '../crdt/map';
 import { FrameworkSyncEngine } from '../engine';
@@ -233,6 +234,48 @@ export function selfHealingQueueSort(jobs: SystemArchitectJob[]): SystemArchitec
 // Scenario 3: P2P Cryptographic Receipt Chain Fork Reconciliation
 // ============================================================================
 
+// ─── BLAKE3 3-Tier Fallback (simulator local) ─────────────────────────────────
+
+function simulatorDjb2Hex(input: string): string {
+  let h1 = 5381;
+  let h2 = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    const c = input.charCodeAt(i);
+    h1 = ((h1 << 5) + h1 + c) | 0;
+    h2 = ((h2 ^ c) * 0x01000193) | 0;
+  }
+  const u1 = h1 < 0 ? h1 + 0x100000000 : h1;
+  const u2 = h2 < 0 ? h2 + 0x100000000 : h2;
+  const ts = Date.now().toString(16).padStart(16, '0');
+  const p1 = u1.toString(16).padStart(8, '0');
+  const p2 = u2.toString(16).padStart(8, '0');
+  const prefix = input.slice(0, 8)
+    .split('')
+    .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
+    .join('')
+    .padEnd(16, '0');
+  return (ts + p1 + p2 + prefix).slice(0, 64).padEnd(64, '0');
+}
+
+function simulatorHash(input: string): string {
+  // Tier 1: BLAKE3
+  try {
+    const h = _blake3(input);
+    if (typeof h === 'string' && h.length >= 32) return h;
+    throw new Error('invalid');
+  } catch {
+    // Tier 2: pure-JS SHA-256
+    try {
+      const h = _sha256(input);
+      if (typeof h === 'string' && h.length >= 32) return h;
+      throw new Error('invalid');
+    } catch {
+      // Tier 3: DJB2 hex
+      return simulatorDjb2Hex(input);
+    }
+  }
+}
+
 export class CryptographicOutboxManager {
   private lastReceiptHash: string = 'genesis_hash';
   private receipts: OutboxReceipt[] = [];
@@ -255,13 +298,11 @@ export class CryptographicOutboxManager {
   }
 
   public enqueueDelta(delta: OutboxDelta): OutboxReceipt {
-    const inputHash = crypto.createHash('sha256').update(delta.subject).digest('hex');
-    const outputHash = crypto.createHash('sha256').update(delta.object).digest('hex');
-    const deltaHash = crypto.createHash('sha256').update(delta.predicate + delta.timestamp.toString()).digest('hex');
-
-    const receiptHash = crypto.createHash('sha256')
-      .update(this.lastReceiptHash + inputHash + outputHash + deltaHash)
-      .digest('hex');
+    // BLAKE3 3-tier fallback for each component
+    const inputHash = simulatorHash(canonicalStringify({ subject: delta.subject }));
+    const outputHash = simulatorHash(canonicalStringify({ object: delta.object }));
+    const deltaHash = simulatorHash(canonicalStringify({ predicate: delta.predicate, timestamp: delta.timestamp }));
+    const receiptHash = simulatorHash(this.lastReceiptHash + inputHash + outputHash + deltaHash);
 
     const receipt: OutboxReceipt = {
       inputHash,
@@ -301,13 +342,10 @@ export class CryptographicOutboxManager {
     const reconciledReceipts: OutboxReceipt[] = [];
 
     for (const delta of sortedDeltas) {
-      const inputHash = crypto.createHash('sha256').update(delta.subject).digest('hex');
-      const outputHash = crypto.createHash('sha256').update(delta.object).digest('hex');
-      const deltaHash = crypto.createHash('sha256').update(delta.predicate + delta.timestamp.toString()).digest('hex');
-
-      const receiptHash = crypto.createHash('sha256')
-        .update(currentHash + inputHash + outputHash + deltaHash)
-        .digest('hex');
+      const inputHash = simulatorHash(canonicalStringify({ subject: delta.subject }));
+      const outputHash = simulatorHash(canonicalStringify({ object: delta.object }));
+      const deltaHash = simulatorHash(canonicalStringify({ predicate: delta.predicate, timestamp: delta.timestamp }));
+      const receiptHash = simulatorHash(currentHash + inputHash + outputHash + deltaHash);
 
       reconciledReceipts.push({
         inputHash,
