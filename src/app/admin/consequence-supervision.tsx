@@ -47,7 +47,7 @@ const supervisorsList = [
 ];
 
 const adminModules = [
-  { name: 'Consequence Supervision', route: '/admin/consequence-supervision', icon: 'dashboard', color: '#3B82F6' },
+  { name: 'Consequence Supervision', route: '/admin/consequence-supervision', icon: 'tachometer', color: '#3B82F6' },
   { name: 'Church Profile', route: '/admin/church', icon: 'institution', color: '#10B981' },
   { name: 'Content', route: '/admin/content', icon: 'file-text-o', color: '#8B5CF6' },
   { name: 'Sermons', route: '/admin/sermons', icon: 'microphone', color: '#F59E0B' },

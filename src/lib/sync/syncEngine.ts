@@ -77,9 +77,9 @@ async function getLatestReceiptHash(): Promise<string> {
   // SQLite doesn't have a native "ORDER BY created_at DESC LIMIT 1" on text admitted_at,
   // but admitted_at is ISO-8601 so lexicographic ordering is correct.
   // We fetch all and pick the last; in production this is bounded by the compaction cycle.
-  const rows = await db
-    .select({ receiptHash: syncAdmissionReceipts.receiptHash })
-    .from(syncAdmissionReceipts);
+  const rows = (await db
+    .select({ receiptHash: syncAdmissionReceipts.receiptHash, admittedAt: syncAdmissionReceipts.admittedAt })
+    .from(syncAdmissionReceipts)) as any[];
 
   if (rows.length === 0) {
     return GENESIS_PREVIOUS_HASH;
@@ -88,12 +88,8 @@ async function getLatestReceiptHash(): Promise<string> {
   // Find the receipt with the lexicographically largest admitted_at.
   // In the rare event of a tie we return an arbitrary one (still safe because
   // the chain is ordered by insertion anyway).
-  const latest = await db
-    .select({ receiptHash: syncAdmissionReceipts.receiptHash, admittedAt: syncAdmissionReceipts.admittedAt })
-    .from(syncAdmissionReceipts);
-
-  let best = latest[0];
-  for (const row of latest) {
+  let best = rows[0];
+  for (const row of rows) {
     if (row.admittedAt > best.admittedAt) {
       best = row;
     }

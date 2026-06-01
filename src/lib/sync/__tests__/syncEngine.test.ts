@@ -68,21 +68,23 @@ jest.mock('../../db/db', () => {
     const p = Promise.resolve([]);
     return Object.assign(p, { orderBy: mockOrderByFn });
   });
-  const mockFromFn = jest.fn().mockReturnValue({ where: mockWhereSelectFn });
+  const mockFromFn = jest.fn().mockImplementation((table: any) => {
+    const tableName: string = (table && table[Symbol.for('drizzle:Name')]) ? String(table[Symbol.for('drizzle:Name')]) : '';
+    if (tableName === 'sync_admission_receipts') {
+      return Promise.resolve([]);
+    }
+    return { where: mockWhereSelectFn };
+  });
 
   const mockWhereBlockedFn = jest.fn().mockResolvedValue([]);
   const mockFromBlockedFn = jest.fn().mockReturnValue({ where: mockWhereBlockedFn });
 
-  // ── Main insert router — dispatches to the correct table mock
+  // ── Main insert router — uses drizzle's Symbol.for('drizzle:Name') to identify tables
+  const DRIZZLE_NAME = Symbol.for('drizzle:Name');
   const mockInsertFn = jest.fn().mockImplementation((table: any) => {
-    if (table && table[Symbol.for('drizzle:IsDrizzleTable')]) {
-      const tableName: string =
-        (table as any)._.name ??
-        (table as any)._ ?.config?.name ??
-        '';
-      if (tableName === 'sync_admission_receipts') return mockAdmissionReceiptsInsert(table);
-      if (tableName === 'sync_job_quarantine') return mockQuarantineInsert(table);
-    }
+    const tableName: string = (table && table[DRIZZLE_NAME]) ? String(table[DRIZZLE_NAME]) : '';
+    if (tableName === 'sync_admission_receipts') return mockAdmissionReceiptsInsert(table);
+    if (tableName === 'sync_job_quarantine') return mockQuarantineInsert(table);
     // Default: sync_queue insert
     return mockSyncQueueInsert(table);
   });
@@ -100,7 +102,8 @@ jest.mock('../../db/db', () => {
   const mockWhereUpdateFn = jest.fn();
   const mockSetFn = jest.fn().mockReturnValue({ where: mockWhereUpdateFn });
   const mockUpdateFn = jest.fn().mockImplementation((table: any) => {
-    if (table && (table as any)._.name === 'sync_admission_receipts') {
+    const tableName: string = (table && table[DRIZZLE_NAME]) ? String(table[DRIZZLE_NAME]) : '';
+    if (tableName === 'sync_admission_receipts') {
       return mockAdmissionReceiptsUpdate(table);
     }
     return { set: mockSetFn };
@@ -238,12 +241,25 @@ describe('SyncEngine Outbox System', () => {
     engine = new TestSyncEngine();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Default: admission receipts select returns empty array (genesis hash path)
-    mockedDb._mockFrom.mockReturnValue(Promise.resolve([]));
-    // Default: admission receipts insert succeeds
-    mockedDb._mockAdmissionReceiptsInsertValues.mockResolvedValue(undefined);
-    // Default: admission receipts update succeeds
-    mockedDb._mockAdmissionReceiptsUpdateWhere.mockResolvedValue(undefined);
+    // Reset all mock queues and implementations to prevent leakage between tests
+    mockedDb._mockReturning.mockReset();
+    mockedDb._mockAdmissionReceiptsInsertValues.mockReset().mockResolvedValue(undefined);
+    mockedDb._mockAdmissionReceiptsUpdateWhere.mockReset().mockResolvedValue(undefined);
+    mockedDb._mockQuarantineInsertValues.mockReset().mockResolvedValue(undefined);
+    mockedDb._mockOrderBy.mockReset();
+    mockedDb._mockWhereSelect.mockReset().mockImplementation(() => {
+      const p = Promise.resolve([]);
+      return Object.assign(p, { orderBy: mockedDb._mockOrderBy });
+    });
+    mockedDb._mockWhereBlocked.mockReset().mockResolvedValue([]);
+
+    mockedDb._mockFrom.mockReset().mockImplementation((table: any) => {
+      const tableName: string = (table && table[Symbol.for('drizzle:Name')]) ? String(table[Symbol.for('drizzle:Name')]) : '';
+      if (tableName === 'sync_admission_receipts') {
+        return Promise.resolve([]);
+      }
+      return { where: mockedDb._mockWhereSelect };
+    });
   });
 
   afterEach(() => {
@@ -257,7 +273,6 @@ describe('SyncEngine Outbox System', () => {
   describe('PATQ Admission Gate Enforcement', () => {
     it('should write a BLAKE3 receipt to sync_admission_receipts BEFORE the sync_queue insert', async () => {
       const mockJob = makeSyncJob();
-      mockedDb._mockReturning.mockResolvedValueOnce([mockJob]);
 
       // Track call order
       const callOrder: string[] = [];
@@ -529,7 +544,6 @@ describe('SyncEngine Outbox System', () => {
       jest.clearAllMocks();
       mockedDb._mockAdmissionReceiptsInsertValues.mockResolvedValue(undefined);
       mockedDb._mockAdmissionReceiptsUpdateWhere.mockResolvedValue(undefined);
-      mockedDb._mockFrom.mockReturnValue(Promise.resolve([]));
 
       await engine.queueJob({ jobType: 'create_post', payload: '{"title":"Different"}', entityId: 'e1' });
       const receipt2 = mockedDb._mockAdmissionReceiptsInsertValues.mock.calls[0][0];
@@ -555,7 +569,6 @@ describe('SyncEngine Outbox System', () => {
       jest.clearAllMocks();
       mockedDb._mockAdmissionReceiptsInsertValues.mockResolvedValue(undefined);
       mockedDb._mockAdmissionReceiptsUpdateWhere.mockResolvedValue(undefined);
-      mockedDb._mockFrom.mockReturnValue(Promise.resolve([]));
       mockedDb._mockQuarantineInsertValues.mockResolvedValue(undefined);
 
       await expect(
@@ -681,7 +694,6 @@ describe('SyncEngine Outbox System', () => {
       jest.clearAllMocks();
       mockedDb._mockAdmissionReceiptsInsertValues.mockResolvedValue(undefined);
       mockedDb._mockAdmissionReceiptsUpdateWhere.mockResolvedValue(undefined);
-      mockedDb._mockFrom.mockReturnValue(Promise.resolve([]));
 
       const failedJob = { ...job, status: 'failed' as const, attempts: 2 };
       mockedDb._mockOrderBy.mockResolvedValueOnce([failedJob]);
