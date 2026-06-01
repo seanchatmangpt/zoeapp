@@ -4,8 +4,10 @@
     "strict": true,
     "moduleResolution": "bundler",
     "skipLibCheck": true,
+    "types": ["nativewind/types"],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@pcp/*": ["../pcp/src/framework/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],

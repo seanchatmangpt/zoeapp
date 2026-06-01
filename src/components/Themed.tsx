@@ -1,1 +1,1 @@
-export * from '../framework/ui/Themed';
+export * from '@pcp/ui/Themed';

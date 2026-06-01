@@ -1,1 +1,1 @@
-export * from '../framework/ui/TransitionOverlay';
+export * from '@pcp/ui/TransitionOverlay';

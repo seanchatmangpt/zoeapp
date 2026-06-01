@@ -517,7 +517,7 @@ export default function OpenAIAvatarRelativeProjection() {
       if (isMountedRef.current) {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }
-    }, 100);
+    }, 100) as any;
   }, []);
 
   const handleScroll = useCallback((event: any) => {

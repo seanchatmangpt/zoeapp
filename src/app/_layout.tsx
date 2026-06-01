@@ -8,9 +8,9 @@ import { View } from 'react-native';
 
 import { useColorScheme } from '@/src/components/useColorScheme';
 import { SessionProvider, useSession } from '../../context/SessionProvider';
-import { VkgProvider } from '@/src/components/VkgProvider';
 import { TransitionOverlay } from '@/src/components/TransitionOverlay';
 import Colors from '@/src/constants/Colors';
+import { PcpFrameworkProvider } from '@pcp/core/PcpFrameworkProvider';
 
 // Import your global CSS file
 import '../../global.css';
@@ -91,10 +91,10 @@ const CustomDarkTheme = {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { session } = useSession();
+  const { session, isTransitioning, transitionType } = useSession();
 
   return (
-    <VkgProvider>
+    <PcpFrameworkProvider>
       <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
         <View style={{ flex: 1 }}>
           <Stack
@@ -113,9 +113,13 @@ function RootLayoutNav() {
               <Stack.AvatarRelativeProjection name="(auth)" options={{ headerShown: false }} />
             </Stack.Protected>
           </Stack>
-          <TransitionOverlay />
+          <TransitionOverlay 
+            isTransitioning={isTransitioning}
+            transitionType={transitionType}
+            colorScheme={colorScheme as any}
+          />
         </View>
       </ThemeProvider>
-    </VkgProvider>
+    </PcpFrameworkProvider>
   );
 }

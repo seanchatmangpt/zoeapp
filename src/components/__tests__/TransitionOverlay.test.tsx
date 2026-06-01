@@ -45,7 +45,7 @@ describe('TransitionOverlay Component', () => {
   });
 
   test('should not render anything when isTransitioning is false', () => {
-    const { toJSON } = render(<TransitionOverlay />);
+    const { toJSON } = render(<TransitionOverlay isTransitioning={false} />);
     expect(toJSON()).toBeNull();
   });
 
@@ -58,7 +58,7 @@ describe('TransitionOverlay Component', () => {
       setIsTransitioning: jest.fn(),
     });
 
-    const { getByText } = render(<TransitionOverlay />);
+    const { getByText } = render(<TransitionOverlay isTransitioning={false} />);
 
     expect(getByText('Welcome back!')).toBeTruthy();
     expect(getByText('Securing session & preparing your workspace')).toBeTruthy();
@@ -77,7 +77,7 @@ describe('TransitionOverlay Component', () => {
     });
     mockUseColorScheme.mockReturnValue('dark');
 
-    const { getByText } = render(<TransitionOverlay />);
+    const { getByText } = render(<TransitionOverlay isTransitioning={false} />);
 
     expect(getByText('Signing out...')).toBeTruthy();
     expect(getByText('Clearing session cache & returning to login')).toBeTruthy();
@@ -95,7 +95,7 @@ describe('TransitionOverlay Component', () => {
       setIsTransitioning: jest.fn(),
     });
 
-    const { getByText, queryByText, rerender } = render(<TransitionOverlay />);
+    const { getByText, queryByText, rerender } = render(<TransitionOverlay isTransitioning={false} />);
     expect(getByText('Welcome back!')).toBeTruthy();
 
     mockUseSession.mockReturnValue({
@@ -107,7 +107,7 @@ describe('TransitionOverlay Component', () => {
     });
 
     await act(async () => {
-      rerender(<TransitionOverlay />);
+      rerender(<TransitionOverlay isTransitioning={false} />);
     });
 
     expect(withTimingSpy).toHaveBeenCalledWith(0, { duration: 350 }, expect.any(Function));
@@ -125,7 +125,7 @@ describe('TransitionOverlay Component', () => {
       setIsTransitioning: jest.fn(),
     });
 
-    const { unmount } = render(<TransitionOverlay />);
+    const { unmount } = render(<TransitionOverlay isTransitioning={false} />);
     expect(cancelAnimationSpy).not.toHaveBeenCalled();
 
     unmount();
@@ -141,7 +141,7 @@ describe('TransitionOverlay Component', () => {
       setIsTransitioning: jest.fn(),
     });
 
-    const { getByLabelText } = render(<TransitionOverlay />);
+    const { getByLabelText } = render(<TransitionOverlay isTransitioning={false} />);
     const overlay = getByLabelText('Welcome back! Securing session & preparing your workspace');
     expect(overlay.props.accessible).toBe(true);
     expect(overlay.props.accessibilityRole).toBe('alert');

@@ -1,1 +1,1 @@
-export * from '../framework/ui/AvatarRelativeProjection';
+export * from '@pcp/ui/AvatarRelativeProjection';

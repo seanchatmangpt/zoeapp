@@ -1,1 +1,1 @@
-export * from '../framework/ui/OfflineBanner';
+export * from '@pcp/ui/OfflineBanner';

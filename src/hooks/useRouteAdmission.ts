@@ -5,7 +5,7 @@
 import { useSession } from '../../context/SessionProvider';
 import { admitRoute, DEFAULT_IDENTITY_HIERARCHY } from '../route-law/guards';
 import { defaultResolveParticipant } from '../route-law/ProtectedRoute';
-import { createRouteAdmissionHook } from '../framework/data';
+import { createRouteAdmissionHook } from '@pcp/data';
 
 /**
  * Custom hook to check if the current user/session meets the requirements for a route.
@@ -18,4 +18,4 @@ export const useRouteAdmission = createRouteAdmissionHook({
   admitRoute,
 });
 
-export type { UseRouteAdmissionOptions, UseRouteAdmissionResult } from '../framework/data';
+export type { UseRouteAdmissionOptions, UseRouteAdmissionResult } from '@pcp/data';

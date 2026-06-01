@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import { Text, View } from '../Themed';
-import { ThemeProvider } from '../../framework/ui/theme/ThemeContext';
+import { ThemeProvider } from '@pcp/ui/theme/ThemeContext';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>{children}</ThemeProvider>

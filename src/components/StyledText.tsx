@@ -1,1 +1,1 @@
-export * from '../framework/ui/StyledText';
+export * from '@pcp/ui/StyledText';

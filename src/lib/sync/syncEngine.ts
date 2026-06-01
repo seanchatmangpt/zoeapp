@@ -24,7 +24,7 @@ import {
   type NewSyncJob,
 } from '../db/schema';
 import { eq, inArray, asc, and } from 'drizzle-orm';
-import { FrameworkSyncEngine, SyncStorageAdapter } from '../../framework/sync';
+import { FrameworkSyncEngine, SyncStorageAdapter } from '@pcp/sync';
 import {
   DefaultAdmissionGate,
   type AdmissionGate,

@@ -1,0 +1,13 @@
+{
+  "operation_id": "a23a60f2-2a10-4126-95f3-6062294be0ef",
+  "timestamp": "2026-06-01T23:12:31.241420Z",
+  "input_hashes": [
+    "ggen.toml:96c817c0e6f2d5557a31cd71244e0a9e145eacf204afc723962b38334dd7254d"
+  ],
+  "output_hashes": [
+    "/Users/sac/wasm4pm/src/boundary_generated.rs:3315ea9f5f8e28c901118a7f417fad8103e1ba28126a3feb0d81562263d4cc9d",
+    "/Users/sac/zoeapp/src/framework/v30/post-cyberpunk/BoardClaims_generated.ts:729b75b74269f090a2b6fc3300311f423745c6da4dcadd29258eb605a40bacd6"
+  ],
+  "signature": "3367a13594e52b8ad4d8b9568105cdaaff2b86a03b8c7757e76c440cf15bac70bf0911385415b7eff12f5cf98260ecc21c4d96a69fca7c9b8ba86715a33aa90a",
+  "previous_receipt_hash": null
+}
