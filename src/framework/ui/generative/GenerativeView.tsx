@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, Image, Pressable, SafeAreaView } from 'react-native';
 import { GenerativeViewProps, LayoutNode } from './types';
 import { useGenerativeLayout } from './hooks/useGenerativeLayout';
 import { cn } from '../../../utils/cn';
@@ -18,6 +18,11 @@ export const GenerativeView: React.FC<GenerativeViewProps> = ({
 }) => {
   const { header, body, footer } = useGenerativeLayout(schema, data);
   const theme = useTheme();
+
+  // Iron Law Fallback: Always extract and render critical action intents deterministically
+  const criticalActions = useMemo(() => {
+    return schema.fields.filter(f => f.predicate.includes('schema.org/Action') || f.required);
+  }, [schema]);
 
   const renderNode = (node: LayoutNode) => {
     const { field, value, hint, key } = node;
@@ -94,6 +99,22 @@ export const GenerativeView: React.FC<GenerativeViewProps> = ({
         <View className="flex-row flex-wrap px-2 mt-4 border-t border-border pt-4">
           {footer.map(renderNode)}
         </View>
+      )}
+
+      {/* Iron Law Enforcement Layer: Deterministic rendering of critical actions */}
+      {criticalActions.length > 0 && (
+        <SafeAreaView className="p-4 border-t border-red-500/30 bg-card mt-auto" testID="iron-law-fallback">
+          <Text className="text-xs font-bold text-red-500 mb-2 uppercase">Critical Actions</Text>
+          {criticalActions.map((action) => (
+             <Pressable 
+               key={`fallback-${action.predicate}`}
+               className="p-3 bg-red-500/10 rounded-lg mb-2"
+               onPress={() => onAction?.(action.predicate, data[action.predicate])}
+             >
+               <Text className="text-red-700 font-semibold">{action.label}</Text>
+             </Pressable>
+          ))}
+        </SafeAreaView>
       )}
     </View>
   );

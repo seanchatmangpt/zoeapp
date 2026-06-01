@@ -1,6 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { AutoFixer } from './AutoFixer';
 
 export interface AutoFixErrorBoundaryProps {
@@ -17,16 +16,18 @@ export interface AutoFixErrorBoundaryProps {
 export interface AutoFixErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  autoFixerCrashed: boolean;
 }
 
 /**
  * Enhanced ErrorBoundary with Intelligent Auto-Fixing capabilities.
  * Extends standard error handling with analysis-driven recovery options.
+ * Incorporates an "Iron Law" fallback to prevent infinite crashing loops.
  */
 export class AutoFixErrorBoundary extends Component<AutoFixErrorBoundaryProps, AutoFixErrorBoundaryState> {
   constructor(props: AutoFixErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, autoFixerCrashed: false };
   }
 
   static defaultProps = {
@@ -34,10 +35,16 @@ export class AutoFixErrorBoundary extends Component<AutoFixErrorBoundaryProps, A
   };
 
   static getDerivedStateFromError(error: Error): AutoFixErrorBoundaryState {
-    return { hasError: true, error };
+    return { hasError: true, error, autoFixerCrashed: false };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // If the error happens while already in error state, the AutoFixer or fallback crashed
+    if (this.state.hasError) {
+      this.setState({ autoFixerCrashed: true });
+      return;
+    }
+
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
@@ -46,11 +53,24 @@ export class AutoFixErrorBoundary extends Component<AutoFixErrorBoundaryProps, A
   }
 
   resetError = () => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false, error: null, autoFixerCrashed: false });
   };
 
   render() {
     if (this.state.hasError && this.state.error) {
+      // Iron Law: If the AutoFixer or custom fallback crashes, render absolute raw primitives
+      if (this.state.autoFixerCrashed) {
+        return (
+          <SafeAreaView style={{ flex: 1, backgroundColor: '#000', padding: 20, justifyContent: 'center' }}>
+            <Text style={{ color: 'red', fontSize: 24, fontWeight: 'bold' }}>FATAL ERROR</Text>
+            <Text style={{ color: 'white', marginTop: 10 }}>The recovery system has crashed.</Text>
+            <TouchableOpacity onPress={this.resetError} style={{ marginTop: 20, padding: 15, backgroundColor: '#333' }}>
+              <Text style={{ color: 'white', textAlign: 'center' }}>FORCE RELOAD</Text>
+            </TouchableOpacity>
+          </SafeAreaView>
+        );
+      }
+
       if (typeof this.props.fallback === 'function') {
         return this.props.fallback(this.state.error, this.resetError);
       }

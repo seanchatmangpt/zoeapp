@@ -98,4 +98,28 @@ describe('MeshSyncEngine', () => {
     timerEngine.stop();
     jest.useRealTimers();
   });
+
+  it('should intercept outdated messages via onCausalWindowViolation and not merge them', () => {
+    const violationMock = jest.fn();
+    const strictEngine = new MeshSyncEngineImpl(adapter, { onCausalWindowViolation: violationMock });
+    const reg = new LWWRegister('peer-local', 'initial');
+    strictEngine.registerCrdt('reg-1', reg);
+
+    const outdatedTimestamp = Date.now() - (6 * 60 * 1000); // 6 minutes ago (violates 5 min window)
+
+    adapter.simulateIncomingMessage({
+      type: 'sync_state',
+      senderId: 'peer-remote',
+      payload: { id: 'reg-1', state: { value: 'remote-value', timestamp: outdatedTimestamp, peerId: 'peer-remote' } },
+      timestamp: outdatedTimestamp
+    });
+
+    // Should intercept via callback
+    expect(violationMock).toHaveBeenCalled();
+    
+    // Should NOT merge the state automatically
+    expect(reg.value).toBe('initial');
+    
+    strictEngine.stop();
+  });
 });

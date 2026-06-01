@@ -89,6 +89,11 @@ export interface MeshSyncEngineConfig {
    * Whether to sync the full state or just deltas.
    */
   syncStrategy?: 'full' | 'delta';
+  /**
+   * Causal window constraint enforcement. If a delta is older than 5 minutes (or specific window),
+   * this callback is triggered instead of auto-merging the state, handing control to Governance.
+   */
+  onCausalWindowViolation?: (message: MeshMessage) => void;
 }
 
 /**

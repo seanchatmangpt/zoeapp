@@ -74,13 +74,25 @@ export class MeshSyncEngineImpl implements MeshSyncEngine {
   }
 
   private handleIncomingMessage(message: MeshMessage) {
-    const { type, payload, senderId } = message;
+    const { type, payload, senderId, timestamp } = message;
 
     // Don't process our own messages
     if (senderId === this.adapter.getLocalPeerId()) return;
 
     if (type === 'sync_state' || type === 'sync_delta') {
+      // Iron Law Constraint: Split-Brain / Causal Window check
+      const CAUSAL_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+      const isOutdated = (Date.now() - timestamp) > CAUSAL_WINDOW_MS;
+
+      if (isOutdated && this.config.onCausalWindowViolation) {
+        // Intercepted by governance or manual verification UI
+        this.config.onCausalWindowViolation(message);
+        return;
+      }
+
       const { id, state, delta } = payload;
+      if (!state && !delta) return; // Drop malformed payloads
+
       const crdt = this.crdts.get(id);
       if (crdt) {
         crdt.merge(type === 'sync_state' ? state : delta);
