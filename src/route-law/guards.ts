@@ -117,40 +117,43 @@ export function requireReceiptBeforeRender(
     const mmkvReceiptJson = mmkvInstance.getString(`receipt_${routeKey}`);
     if (mmkvReceiptJson) {
       let receipt: Record<string, unknown>;
+      let parseError = false;
       try {
         receipt = JSON.parse(mmkvReceiptJson);
       } catch {
-        // Corrupt JSON in MMKV — treat as not found, fall through
+        // Corrupt JSON in MMKV — treat as not found, fall through to tier 2
         receipt = {};
+        parseError = true;
       }
 
       const actualHash = String(
         (receipt.deltaHash as string) ?? (receipt.blake3Hash as string) ?? ''
       );
 
-      if (expectedBlake3Hash) {
-        if (actualHash === expectedBlake3Hash) {
+      // Only treat as a mismatch if the JSON was valid AND contained a real hash.
+      // If the JSON was corrupt (empty actualHash from parseError), fall through.
+      if (!parseError && actualHash) {
+        if (expectedBlake3Hash) {
+          if (actualHash === expectedBlake3Hash) {
+            return {
+              receiptConfirmed: true,
+              confirmedBlake3Hash: actualHash,
+              rejectionReason: null,
+              rejectionMessage: null,
+            };
+          }
+          // Valid JSON with a real hash that doesn't match — explicit security failure
           return {
-            receiptConfirmed: true,
+            receiptConfirmed: false,
             confirmedBlake3Hash: actualHash,
-            rejectionReason: null,
-            rejectionMessage: null,
+            rejectionReason: 'RECEIPT_HASH_MISMATCH',
+            rejectionMessage:
+              `BLAKE3 receipt for route '${routeKey}' was found in MMKV but its ` +
+              `hash does not match. Expected: ${expectedBlake3Hash}, Actual: ${actualHash}. ` +
+              `This may indicate tampered state.`,
           };
         }
-        // Hash mismatch — do NOT fall through; this is an explicit security failure
-        return {
-          receiptConfirmed: false,
-          confirmedBlake3Hash: actualHash,
-          rejectionReason: 'RECEIPT_HASH_MISMATCH',
-          rejectionMessage:
-            `BLAKE3 receipt for route '${routeKey}' was found in MMKV but its ` +
-            `hash does not match. Expected: ${expectedBlake3Hash}, Actual: ${actualHash}. ` +
-            `This may indicate tampered state.`,
-        };
-      }
-
-      // No hash constraint — receipt presence is sufficient
-      if (actualHash) {
+        // No hash constraint — valid receipt presence is sufficient
         return {
           receiptConfirmed: true,
           confirmedBlake3Hash: actualHash,
@@ -158,6 +161,7 @@ export function requireReceiptBeforeRender(
           rejectionMessage: null,
         };
       }
+      // Fall through: either corrupt JSON or valid JSON with no hash field
     }
   } catch (mmkvErr: any) {
     // MMKV access error — fall through to tier 2

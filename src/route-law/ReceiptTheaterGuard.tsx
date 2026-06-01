@@ -630,6 +630,9 @@ export const ReceiptTheaterGuard: React.FC<ReceiptTheaterGuardProps> = ({
   // Track when verification started for OTel span duration
   const verifyStartRef = React.useRef<number>(Date.now());
 
+  // Track the active timeout handle so we can cancel it on unmount or early resolution
+  const timeoutHandleRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // ── Core verification logic ────────────────────────────────────────────────
 
   const runVerification = React.useCallback(
@@ -640,9 +643,10 @@ export const ReceiptTheaterGuard: React.FC<ReceiptTheaterGuardProps> = ({
 
       setTheaterState({ kind: 'PENDING_VERIFICATION' });
 
-      // Enforce timeout — race the lookup against a 3-second deadline
-      const timeoutPromise = new Promise<ReceiptLookupResult>((resolve) =>
-        setTimeout(
+      // Enforce timeout — race the lookup against the deadline
+      // Store the handle so it can be cancelled
+      const timeoutPromise = new Promise<ReceiptLookupResult>((resolve) => {
+        timeoutHandleRef.current = setTimeout(
           () =>
             resolve({
               found: false,
@@ -651,13 +655,20 @@ export const ReceiptTheaterGuard: React.FC<ReceiptTheaterGuardProps> = ({
               error: `Verification timed out after ${timeoutMs}ms`,
             }),
           timeoutMs
-        )
-      );
+        );
+      });
 
       let result: ReceiptLookupResult;
       try {
         result = await Promise.race([
-          lookupReceiptForRoute(routeKey, expectedBlake3Hash),
+          lookupReceiptForRoute(routeKey, expectedBlake3Hash).then((r) => {
+            // Cancel the timeout if lookup resolves first
+            if (timeoutHandleRef.current !== null) {
+              clearTimeout(timeoutHandleRef.current);
+              timeoutHandleRef.current = null;
+            }
+            return r;
+          }),
           timeoutPromise,
         ]);
       } catch (unexpectedErr: any) {
@@ -667,6 +678,13 @@ export const ReceiptTheaterGuard: React.FC<ReceiptTheaterGuardProps> = ({
           mismatched: false,
           error: `Unexpected error: ${unexpectedErr?.message ?? String(unexpectedErr)}`,
         };
+      }
+
+      // Cancel timeout if still running (e.g., the timeout resolved first but
+      // lookup finished shortly after — no harm calling clearTimeout on already-fired handles)
+      if (timeoutHandleRef.current !== null) {
+        clearTimeout(timeoutHandleRef.current);
+        timeoutHandleRef.current = null;
       }
 
       if (!isActive.current) return;
@@ -742,6 +760,11 @@ export const ReceiptTheaterGuard: React.FC<ReceiptTheaterGuardProps> = ({
     return () => {
       isActive.current = false;
       mmkvListener?.remove();
+      // Cancel any pending verification timeout to prevent open handle leaks
+      if (timeoutHandleRef.current !== null) {
+        clearTimeout(timeoutHandleRef.current);
+        timeoutHandleRef.current = null;
+      }
     };
   }, [routeKey, subscribeToMMKV, runVerification]);
 
