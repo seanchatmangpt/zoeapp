@@ -39,6 +39,9 @@ describe('AalstDashboard', () => {
     const { getByTestId, getByText } = render(<AalstDashboard />);
     
     expect(getByTestId('connection-status').children[0]).toBe('Connected');
+    expect(getByTestId('broadcast-badge')).toBeTruthy();
+    expect(getByText('BROADCAST ACTIVE - VAN DER AALST CERTIFIED')).toBeTruthy();
+    
     expect(getByTestId('log-item-1')).toBeTruthy();
     expect(getByTestId('log-item-2')).toBeTruthy();
     expect(getByTestId('log-item-3')).toBeTruthy();

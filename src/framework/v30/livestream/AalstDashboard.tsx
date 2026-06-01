@@ -65,9 +65,14 @@ export const AalstDashboard: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text testID="connection-status" style={styles.status}>
-        {isConnected ? 'Connected' : 'Disconnected'}
-      </Text>
+      <View style={styles.header}>
+        <Text testID="connection-status" style={styles.status}>
+          {isConnected ? 'Connected' : 'Disconnected'}
+        </Text>
+        <Text testID="broadcast-badge" style={styles.broadcastBadge}>
+          BROADCAST ACTIVE - VAN DER AALST CERTIFIED
+        </Text>
+      </View>
       <FlatList
         data={logs}
         keyExtractor={(item) => item.id}
@@ -85,11 +90,26 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#f5f5f5',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   status: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: '#333',
+  },
+  broadcastBadge: {
+    backgroundColor: '#2ecc71',
+    color: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    fontSize: 12,
+    fontWeight: 'bold',
+    overflow: 'hidden',
   },
   logItem: {
     padding: 12,
