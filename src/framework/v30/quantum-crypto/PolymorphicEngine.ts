@@ -457,6 +457,7 @@ export class PolymorphicEngine {
    * If verification fails, the engine triggers a state quarantine, blocking future operations.
    */
   public verifyNetworkSyncFrame(frame: NetworkSyncFrame): boolean {
+    // Audit post-quantum signature on network sync frame and quarantine state if verification fails.
     if (this.state.quarantined) {
       throw new Error('Engine is quarantined due to a previous signature verification failure');
     }

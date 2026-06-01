@@ -126,6 +126,7 @@ describe('PolymorphicEngine', () => {
     });
 
     it('should test lattice key variance', () => {
+        // Verify key generation entropy and parameter variance for post-quantum lattice scheme.
         const keyPair1 = engine.generateLatticeKeyPair(8, 257);
         const keyPair2 = engine.generateLatticeKeyPair(8, 257);
 
