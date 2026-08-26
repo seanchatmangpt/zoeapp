@@ -133,7 +133,7 @@ witness_marker!(
 );
 witness_marker!(
     /// WF-net soundness (van der Aalst) — the soundness criterion for workflow nets.
-    WfNetSoundnessPaper,
+    PetriNetSoundnessPaper,
     "wfnet-soundness-paper",
     WitnessFamily::Paper,
     "The Application of Petri Nets to Workflow Management (soundness)",
@@ -173,7 +173,7 @@ witness_marker!(
     ///
     /// Covers typed routing constructs (AND/XOR/OR split/join), cancellation
     /// regions, and multiple-instance tasks. An `Admission<T, YawlPaper>` is
-    /// distinguishable at the type level from `Admission<T, WfNetSoundnessPaper>`.
+    /// distinguishable at the type level from `Admission<T, PetriNetSoundnessPaper>`.
     YawlPaper,
     "yawl-paper",
     WitnessFamily::Paper,
@@ -185,7 +185,7 @@ witness_marker!(
     ///
     /// Covers the separable WF-net subclass and the WF-net → POWL 2.0
     /// transformation theorem. Needed to tag admissions against this authority.
-    SeparableWfNetPaper,
+    SeparablePetriNetPaper,
     "separable-wfnet-paper",
     WitnessFamily::Paper,
     "Hierarchical Decomposition of Separable Workflow-Nets",
@@ -236,7 +236,7 @@ witness_marker!(
     ///
     /// Names the alignment approach to conformance — the authority behind
     /// optimal and heuristic alignments between an event log and a process
-    /// model. Distinct from [`WfNetSoundnessPaper`] (structural soundness)
+    /// model. Distinct from [`PetriNetSoundnessPaper`] (structural soundness)
     /// and [`OcpqPaper`] (querying). Graduate to `wasm4pm` when an actual
     /// alignment computation is needed.
     AlignmentPaper,
@@ -323,12 +323,12 @@ witness_marker!(
     ///
     /// Names the authority under which a specific *object type* (e.g. `"order"`,
     /// `"item"`) within an OCEL 2.0 log is admitted or refused. Distinct from
-    /// [`Ocel20`], which names the overall standard: `OcelObjectType` names the
+    /// [`Ocel20`], which names the overall standard: `OCELObjectType` names the
     /// sub-authority that governs individual object-type declarations.
     ///
     /// Structure-only authority label; see [`Witness`]. Graduate to `wasm4pm`
     /// when type-level object classification must be *enforced*, not merely named.
-    OcelObjectType,
+    OCELObjectType,
     "ocel-object-type",
     WitnessFamily::Standard,
     "OCEL 2.0 object-type namespace",
@@ -340,12 +340,12 @@ witness_marker!(
     /// Names the authority under which a specific *event type* (activity name,
     /// e.g. `"place_order"`, `"ship"`) within an OCEL 2.0 log is admitted or
     /// refused. Distinct from [`Ocel20`], which names the overall standard:
-    /// `OcelEventType` names the sub-authority that governs individual activity
+    /// `OCELEventType` names the sub-authority that governs individual activity
     /// declarations.
     ///
     /// Structure-only authority label; see [`Witness`]. Graduate to `wasm4pm`
     /// when activity-type enforcement is needed.
-    OcelEventType,
+    OCELEventType,
     "ocel-event-type",
     WitnessFamily::Standard,
     "OCEL 2.0 event-type (activity) namespace",
@@ -357,12 +357,12 @@ witness_marker!(
     /// Names the authority under which a specific *attribute domain* (e.g.
     /// `"price"`, `"status"`, `"quantity"`) within an OCEL 2.0 object or event
     /// is admitted or refused. Distinct from [`Ocel20`] (the overall standard)
-    /// and [`OcelObjectType`] (the object-type namespace): `OcelAttributeType`
+    /// and [`OCELObjectType`] (the object-type namespace): `OCELEventAttributeType`
     /// governs individual attribute-domain declarations.
     ///
     /// Structure-only authority label; see [`Witness`]. Graduate to `wasm4pm`
     /// when attribute-domain validation is needed.
-    OcelAttributeType,
+    OCELEventAttributeType,
     "ocel-attribute-type",
     WitnessFamily::Standard,
     "OCEL 2.0 attribute-type namespace",
@@ -373,18 +373,18 @@ witness_marker!(
     ///
     /// Names the authority that governs lossless conversion of a *separable*
     /// WF-net into a POWL 2.0 model via the decomposition theorem (Definition 4.1
-    /// and Theorem 4.3 of the 2026 paper). An `Admission<T, WfNet2Powl>` asserts
+    /// and Theorem 4.3 of the 2026 paper). An `Admission<T, PetriNet2Powl>` asserts
     /// that the admitted value was produced by — or is compatible with — the
     /// Kourani 2026 WF-net→POWL conversion path.
     ///
-    /// Distinct from [`SeparableWfNetPaper`], which names the *separability
+    /// Distinct from [`SeparablePetriNetPaper`], which names the *separability
     /// subclass* authority, and from [`PowlPaper`], which names the POWL language
-    /// authority. `WfNet2Powl` names the *conversion* authority: the boundary
+    /// authority. `PetriNet2Powl` names the *conversion* authority: the boundary
     /// where a WF-net *becomes* a POWL model.
     ///
     /// Structure-only authority label; see [`Witness`]. The actual conversion
     /// (decomposition, language-equivalence check) graduates to `wasm4pm`.
-    WfNet2Powl,
+    PetriNet2Powl,
     "wfnet-to-powl",
     WitnessFamily::Paper,
     "WF-net to POWL 2.0 conversion (Kourani, Park & van der Aalst)",

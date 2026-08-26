@@ -325,7 +325,7 @@ pub enum ArcDirectionConst {
 /// The soundness state of a WF-net — tracks witnessing at the type level.
 ///
 /// `SoundnessState::Witnessed` is the non-forgeable state. Only the sanctioned
-/// `witness_soundness` path in `petri` produces a `WfNetConst<{Witnessed}>`.
+/// `witness_soundness` path in `petri` produces a `PetriNetConst<{Witnessed}>`.
 #[derive(ConstParamTy, PartialEq, Eq, Clone, Copy, Debug, Hash)]
 pub enum SoundnessState {
     /// Soundness not yet asserted.
@@ -547,9 +547,9 @@ pub enum ProcessShapeKind {
     /// An XES log (IEEE 1849).
     XesLog,
     /// An OCEL 2.0 log.
-    OcelLog,
+    OCEL,
     /// A directly-follows graph.
-    DirectlyFollowsGraph,
+    DFG,
     /// An object-centric directly-follows graph.
     ObjectCentricDfg,
     /// A Petri net.
@@ -621,7 +621,7 @@ pub enum ProcessTreeOperatorKind {
 ///
 /// Each variant names a specific control-flow pattern from the canonical 20-pattern
 /// catalogue. A type carrying `WorkflowPattern` as a const param asserts that it
-/// models that specific pattern at the type level — so `WfNetConst` claiming
+/// models that specific pattern at the type level — so `PetriNetConst` claiming
 /// `Pattern::ParallelSplit` cannot be silently confused with one claiming
 /// `Pattern::ExclusiveChoice`.
 ///

@@ -11,7 +11,7 @@
 //! pins the toolchain to nightly. The following features are declared at the
 //! crate root with no cfg gate:
 //!
-//! - `generic_const_exprs` — law machinery and `WfNetConst<SOUNDNESS>`
+//! - `generic_const_exprs` — law machinery and `PetriNetConst<SOUNDNESS>`
 //! - `adt_const_params` — `ConditionCell<BITS>`, `Between01<NUM,DEN>`, and
 //!   `Metric<KIND,NUM,DEN>`
 //! - `const_trait_impl` — compile-time trait dispatch in law surfaces
@@ -29,8 +29,8 @@
 //!   then exported back out (or graduated to `wasm4pm`) — never laundered
 //!   raw-to-raw.
 //! - A place where **refusal is first-class**: every serious surface refuses
-//!   with a *specific named law* (e.g. `DanglingEventObjectLink`,
-//!   `MissingFinalMarking`, `UnsoundWfNet`), never a bare `InvalidInput`.
+//!   with a *specific named law* (e.g. `DanglingOCELRelationship`,
+//!   `MissingFinalMarking`, `UnsoundPetriNet`), never a bare `InvalidInput`.
 //! - Built from **small, transparent, strongly-named types**: `PhantomData`
 //!   witness/state markers and zero-cost `#[repr(transparent)]` ID wrappers.
 //!
@@ -125,7 +125,7 @@
 //!         -> Result<Admission<bool, Ocel20>, Refusal<&'static str, Ocel20>>
 //!     {
 //!         if raw.value { Ok(Admission::new(true)) }
-//!         else { Err(Refusal::new("DanglingEventObjectLink")) }
+//!         else { Err(Refusal::new("DanglingOCELRelationship")) }
 //!     }
 //! }
 //!
@@ -263,8 +263,8 @@ pub use crate::eventlog::{Event, EventLog, Trace};
 pub use crate::evidence::Evidence;
 pub use crate::ids::{ActivityId, CaseId, EventId, ObjectId};
 pub use crate::loss::{LossPolicy, ProjectionName};
-pub use crate::ocel::OcelLog;
-pub use crate::petri::{PetriNet, WfNet, WfNetConst};
+pub use crate::ocel::OCEL;
+pub use crate::petri::{PetriNet, PetriNet, PetriNetConst};
 pub use crate::receipt::ReceiptEnvelope;
 pub use crate::state::{Admitted, Exportable, Parsed, Projected, Raw, Receipted, Refused};
 pub use crate::streaming::{OfflineEvidence, OnlineEvidence};
