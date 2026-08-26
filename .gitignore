@@ -37,3 +37,7 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# agent scratch briefings/handoffs (per-run orchestration state, not source)
+.agents/
+tmp_compat_full/
