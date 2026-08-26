@@ -4,12 +4,37 @@
     "strict": true,
     "moduleResolution": "bundler",
     "skipLibCheck": true,
-    "types": ["nativewind/types"],
+    "types": [
+      "nativewind/types"
+    ],
     "paths": {
-      "@/*": ["./*"],
-      "@pcp/*": ["../pcp/src/framework/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@pcp/*": [
+        "../pcp/src/framework/*"
+      ],
+      "@wasm4pm-compat/*": [
+        "../wasm4pm-compat/src/ts/*"
+      ],
+      "@types/wasm4pm": [
+        "../pcp/src/types/bindings"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],
-  "exclude": ["node_modules", "supabase", "scripts", "_templates", "src/framework", "pcp_symlink"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "supabase",
+    "scripts",
+    "_templates",
+    "src/framework",
+    "pcp_symlink"
+  ]
 }

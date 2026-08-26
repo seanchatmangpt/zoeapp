@@ -7,7 +7,10 @@ const path = require('path');
 const config = getDefaultConfig(__dirname);
 
 // Add the PCP framework directory to watch folders
-config.watchFolders = [path.resolve(__dirname, '../pcp')];
+config.watchFolders = [
+  path.resolve(__dirname, '../pcp'),
+  path.resolve(__dirname, '../wasm4pm-compat')
+];
 
 // Ensure resolver looks in the correct places
 config.resolver.nodeModulesPaths = [
