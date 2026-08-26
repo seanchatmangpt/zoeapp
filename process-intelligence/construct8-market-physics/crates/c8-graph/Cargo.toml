@@ -1,0 +1,11 @@
+[package]
+name = "c8-graph"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+c8-core = { path = "../c8-core" }
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }

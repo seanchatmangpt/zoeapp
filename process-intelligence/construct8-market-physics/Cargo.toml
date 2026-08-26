@@ -1,0 +1,12 @@
+[workspace]
+members = [
+    "crates/c8-core", "crates/c8-market",
+    "crates/c8-time", "crates/c8-graph",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Construct8 Swarm Agent 2"]
+license = "MIT"

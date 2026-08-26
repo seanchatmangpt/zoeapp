@@ -1,0 +1,9 @@
+[package]
+name = "c8-time"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
